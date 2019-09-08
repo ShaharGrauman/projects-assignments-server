@@ -1,4 +1,6 @@
 package com.grauman.amdocs.dao.interfaces;
 
-public interface IProjectsDAO extends IDAO{
+import com.grauman.amdocs.models.Project;
+
+public interface IProjectsDAO extends IDAO<Project>{
 }
