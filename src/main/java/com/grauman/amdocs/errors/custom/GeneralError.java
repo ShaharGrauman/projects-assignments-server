@@ -1,12 +1,12 @@
 package com.grauman.amdocs.errors.custom;
 
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class GeneralError {
-    private int status;
-    private String message;
+    private HttpStatus status;
+    private String errorMessage;
 }
