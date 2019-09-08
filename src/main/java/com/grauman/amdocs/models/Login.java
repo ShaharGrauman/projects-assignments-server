@@ -1,8 +1,12 @@
 package com.grauman.amdocs.models;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Login {
 	
 	private String username;
