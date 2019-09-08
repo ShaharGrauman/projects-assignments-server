@@ -18,7 +18,7 @@ import com.grauman.amdocs.models.Login;
 public class LoginController {
 
 	@Autowired
-	ILoginDAO loginDAO;
+	private ILoginDAO loginDAO;
 
 	@GetMapping("")
 	public ResponseEntity<String> login(){

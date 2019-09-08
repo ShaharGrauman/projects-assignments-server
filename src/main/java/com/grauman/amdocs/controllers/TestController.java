@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class TestController {
 
 	@Autowired
-	LoginDAO dao;
+	private LoginDAO dao;
 
 	@GetMapping("/string")
 	public ResponseEntity<List<Login>> test1() throws IOException, SQLException {
