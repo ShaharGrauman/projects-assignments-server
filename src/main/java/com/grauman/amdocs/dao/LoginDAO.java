@@ -15,6 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class LoginDAO implements ILoginDAO {
@@ -35,9 +37,9 @@ public class LoginDAO implements ILoginDAO {
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
 
-                        Users.add(Login.builder()
-                                .username(result.getString("username"))
-                                .password(result.getString("password")).build()
+                        Users.add(new Login(
+                                result.getString("username"),
+                                result.getString("password"))
                         );
                     }
                 }
@@ -72,7 +74,13 @@ public class LoginDAO implements ILoginDAO {
 
     @Override
     public String validate(String username, String password) throws SQLException{
-        //  String[] credentials = details.split(":");
+
+        Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+        Matcher usernameMatcher = pattern.matcher(username);
+        Matcher passwordMatcher = pattern.matcher(password);
+
+        if (passwordMatcher.find() || usernameMatcher.find())
+            throw new InvalidCredentials("Illegal characters were found");
 
         try (Connection conn = db.getConnection()){
 
@@ -90,12 +98,10 @@ public class LoginDAO implements ILoginDAO {
                         }
                     }
                 }
-
-
             }
 
         }
-        return 	Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 
     }
 }
