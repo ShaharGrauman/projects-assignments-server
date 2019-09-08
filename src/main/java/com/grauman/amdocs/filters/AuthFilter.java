@@ -17,9 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthFilter implements Filter {
 
-
 	@Autowired
-	ILoginDAO dao;
+	private ILoginDAO dao;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -40,15 +39,15 @@ public class AuthFilter implements Filter {
 			System.out.println("auth header: " + details);
 			String[] credentials = details.split(":");
 
+			// catch SQLException and rethrow as a runtime exception
+			// since the method does not allow to add the throws SQLException deceleration to it
 			try {
+
 				dao.validate(credentials[0],credentials[1]);
 
 			}catch (SQLException e){
 				throw new RuntimeException(e);
 			}
-
-
-
 		}
 
 		chain.doFilter(request, response);
