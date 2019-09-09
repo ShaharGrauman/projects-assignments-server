@@ -26,7 +26,7 @@ public class LoginDAO implements ILoginDAO {
     @Override
     public List<Login> findAll() throws SQLException {
 
-        final String query = "SELECT * FROM user";
+        final String query = "SELECT * FROM users";
 
         List<Login> Users = new ArrayList<>();
 
@@ -38,7 +38,7 @@ public class LoginDAO implements ILoginDAO {
                     while (result.next()) {
 
                         Users.add(new Login(
-                                result.getString("username"),
+                                result.getString("email"),
                                 result.getString("password"))
                         );
                     }
@@ -75,16 +75,17 @@ public class LoginDAO implements ILoginDAO {
     @Override
     public String validate(String username, String password) throws SQLException{
 
-        Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
-        Matcher usernameMatcher = pattern.matcher(username);
-        Matcher passwordMatcher = pattern.matcher(password);
-
-        if (passwordMatcher.find() || usernameMatcher.find())
-            throw new InvalidCredentials("Illegal characters were found");
+//        Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
+//        Matcher usernameMatcher = pattern.matcher(username);
+//        Matcher passwordMatcher = pattern.matcher(password);
+//
+//        if (passwordMatcher.find() || usernameMatcher.find())
+    	if(username.isEmpty() || password.isEmpty())
+            throw new InvalidCredentials("username and password are required");
 
         try (Connection conn = db.getConnection()){
 
-            try(PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM User WHERE username = ?")){
+            try(PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM users WHERE email = ?")){
                 preparedStatement.setString(1,username);
                // preparedStatement.setString(2,password);
 
