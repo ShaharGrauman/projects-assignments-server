@@ -397,3 +397,22 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2019-09-10 12:06:30
+
+
+
+ALTER TABLE `assignments`.`users` 
+CHANGE COLUMN `phone` `phone` TEXT NULL DEFAULT NULL ;
+
+ALTER TABLE admin.users
+ADD image text;
+
+INSERT INTO `assignments`.`worksite` (`name`, `country_id`, `city`) VALUES ('HiTech Park', '1', 'Nazareth');
+
+INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
+VALUES ('1212', 'Shahar', 'Grauman', 'graumanoz@gmail.com', 'R&D', '1', 'Israel', '0541234567', b'1', b'0', b'0', '123456');
+
+INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
+VALUES ('1212', 'Shahar', 'Grauman', 'graumanoz@gmail.com', 'R&D', '1', 'Israel', '0541234567', b'1', b'0', b'0', '123456');
+
+INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `manager_id`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
+VALUES ('3232', 'Majd', 'Rizik', 'majdrizik@gmail.com', '1', 'R&D', '1', 'Israel', '0541234568', b'1', b'0', b'0', '123456');
