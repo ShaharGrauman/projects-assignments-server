@@ -25,7 +25,7 @@ public class EmployeesDAO implements IEmployeesDAO {
     public List<Employee> findAll() throws SQLException {
     	
     	List<Employee> users=new ArrayList<Employee>();
-		String sqlAllUserscommand="select U.id,U.employee_number,concat(U.first_name,U.last_name) as name,"
+		String sqlAllUserscommand="select U.id,U.employee_number,concat(U.first_name,' ',U.last_name) as name,"
 								+ "U.department,concat(WS.name,C.name) as work_site"
 								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
 								+ " JOIN country C ON WS.country_id=C.id";
@@ -73,7 +73,7 @@ public class EmployeesDAO implements IEmployeesDAO {
   	}
   //By Name
   		public List<Employee> find(String name) throws SQLException {
-
+  			
   			List <Employee> found = new ArrayList<>();
   			List<Role> employeeRoles=new ArrayList<>();
 
