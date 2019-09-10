@@ -14,7 +14,7 @@ import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class AuthFilter implements Filter {
 
 	@Autowired
