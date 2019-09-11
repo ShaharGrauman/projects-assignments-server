@@ -17,6 +17,12 @@ public class FinalEmployeeSkill {
 	private int level;
 	private String comment;
 	private Status status;
+
+	public FinalEmployeeSkill(int employeeSkillId, String employeeSkillName, int level){
+		this.employeeSkillId=employeeSkillId;
+		this.skillName=employeeSkillName;
+		this.level=level;
+	}
 	
 	
 
