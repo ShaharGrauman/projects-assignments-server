@@ -7,10 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Skill {
-	private String skillname;
-	private int skillid;
-	private SkillType type;
-	
+public class ResponseCode {
+
+	private int code;
 	
 }

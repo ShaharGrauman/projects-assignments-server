@@ -1,16 +1,17 @@
 package com.grauman.amdocs.models;
 
+import java.sql.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class Skill {
-	private String skillname;
-	private int skillid;
-	private SkillType type;
+public class SkillUpdatesHistory {
+//POJO for approved skill history 
 	
-	
+	private Integer level;
+	private Date date;
+
 }
