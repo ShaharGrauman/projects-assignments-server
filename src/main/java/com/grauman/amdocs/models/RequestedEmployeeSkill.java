@@ -13,8 +13,11 @@ public class RequestedEmployeeSkill {
 
 	private String employeeName;
 	private int employeeSkillId;
+	private int employeeId;
+	private int skillId;
 	private String skillName;
 	private Date date;
 	private int level;
+	private SkillType type;
 	
 }
