@@ -416,3 +416,19 @@ VALUES ('1212', 'Shahar', 'Grauman', 'graumanoz@gmail.com', 'R&D', '1', 'Israel'
 
 INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `manager_id`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
 VALUES ('3232', 'Majd', 'Rizik', 'majdrizik@gmail.com', '1', 'R&D', '1', 'Israel', '0541234568', b'1', b'0', b'0', '123456');
+
+
+ALTER TABLE `admin`.`permissions` 
+DROP COLUMN `role_id`,
+DROP INDEX `role_id` ;
+
+
+CREATE TABLE `admin`.`rolepermissions` (
+  `role_permission_id ` INT NOT NULL,
+  `permission_id` INT NOT NULL,
+  PRIMARY KEY (`role_permission_id `, `permission_id`));
+
+ALTER TABLE rolepermissions
+ADD CONSTRAINT role_permission_id FOREIGN KEY (role_permission_id) REFERENCES roles(id),
+ADD CONSTRAINT Permission_id FOREIGN KEY (Permission_id) REFERENCES permissions(id);
+
