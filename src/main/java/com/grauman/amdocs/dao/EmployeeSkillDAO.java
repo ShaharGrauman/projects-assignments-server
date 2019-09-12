@@ -15,14 +15,14 @@ import com.grauman.amdocs.dao.interfaces.IEmployeeSkillDAO;
 import com.grauman.amdocs.dao.interfaces.ISkillsDAO;
 import com.grauman.amdocs.errors.custom.InvalidDataException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
-import com.grauman.amdocs.models.ApprovedSkillHistory;
 import com.grauman.amdocs.models.EmployeeSkill;
 import com.grauman.amdocs.models.FinalEmployeeSkill;
 import com.grauman.amdocs.models.RequestedEmployeeSkill;
 import com.grauman.amdocs.models.Skill;
 import com.grauman.amdocs.models.SkillType;
-import com.grauman.amdocs.models.SkillUpdatesHistory;
 import com.grauman.amdocs.models.Status;
+import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
+import com.grauman.amdocs.models.vm.SkillUpdatesHistoryVM;
 
 @Service
 public class EmployeeSkillDAO implements IEmployeeSkillDAO {
@@ -138,10 +138,10 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	}
 
 	@Override
-	public List<SkillUpdatesHistory> findSkillUpdates(int skillId, int employeeId, SkillType skillType)
+	public List<SkillUpdatesHistoryVM> findSkillUpdates(int skillId, int employeeId, SkillType skillType)
 			throws SQLException {
 
-		List<SkillUpdatesHistory> skillDetails = new ArrayList<SkillUpdatesHistory>();
+		List<SkillUpdatesHistoryVM> skillDetails = new ArrayList<SkillUpdatesHistoryVM>();
 
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn
@@ -154,7 +154,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 				ResultSet result = command.executeQuery();
 				while (result.next()) {
-					skillDetails.add(new SkillUpdatesHistory(result.getInt("level"), result.getDate("date")));
+					skillDetails.add(new SkillUpdatesHistoryVM(result.getInt("level"), result.getDate("date")));
 				}
 
 				result.close();
@@ -167,8 +167,8 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	}
 
 	@Override
-	public List<ApprovedSkillHistory> findApprovedSkills(int employeeId, SkillType skillType) throws SQLException {
-		List<ApprovedSkillHistory> approvedEmployeeSkills = new ArrayList<ApprovedSkillHistory>();
+	public List<ApprovedSkillHistoryVM> findApprovedSkills(int employeeId, SkillType skillType) throws SQLException {
+		List<ApprovedSkillHistoryVM> approvedEmployeeSkills = new ArrayList<ApprovedSkillHistoryVM>();
 
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn
@@ -182,7 +182,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 				ResultSet result = command.executeQuery();
 				while (result.next()) {
-					approvedEmployeeSkills.add(new ApprovedSkillHistory(result.getString("name"),
+					approvedEmployeeSkills.add(new ApprovedSkillHistoryVM(result.getString("name"),
 							findSkillUpdates(result.getInt("skill_id"), result.getInt("user_id"), skillType)));
 				}
 				result.close();

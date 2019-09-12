@@ -3,12 +3,12 @@ package com.grauman.amdocs.dao.interfaces;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.grauman.amdocs.models.ApprovedSkillHistory;
 import com.grauman.amdocs.models.EmployeeSkill;
 import com.grauman.amdocs.models.FinalEmployeeSkill;
 import com.grauman.amdocs.models.RequestedEmployeeSkill;
 import com.grauman.amdocs.models.SkillType;
-import com.grauman.amdocs.models.SkillUpdatesHistory;
+import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
+import com.grauman.amdocs.models.vm.SkillUpdatesHistoryVM;
 
 public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 
@@ -27,7 +27,7 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 	 * @return list of skill updates by skill id and employee id that are approved
 	 * @throws SQLException
 	 */
-	public List<SkillUpdatesHistory> findSkillUpdates(int skillId, int employeeId, SkillType skillType)
+	public List<SkillUpdatesHistoryVM> findSkillUpdates(int skillId, int employeeId, SkillType skillType)
 			throws SQLException;
 
 	/**
@@ -37,7 +37,7 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 	 * @return list of approved skills for single employee
 	 * @throws SQLException
 	 */
-	public List<ApprovedSkillHistory> findApprovedSkills(int employeeId, SkillType skillType) throws SQLException;
+	public List<ApprovedSkillHistoryVM> findApprovedSkills(int employeeId, SkillType skillType) throws SQLException;
 
 	/**
 	 * 

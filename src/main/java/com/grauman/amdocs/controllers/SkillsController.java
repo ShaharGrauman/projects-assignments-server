@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.interfaces.IEmployeeSkillDAO;
-import com.grauman.amdocs.models.ApprovedSkillHistory;
 import com.grauman.amdocs.models.EmployeeSkill;
 import com.grauman.amdocs.models.FinalEmployeeSkill;
 import com.grauman.amdocs.models.RequestedEmployeeSkill;
 import com.grauman.amdocs.models.SkillType;
+import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
 
 @RestController
 @RequestMapping("/skills")
@@ -29,8 +29,8 @@ public class SkillsController {
 
 	
 	@GetMapping("/approvedskills/{user_id}/{type}")
-	public @ResponseBody ResponseEntity<List<ApprovedSkillHistory>> getEmployeeSkillsUpdateByEmployeeIdAndSkillType(@PathVariable int user_id,@PathVariable SkillType type) throws SQLException {
-		List<ApprovedSkillHistory> approvedSkillHistories=employeeSkillDAO.findApprovedSkills(user_id, type);
+	public @ResponseBody ResponseEntity<List<ApprovedSkillHistoryVM>> getEmployeeSkillsUpdateByEmployeeIdAndSkillType(@PathVariable int user_id,@PathVariable SkillType type) throws SQLException {
+		List<ApprovedSkillHistoryVM> approvedSkillHistories=employeeSkillDAO.findApprovedSkills(user_id, type);
 		return ResponseEntity.ok().body(approvedSkillHistories);
 	}
 	@GetMapping("/employeeskills/{user_id}/{type}")
