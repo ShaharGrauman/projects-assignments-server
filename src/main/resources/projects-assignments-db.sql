@@ -403,7 +403,7 @@ UNLOCK TABLES;
 ALTER TABLE `assignments`.`users` 
 CHANGE COLUMN `phone` `phone` TEXT NULL DEFAULT NULL ;
 
-ALTER TABLE admin.users
+ALTER TABLE assignments.users
 ADD image text;
 
 INSERT INTO `assignments`.`worksite` (`name`, `country_id`, `city`) VALUES ('HiTech Park', '1', 'Nazareth');
@@ -418,12 +418,13 @@ INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`,
 VALUES ('3232', 'Majd', 'Rizik', 'majdrizik@gmail.com', '1', 'R&D', '1', 'Israel', '0541234568', b'1', b'0', b'0', '123456');
 
 
-ALTER TABLE `admin`.`permissions` 
+ALTER TABLE `assignments`.`permissions` 
+DROP FOREIGN KEY role_id,
 DROP COLUMN `role_id`,
 DROP INDEX `role_id` ;
 
 
-CREATE TABLE `admin`.`rolepermissions` (
+CREATE TABLE `assignments`.`rolepermissions` (
   `role_permission_id ` INT NOT NULL,
   `permission_id` INT NOT NULL,
   PRIMARY KEY (`role_permission_id `, `permission_id`));
