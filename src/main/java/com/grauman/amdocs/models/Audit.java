@@ -14,7 +14,8 @@ import lombok.Setter;
 public class Audit {
 	private Integer id;
 	private Integer employeeNumber;
-	private String name;
+	private String firstName;
+	private String lastName;
 	private Date dateTime;
 	private Integer userId;
 	private String activity;
@@ -33,12 +34,13 @@ public class Audit {
         this.dateTime=dateTime;
         this.activity=activity;
     }
-    public Audit(Integer id,Integer employeeNumber,String name, Date dateTime,String activity) {
+    public Audit(Integer id,Integer employeeNumber,String firstName,String lastName, Date dateTime,String activity) {
         this.id=id;
         this.employeeNumber=employeeNumber;
+        this.firstName=firstName;
+        this.lastName=lastName;
         this.dateTime=dateTime;
         this.activity=activity;
-        this.name=name;
     }
 	
 }

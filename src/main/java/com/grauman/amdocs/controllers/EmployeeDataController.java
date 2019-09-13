@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.EmployeeDataDAO;
+import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.Department;
 import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Role;
@@ -26,39 +28,72 @@ import com.grauman.amdocs.models.WorkSite;
 public class EmployeeDataController {
 	@Autowired
 	private EmployeeDataDAO employeeDataDAO;
+	
+//All Employees
+	@GetMapping("")
+	public ResponseEntity<List<EmployeeData>> all() throws SQLException {
+		List<EmployeeData> employee= employeeDataDAO.findAll();
+		return ResponseEntity.ok().body(employee);
+		}
 //Employee
-	@GetMapping("/{id}")
-	public ResponseEntity<EmployeeData> findEmployeeById(@PathVariable int id) throws SQLException {
+	@GetMapping("/id")
+	public ResponseEntity<EmployeeData> findEmployeeById(@RequestParam int id) throws SQLException {
 		EmployeeData employee=employeeDataDAO.find(id);
 		return ResponseEntity.ok().body(employee);
 	}
 //Add Employee
-    @PostMapping("")
-    public ResponseEntity<EmployeeData> newEmployee(@RequestBody EmployeeData employee) throws SQLException{
-    	EmployeeData employeeResult = employeeDataDAO.add(employee);
-    	return ResponseEntity.ok().body(employeeResult);
-    }
+	@PostMapping("")
+	public ResponseEntity<EmployeeData> newEmployee(@RequestBody EmployeeData employee) throws SQLException{
+		EmployeeData employeeResult = employeeDataDAO.add(employee);
+		return ResponseEntity.ok().body(employeeResult);
+	}
 //Update Employee
-    @PutMapping("/{id}")
-    public ResponseEntity<EmployeeData> updateEmployeeInfo(@PathVariable int id, @RequestBody EmployeeData employee) throws SQLException {
-    	EmployeeData employeeByID = employeeDataDAO.update(employee);
-    	return ResponseEntity.ok().body(employeeByID); 
-}
-
+	@PutMapping("/update/id")
+	public ResponseEntity<EmployeeData> updateEmployeeInfo(@RequestParam int id, @RequestBody EmployeeData employee) throws SQLException {
+		EmployeeData employeeByID = employeeDataDAO.update(employee);
+		return ResponseEntity.ok().body(employeeByID); 
+	}
 //Delete Employee
-    @DeleteMapping("/{id}")
-    public ResponseEntity<EmployeeData> deleteEmployee(@PathVariable Integer id) throws SQLException {
-    	EmployeeData deletedEmployee = employeeDataDAO.delete(id);
-    	return ResponseEntity.ok().body(deletedEmployee);   
-    	}
-    
+	@DeleteMapping("/delete/id")
+	public ResponseEntity<EmployeeData> deleteEmployee(@RequestParam Integer id) throws SQLException {
+		EmployeeData deletedEmployee = employeeDataDAO.delete(id);
+		return ResponseEntity.ok().body(deletedEmployee);   
+	}
+	@GetMapping("/name")
+	public ResponseEntity<List<EmployeeData>> findByName(@RequestParam String name) throws SQLException {
+		List<EmployeeData> employeeByName=employeeDataDAO.filterByName(name);
+		return ResponseEntity.ok().body(employeeByName);
+		}
+	@GetMapping("/role")
+	public ResponseEntity<List<EmployeeData>> findByRole(@RequestParam String role) throws SQLException {
+		List<EmployeeData> employeeByRole=employeeDataDAO.filterByRole(role);
+		return ResponseEntity.ok().body(employeeByRole);
+	}
+	@GetMapping("/department")
+	public ResponseEntity<List<EmployeeData>> findByDepartment(@RequestParam String department) throws SQLException {
+		List<EmployeeData> employeeByDepartment=employeeDataDAO.filterByDepartment(department);
+		return ResponseEntity.ok().body(employeeByDepartment);
+	}
+	@GetMapping("/worksite")
+	public ResponseEntity<List<EmployeeData>> findByWorkSite(@RequestParam String worksite) throws SQLException {
+		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByWorkSite(worksite);
+		return ResponseEntity.ok().body(employeeByWorSite);
+	}
+	@GetMapping("/country")
+	public ResponseEntity<List<EmployeeData>> findByCountry(@RequestParam String country) throws SQLException {
+		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByCountry(country);
+		return ResponseEntity.ok().body(employeeByWorSite);
+	}
+	
 //Unlock Employee
-    @PutMapping("/unlock/{id}")
-    public ResponseEntity<EmployeeData>  unlockEmployee(@PathVariable Integer id) throws SQLException {
-    	EmployeeData unlockedEmployee = employeeDataDAO.unlock(id);
-    	return ResponseEntity.ok().body(unlockedEmployee);    
-    	}
-    
+	@PutMapping("/unlock/id")
+	public ResponseEntity<EmployeeData>  unlockEmployee(@RequestParam Integer id) throws SQLException {
+		EmployeeData unlockedEmployee = employeeDataDAO.unlock(id);
+		return ResponseEntity.ok().body(unlockedEmployee);    
+	}
+	
+//################################################################################
+
 //Select Work Sites
 	@GetMapping("/WorkSites")
 	public ResponseEntity<List<WorkSite>> allSites() throws SQLException {
@@ -72,7 +107,6 @@ public class EmployeeDataController {
 		return ResponseEntity.ok().body(roles);
 
     }
-
 //Select Departments
     @GetMapping("/departments")
     public ResponseEntity<List<Department>> allDepartments() throws SQLException {
@@ -85,5 +119,35 @@ public class EmployeeDataController {
     public ResponseEntity<List<EmployeeData>> allManagers() throws SQLException {
     	List<EmployeeData>managers= employeeDataDAO.findAllManagers();
     	return ResponseEntity.ok().body(managers);
+    }
+//Select countries	
+    @GetMapping("/countries")
+    public ResponseEntity<List<Country>> allCountries() throws SQLException {
+    	List<Country>countries= employeeDataDAO.findAllCountries();
+    	return ResponseEntity.ok().body(countries);
+    }
+//Number Of Employees
+    @GetMapping("/countEmployees")
+    public Integer numberOfEmployees() throws SQLException {
+    	Integer Counter= employeeDataDAO.countEmployees();
+    	return Counter;
+    }
+//Number Of Roles
+    @GetMapping("/countRoles")
+    public Integer numberOfRoles() throws SQLException {
+    	Integer Counter= employeeDataDAO.countRoles();
+    	return Counter;
+    }
+//Number Of Departments
+    @GetMapping("/countDepartments")
+    public Integer numberOfDepartments() throws SQLException {
+    	Integer Counter= employeeDataDAO.countDepartments();
+    	return Counter;
+    }
+//Number Of Countries
+    @GetMapping("/countWorkSites")
+    public Integer numberOfWorkSites() throws SQLException {
+    	Integer Counter= employeeDataDAO.countWorkSites();
+    	return Counter;
     }
 }

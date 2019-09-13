@@ -26,7 +26,9 @@ public class RoleDAO implements IRoleDAO{
 
 		String sqlFindRoles="select id,name from roles";
 		String findRolePermissions="select P.id,P.name"
-								+ " from roles R JOIN permissions P ON R.id=P.role_id where P.role_id=?";
+				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_permission_id"
+				+ " where RP.permission_id=P.id AND RP.role_permission_id=?";
+				
 		
 		try(Connection conn = db.getConnection()){			
 			try(Statement command = conn.createStatement()){
@@ -43,8 +45,9 @@ public class RoleDAO implements IRoleDAO{
 						command2.setInt(1,role.getId());
 						ResultSet result2=command2.executeQuery();
 						List<Permission> rolePermissions=new ArrayList<>();
-
+						
 						while(result2.next()){
+							System.out.println(role.getId());
 							rolePermissions.add(new Permission(
 									result2.getInt(1),
 									result2.getString(2)
@@ -62,15 +65,59 @@ public class RoleDAO implements IRoleDAO{
 
 	@Override
 	public Role find(int id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		Role role=null;
+		String sqlRole = "Select * From roles where id=?";
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement statement=conn.prepareStatement(sqlRole)) {
+				statement.setInt(1,id);
+				ResultSet result=statement.executeQuery();
+				if(result.next()) {
+					role=new Role(result.getInt(1),
+								  result.getString(2),
+								  result.getString(3));
+							
+				}
+			}
+		}
+		return role;
 	}
 
 	@Override
-	public Role add(Role movie) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public Role add(Role role) throws SQLException {
+		Role newRole=null;
+		int roleId;
+		List<Permission> rolePermissions=role.getPermissions();
+
+		String sqlAddRole="Insert INTO roles (name,description) values(?,?)";
+		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_permission_id,permission_id) values(?,?)";
+
+
+		try(Connection conn = db.getConnection()){
+			try(PreparedStatement statement=conn.prepareStatement(sqlAddRole,Statement.RETURN_GENERATED_KEYS)){
+				statement.setString(1,role.getName());
+				statement.setString(2,role.getDescription());
+				
+				int rowCountUpdatedRole = statement.executeUpdate();
+
+				ResultSet ids = statement.getGeneratedKeys();
+				while(ids.next()) {
+					roleId = ids.getInt(1);
+					newRole = find(roleId);
+				}
+			}
+			try(PreparedStatement statement2=conn.prepareStatement(sqlLinkRoleWithpermission)){
+				for(int i=0;i<rolePermissions.size();i++) {
+					statement2.setInt(1,newRole.getId());
+					statement2.setInt(2,rolePermissions.get(i).getId());
+					int rowCountUpdatedPermission = statement2.executeUpdate();
+				}
+			}
+		}
+	 
+		return newRole;
+
 	}
+
 
 	@Override
 	public Role update(Role movie) throws SQLException {

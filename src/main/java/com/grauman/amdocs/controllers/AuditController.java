@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.AuditDAO;
@@ -25,21 +26,21 @@ public class AuditController {
 		List<Audit> audit=auditDAO.findAll();
  		return ResponseEntity.ok().body(audit);  
 	}
-	@GetMapping("/{number}")
-    public ResponseEntity<List<Audit>> findBynumber(@PathVariable int number) throws SQLException{
+	@GetMapping("/number")
+    public ResponseEntity<List<Audit>> findBynumber(@RequestParam int number) throws SQLException{
         List<Audit>employeeAudit=auditDAO.searchAuditByEmployeeNumber(number);
  		return ResponseEntity.ok().body(employeeAudit);  
 
     }
-    @GetMapping("/{datefrom}")
-    public ResponseEntity<List<Audit>> findByDateFrom(@PathVariable Date datefrom) throws SQLException{
+    @GetMapping("/datefrom")
+    public ResponseEntity<List<Audit>> findByDateFrom(@RequestParam Date datefrom) throws SQLException{
          List<Audit> auditByDateFrom=auditDAO.searchAuditByDateFrom(datefrom);
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
     
-    @GetMapping("/{dateto}")
-    public ResponseEntity<List<Audit>> findByDateTo(@PathVariable Date dateto) throws SQLException{
+    @GetMapping("/dateto")
+    public ResponseEntity<List<Audit>> findByDateTo(@RequestParam Date dateto) throws SQLException{
         List<Audit>auditByDateTo= auditDAO.searchAuditByDateTo(dateto);
   		return ResponseEntity.ok().body(auditByDateTo);  
 
