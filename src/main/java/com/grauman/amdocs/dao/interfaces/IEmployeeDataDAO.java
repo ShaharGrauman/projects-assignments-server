@@ -14,4 +14,8 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	 List<Role> findAllRoles() throws SQLException;
 	 List<Department> findAllDepartments() throws SQLException;
 	 List<EmployeeData> findAllManagers() throws SQLException;
+//	 List<EmployeeData> getEmployeesByManagerID (int managerID,int pageNumber,int limit) throws SQLException;
+//	 List<EmployeeData> getEmployeesByProjectID(int projectid) throws SQLException;
+//	 List<EmployeeData> searchEmployeesBySkillID(int skillID, int pageNumber, int limit) throws SQLException;
+//	 List<EmployeeData> searchEmployeesBySkillSet(List<Integer> skillSet, int pageNumber, int limit) throws SQLException;
 }
