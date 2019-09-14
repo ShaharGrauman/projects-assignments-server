@@ -43,9 +43,9 @@ public class AuditDAO implements IAuditDAO{
 	    }
 	public List<Audit> searchAuditByEmployeeNumber(int number) throws SQLException {
         List<Audit> audit = new ArrayList<>();
-        String sqlSitesCommand = "Select A.id,A.employee_number,CONCAT(U.first_name,' ',U.last_name) as name,"
-                + "A.date_time,A.activity from audit A join users U on U.id=A.user_id"
-                + " where employee_number=?";
+        String sqlSitesCommand = "Select A.id,A.employee_number,U.first_name,U.last_name,"
+        					   + " A.date_time,A.activity from audit A join users U on U.id=A.user_id"
+        					   + " where U.employee_number=?";
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
                 command.setInt(1, number);
@@ -55,8 +55,9 @@ public class AuditDAO implements IAuditDAO{
                             result.getInt(1),
                             result.getInt(2),
                             result.getString(3),
-                            result.getDate(4),
-                            result.getString(5)));
+                            result.getString(4),
+                            result.getDate(5),
+                            result.getString(6)));
                 }
             }
         }
@@ -67,7 +68,7 @@ public class AuditDAO implements IAuditDAO{
     // search by date from
     public List<Audit> searchAuditByDateFrom(Date datefrom) throws SQLException{
         List<Audit> audit = new ArrayList<>();
-        String sqlSitesCommand = "Select A.id,A.employee_number,CONCAT(U.first_name,' ',U.last_name) as name,"
+        String sqlSitesCommand = "Select A.id,A.employee_number,U.first_name,U.last_name,"
                 + "A.date_time,A.activity from audit A join users U on U.id=A.user_id"
                 + " where date(A.date_time)>?";
         try (Connection conn = db.getConnection()) {
@@ -79,8 +80,9 @@ public class AuditDAO implements IAuditDAO{
                             result.getInt(1),
                             result.getInt(2),
                             result.getString(3),
-                            result.getDate(4),
-                            result.getString(5)));
+                            result.getString(4),
+                            result.getDate(5),
+                            result.getString(6)));
                 }
             }
         }
@@ -92,7 +94,7 @@ public class AuditDAO implements IAuditDAO{
     // search by date To
         public List<Audit> searchAuditByDateTo(Date dateto) throws SQLException{
             List<Audit> audit = new ArrayList<>();
-            String sqlSitesCommand = "Select A.id,A.employee_number,CONCAT(U.first_name,' ',U.last_name) as name,"
+            String sqlSitesCommand = "Select A.id,A.employee_number,U.first_name,U.last_name,"
                     + "A.date_time,A.activity from audit A join users U on U.id=A.user_id"
                     + " where date(A.date_time)<?";
             try (Connection conn = db.getConnection()) {
@@ -104,8 +106,9 @@ public class AuditDAO implements IAuditDAO{
                                 result.getInt(1),
                                 result.getInt(2),
                                 result.getString(3),
-                                result.getDate(4),
-                                result.getString(5)));
+                                result.getString(4),
+                                result.getDate(5),
+                                result.getString(6)));
                     }
                 }
             }
@@ -117,7 +120,7 @@ public class AuditDAO implements IAuditDAO{
         // search by date from to
             public List<Audit> searchAuditByDateBetween(Date datefrom,Date dateto) throws SQLException{
                 List<Audit> audit = new ArrayList<>();
-                String sqlSitesCommand = "Select A.id,A.employee_number,CONCAT(U.first_name,' ',U.last_name) as name,"
+                String sqlSitesCommand = "Select A.id,A.employee_number,U.first_name,U.last_name,"
                         + "A.date_time,A.activity from audit A join users U on U.id=A.user_id"
                         + " where date(A.date_time)<? and date(date_time)>?";
                 try (Connection conn = db.getConnection()) {
@@ -130,8 +133,9 @@ public class AuditDAO implements IAuditDAO{
                                     result.getInt(1),
                                     result.getInt(2),
                                     result.getString(3),
-                                    result.getDate(4),
-                                    result.getString(5)));
+                                    result.getString(4),
+                                    result.getDate(5),
+                                    result.getString(6)));
                         }
                     }
                 }
