@@ -3,7 +3,7 @@ package com.grauman.amdocs.dao;
 import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.AssignmentHistory;
+import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,8 +68,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public List<AssignmentHistory> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
-        List<AssignmentHistory> assignments = new ArrayList<AssignmentHistory>();
+    public List<AssignmentHistoryVM> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
+        List<AssignmentHistoryVM> assignments = new ArrayList<AssignmentHistoryVM>();
 
         if (currPage < 1)
             currPage = 1;
@@ -88,7 +88,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        assignments.add(new AssignmentHistory(
+                        assignments.add(new AssignmentHistoryVM(
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
                                 result.getInt("a.project_id"),

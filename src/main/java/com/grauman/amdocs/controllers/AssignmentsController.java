@@ -2,9 +2,8 @@ package com.grauman.amdocs.controllers;
 
 
 import com.grauman.amdocs.dao.AssignmentsDAO;
-import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.AssignmentHistory;
+import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +26,8 @@ public class AssignmentsController {
 
 
     @GetMapping("")
-    public ResponseEntity<List<AssignmentHistory>> getAssignmentsHistoryForEmployee(@RequestParam int employeeId, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
-        List<AssignmentHistory> assignments = assignmentsDAO.getAssignmentsByUserID(employeeId, pageNumber, limit);
+    public ResponseEntity<List<AssignmentHistoryVM>> getAssignmentsHistoryForEmployee(@RequestParam int employeeId, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
+        List<AssignmentHistoryVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeId, pageNumber, limit);
         return ResponseEntity.ok().body(assignments);
         //return new ResponseEntity<>(assignments, HttpStatus.OK);
     }
