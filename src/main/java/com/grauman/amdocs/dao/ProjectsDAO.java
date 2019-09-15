@@ -44,7 +44,7 @@ public class ProjectsDAO implements IProjectsDAO {
                         projectID = generatedID.getInt(1);
                         item.setId(projectID);
                     } else
-                        throw new SQLException("ProjectVM insertion failed.");
+                        throw new SQLException("Project insertion failed.");
                 }
             }
 
