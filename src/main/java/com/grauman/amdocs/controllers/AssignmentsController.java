@@ -23,9 +23,7 @@ public class AssignmentsController {
 
     @GetMapping("")
     public ResponseEntity<List<AssignmentHistory>> getAssignmentsHistoryForEmployee(@RequestParam int employeeId, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
-        System.out.println("aaaaaaaaaaaaa");
         List<AssignmentHistory> assignments = assignmentsDAO.getAssignmentsByUserID(employeeId, pageNumber, limit);
-//        return ResponseEntity.ok().body(assignments);
-        return new ResponseEntity<>(assignments, HttpStatus.OK);
+        return ResponseEntity.ok().body(assignments);
     }
 }
