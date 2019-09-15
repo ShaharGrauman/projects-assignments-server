@@ -20,6 +20,11 @@ public class ProjectController {
         return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
     }
 
+    @GetMapping("")
+    public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@RequestParam String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName,pageNumber,limit));
+    }
+
 
 
     @PostMapping("")

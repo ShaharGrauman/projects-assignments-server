@@ -155,4 +155,63 @@ public class ProjectsDAO implements IProjectsDAO {
 
         return projectVMList;
     }
+
+    @Override
+    public List<ProjectVM> searchProjectByProjectName(String projectName, Integer pageNumber, Integer limit) throws SQLException {
+
+        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
+        List<SkillsProjectVM> technicalSkillList = new ArrayList<SkillsProjectVM>();
+        List<SkillsProjectVM> productSkillList = new ArrayList<SkillsProjectVM>();
+
+        try (Connection conn = db.getConnection()) {
+            String projectQuery = "select p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+
+            try (PreparedStatement ps = conn.prepareStatement(projectQuery)) {
+
+                ps.setString(1, projectName + '%');
+
+                try (ResultSet Rs = ps.executeQuery()) {
+
+                    while (Rs.next()) {
+
+                        //GET technical SKILL FOR EMPLOYEE
+                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                            skill.setInt(1, Rs.getInt("p.id"));
+
+                            try {
+                                ResultSet tsskill = skill.executeQuery();
+                                while (tsskill.next()) {
+                                    SkillsProjectVM technicalSkill = new SkillsProjectVM(tsskill.getInt(1), tsskill.getString(2), tsskill.getInt(3));
+                                    technicalSkillList.add(technicalSkill);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println(e);
+                            }
+                        }
+                        //GET PRODUCT SKILL FOR EMPLOYEE
+                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                            skill.setInt(1, Rs.getInt("p.id"));
+
+                            try {
+                                ResultSet psskill = skill.executeQuery();
+                                while (psskill.next()) {
+                                    SkillsProjectVM productSkill = new SkillsProjectVM(psskill.getInt(1), psskill.getString(2), psskill.getInt(3));
+                                    productSkillList.add(productSkill);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println(e);
+                            }
+                        }
+                        ProjectVM pro2 = new ProjectVM(Rs.getInt(1), Rs.getString(2), Rs.getString(4), Rs.getDate(3), technicalSkillList, productSkillList, Rs.getInt(5));
+                        projectVMList.add(pro2);
+                        technicalSkillList = new ArrayList<SkillsProjectVM>();
+                        productSkillList = new ArrayList<SkillsProjectVM>();
+                    }
+                }
+            }
+        }
+        return projectVMList;
+    }
 }
