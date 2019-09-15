@@ -7,7 +7,7 @@ import com.grauman.amdocs.models.Skill;
 public interface ISkillsDAO extends IDAO<Skill>{
 	/**
 	 * 
-	 * @param skill id
+	 * @param id
 	 * @return if skill exist return id, else return 0
 	 * @throws SQLException
 	 */

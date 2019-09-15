@@ -23,7 +23,7 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 	/**
 	 * 
 	 * @param skillId
-	 * @param employeeid
+	 * @param skillType
 	 * @return list of skill updates by skill id and employee id that are approved
 	 * @throws SQLException
 	 */
@@ -41,7 +41,7 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 
 	/**
 	 * 
-	 * @param employeeeskill
+	 * @param employeeSkill
 	 * @return message if employee skill added successfully
 	 * @throws SQLException
 	 */
@@ -49,8 +49,7 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 
 	/**
 	 * 
-	 * @param employeeId
-	 * @param skillId
+	 * @param employeeSkillId
 	 * @param level
 	 * @return message if employee skill level updated successfully
 	 * @throws SQLException
