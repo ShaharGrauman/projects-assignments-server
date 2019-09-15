@@ -9,4 +9,6 @@ import java.util.List;
 public interface IProjectsDAO extends IDAO<ProjectVM>{
     // List<ProjectVM> getManagerProjects(int managerId) throws SQLException;
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException;
+    public List<ProjectVM> searchProjectByProjectName(String projectName, Integer pageNumber, Integer limit) throws SQLException;
+
 }

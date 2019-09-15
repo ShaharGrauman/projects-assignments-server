@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class SkillsProjectVM {
-    private int id;
+    private Integer id;
     private String name;
-    private int level;
+    private Integer level;
 }
