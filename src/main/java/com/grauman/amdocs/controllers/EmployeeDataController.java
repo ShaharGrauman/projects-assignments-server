@@ -29,12 +29,19 @@ public class EmployeeDataController {
 	@Autowired
 	private EmployeeDataDAO employeeDataDAO;
 	
-//All Employees
-	@GetMapping("")
-	public ResponseEntity<List<EmployeeData>> all() throws SQLException {
+//All Employees Which are locked
+	@GetMapping("locked")
+	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
 		}
+//All Employees	
+	@GetMapping("")
+	public ResponseEntity<List<EmployeeData>> all() throws SQLException {
+		List<EmployeeData> employee= employeeDataDAO.findAllEmployees();
+		return ResponseEntity.ok().body(employee);
+	}
+
 //Employee
 	@GetMapping("/id")
 	public ResponseEntity<EmployeeData> findEmployeeById(@RequestParam int id) throws SQLException {
