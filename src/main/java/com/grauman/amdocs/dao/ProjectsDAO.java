@@ -2,7 +2,6 @@ package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
-import com.grauman.amdocs.models.FinalEmployeeSkill;
 import com.grauman.amdocs.models.Project;
 import com.grauman.amdocs.models.SkillsProject;
 import org.springframework.beans.factory.annotation.Autowired;
