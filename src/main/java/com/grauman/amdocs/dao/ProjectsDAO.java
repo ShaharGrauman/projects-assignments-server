@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
+import com.grauman.amdocs.errors.custom.LevelValidityException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.vm.ProjectVM;
 import com.grauman.amdocs.models.vm.SkillsProjectVM;
@@ -27,19 +28,19 @@ public class ProjectsDAO implements IProjectsDAO {
     }
 
     @Override
-    public ProjectVM add(ProjectVM item) throws SQLException {
+    public ProjectVM add(ProjectVM item) throws SQLException , LevelValidityException{
         int projectID;
         try (Connection conn = db.getConnection()) {
 
             String insertQueryProject = "INSERT INTO project (name, manager_id, description,start_date)" +
                     "VALUES (?,?,?,?)";
-            try (PreparedStatement fetch = conn.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
-                fetch.setString(1, item.getName());
-                fetch.setInt(2, item.getManagerID());
-                fetch.setString(3, item.getDescription());
-                fetch.setString(4, String.valueOf(item.getStartDate()));
-                fetch.executeUpdate();
-                try (ResultSet generatedID = fetch.getGeneratedKeys()) {
+            try (PreparedStatement fetchInsertQueryProject = conn.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
+                fetchInsertQueryProject.setString(1, item.getName());
+                fetchInsertQueryProject.setInt(2, item.getManagerID());
+                fetchInsertQueryProject.setString(3, item.getDescription());
+                fetchInsertQueryProject.setString(4, String.valueOf(item.getStartDate()));
+                fetchInsertQueryProject.executeUpdate();
+                try (ResultSet generatedID = fetchInsertQueryProject.getGeneratedKeys()) {
                     if (generatedID.next()) {
                         projectID = generatedID.getInt(1);
                         item.setId(projectID);
@@ -56,26 +57,44 @@ public class ProjectsDAO implements IProjectsDAO {
                 insertProjectSkill.append(", (?, ?, ?)");
             }
 
-            try (PreparedStatement fetch = conn.prepareStatement(String.valueOf(insertProjectSkill), Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement fetchInsertProjectSkill = conn.prepareStatement(String.valueOf(insertProjectSkill), Statement.RETURN_GENERATED_KEYS))  {
                 int counter = 0;
                 int i;
                 for (i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
-                    fetch.setInt(i, projectID);
-                    fetch.setInt(i + 1, item.getProductSkill().get(counter).getId());
-                    fetch.setInt(i + 2, item.getProductSkill().get(counter).getLevel());
+                    if(item.getTechnicalSkill().get(counter).getLevel() < 1 || item.getTechnicalSkill().get(counter).getLevel() > 5 )
+                        throw new LevelValidityException("level should be  between 1 to 5");
+                    fetchInsertProjectSkill.setInt(i, projectID);
+                    fetchInsertProjectSkill.setInt(i + 1, item.getProductSkill().get(counter).getId());
+                    fetchInsertProjectSkill.setInt(i + 2, item.getProductSkill().get(counter).getLevel());
                     ++counter;
                 }
                 counter = 0;
                 for (; i <= (sizeSkillTechnical) * 3 + (sizeSkillProduct) * 3; i += 3) {
-                    fetch.setInt(i, projectID);
-                    fetch.setInt(i + 1, item.getTechnicalSkill().get(counter).getId());
-                    fetch.setInt(i + 2, item.getTechnicalSkill().get(counter).getLevel());
+                    if(item.getTechnicalSkill().get(counter).getLevel() < 1 || item.getTechnicalSkill().get(counter).getLevel() > 5 )
+                        throw new LevelValidityException("level should be  between 1 to 5");
+                    fetchInsertProjectSkill.setInt(i, projectID);
+                    fetchInsertProjectSkill.setInt(i + 1, item.getTechnicalSkill().get(counter).getId());
+                    fetchInsertProjectSkill.setInt(i + 2, item.getTechnicalSkill().get(counter).getLevel());
                     ++counter;
                     System.out.println(i);
                 }
-                System.out.println(insertProjectSkill);
-                fetch.executeUpdate();
+
+                fetchInsertProjectSkill.executeUpdate();
+                try (ResultSet generatedID = fetchInsertProjectSkill.getGeneratedKeys()) {
+                    if (generatedID.next()) {
+                        String deleteQueryProject = "DELETE FROM project WHERE id = ?";
+                        try (PreparedStatement fetchDeleteQueryProject = conn.prepareStatement(deleteQueryProject, Statement.RETURN_GENERATED_KEYS)) {
+                            fetchDeleteQueryProject.setString(1, item.getName());
+                            fetchDeleteQueryProject.executeUpdate();
+                        }
+
+                        throw new SQLException("Skill Project insertion failed. Project Deleted");
+                    }
+
+                }
             }
+
+
         }
 
         return item;

@@ -1,9 +1,6 @@
 package com.grauman.amdocs.errors;
 
-import com.grauman.amdocs.errors.custom.GeneralError;
-import com.grauman.amdocs.errors.custom.InvalidCredentials;
-import com.grauman.amdocs.errors.custom.InvalidDataException;
-import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
+import com.grauman.amdocs.errors.custom.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +36,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new GeneralError(status, message));
     }
 
+    @ExceptionHandler({LevelValidityException.class})
+    protected ResponseEntity<Object> handleRangeErrors(RuntimeException ex, WebRequest request) {
+        return generateError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
     /**
      * can handle missing or invalid arguments
      * uncomment if needed
