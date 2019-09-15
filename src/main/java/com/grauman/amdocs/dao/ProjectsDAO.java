@@ -36,15 +36,15 @@ public class ProjectsDAO implements IProjectsDAO {
                     "VALUES (?,?,?,?)";
             try (PreparedStatement fetch = conn.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
                 fetch.setString(1, item.getName());
-                fetch.setString(2, String.valueOf(item.getManagerID()));
+                fetch.setInt(2, item.getManagerID());
                 fetch.setString(3, item.getDescription());
                 fetch.setString(4, String.valueOf(item.getStartDate()));
                 fetch.executeUpdate();
                 try (ResultSet generatedID = fetch.getGeneratedKeys()) {
-                    if (generatedID.next())
+                    if (generatedID.next()) {
                         projectID = generatedID.getInt(1);
-
-                    else
+                        item.setId(projectID);
+                    } else
                         throw new SQLException("Project insertion failed.");
                 }
             }
@@ -59,18 +59,22 @@ public class ProjectsDAO implements IProjectsDAO {
 
             try (PreparedStatement fetch = conn.prepareStatement(String.valueOf(insertProjectSkill), Statement.RETURN_GENERATED_KEYS)) {
                 int counter = 0;
-                for (int i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
-                    fetch.setString(i, String.valueOf(projectID));
-                    fetch.setString(i + 1, String.valueOf(item.getProductSkill().get(counter).getId()));
-                    fetch.setString(i + 2, String.valueOf(item.getProductSkill().get(counter).getLevel()));
+                int i;
+                for (i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
+                    fetch.setInt(i, projectID);
+                    fetch.setInt(i + 1, item.getProductSkill().get(counter).getId());
+                    fetch.setInt(i + 2, item.getProductSkill().get(counter).getLevel());
                     ++counter;
                 }
-                for (int i = 1; i <= (sizeSkillTechnical) * 3; i += 3) {
-                    fetch.setString(i, String.valueOf(projectID));
-                    fetch.setString(i + 1, String.valueOf(item.getTechnicalSkill().get(counter).getId()));
-                    fetch.setString(i + 2, String.valueOf(item.getTechnicalSkill().get(counter).getLevel()));
+                counter=0;
+                for (; i <=(sizeSkillTechnical) * 3+(sizeSkillProduct) * 3; i += 3) {
+                    fetch.setInt(i, projectID);
+                    fetch.setInt(i  + 1, item.getTechnicalSkill().get(counter).getId());
+                    fetch.setInt(i  + 2, item.getTechnicalSkill().get(counter).getLevel());
                     ++counter;
+                    System.out.println(i);
                 }
+                System.out.println(insertProjectSkill);
                 fetch.executeUpdate();
             }
         }
