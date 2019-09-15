@@ -55,13 +55,13 @@ public class EmployeeDataController {
 		return ResponseEntity.ok().body(employeeResult);
 	}
 //Update Employee
-	@PutMapping("/update/id")
+	@PutMapping("/id")
 	public ResponseEntity<EmployeeData> updateEmployeeInfo(@RequestParam int id, @RequestBody EmployeeData employee) throws SQLException {
 		EmployeeData employeeByID = employeeDataDAO.update(employee);
 		return ResponseEntity.ok().body(employeeByID); 
 	}
 //Delete Employee
-	@DeleteMapping("/delete/id")
+	@DeleteMapping("/id")
 	public ResponseEntity<EmployeeData> deleteEmployee(@RequestParam Integer id) throws SQLException {
 		EmployeeData deletedEmployee = employeeDataDAO.delete(id);
 		return ResponseEntity.ok().body(deletedEmployee);   
