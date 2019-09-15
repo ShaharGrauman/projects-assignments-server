@@ -35,12 +35,19 @@ public class EmployeeDataController {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
 		}
-//Employee
+//Employee by employee number
+	@GetMapping("/employeenumber")
+	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeenumber) throws SQLException {
+		EmployeeData employee=employeeDataDAO.findByEmployeeNumber(employeenumber);
+		return ResponseEntity.ok().body(employee);
+	}
+//Employee by employee id
 	@GetMapping("/id")
-	public ResponseEntity<EmployeeData> findEmployeeById(@RequestParam int id) throws SQLException {
+	public ResponseEntity<EmployeeData> find(@RequestParam int id) throws SQLException {
 		EmployeeData employee=employeeDataDAO.find(id);
 		return ResponseEntity.ok().body(employee);
 	}
+	
 //Add Employee
 	@PostMapping("")
 	public ResponseEntity<EmployeeData> newEmployee(@RequestBody EmployeeData employee) throws SQLException{

@@ -65,8 +65,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 	
 // the search will be by Employee Number 
-	@Override
-	public EmployeeData find(int id) throws SQLException {
+
+	public EmployeeData findByEmployeeNumber(int number) throws SQLException {
 		Date auditDate;int employeeId;
 		EmployeeData found = null;
 		List<Role> roles = new ArrayList<>();
@@ -85,13 +85,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command0 = conn.prepareStatement(sqlFindLastLogin)) {
-				command0.setInt(1, id);
+				command0.setInt(1, number);
 				ResultSet result0 = command0.executeQuery();
 				if(result0.next()) {
 					auditDate=result0.getDate(1);
 				
 				try (PreparedStatement command = conn.prepareStatement(sqlFindEmployee)) {
-					command.setInt(1, id);
+					command.setInt(1, number);
 					ResultSet result = command.executeQuery();
 					if(result.next()) {
 						employeeId = result.getInt(1);
@@ -121,7 +121,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return found;
 	}
 // find employee by id .. helping function
-	public EmployeeData findEmployeeById(int id) throws SQLException {
+	@Override
+	public EmployeeData find(int id) throws SQLException {
 		EmployeeData found = null;
 		int employeeId;
 		List<Role> roles = new ArrayList<>();
@@ -196,7 +197,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				while (ids.next()) {
 					//find employee by ID
 					employeeId = ids.getInt(1);
-					newEmployee = findEmployeeById(employeeId);
+					newEmployee = find(employeeId);
 					System.out.println(newEmployee.toString());
 				}
 
@@ -253,7 +254,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
                 }
             }
         }
-        updatedEmployee = findEmployeeById(employee.getId());
+        updatedEmployee = find(employee.getId());
         
     return updatedEmployee;
 
@@ -267,7 +268,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			try (PreparedStatement statment = conn.prepareStatement(sqlDelEmployeeStatement)) {
 				statment.setInt(1, id);
 					int res = statment.executeUpdate();
-					deactevatedEmployee = findEmployeeById(id);
+					deactevatedEmployee = find(id);
 			}
 		}
 		return deactevatedEmployee;
