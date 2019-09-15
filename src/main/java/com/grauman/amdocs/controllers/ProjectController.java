@@ -1,10 +1,8 @@
 package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.ProjectsDAO;
-import com.grauman.amdocs.models.Project;
-import org.omg.CORBA.PRIVATE_MEMBER;
+import com.grauman.amdocs.models.vm.ProjectVM;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,13 +16,20 @@ public class ProjectController {
     private ProjectsDAO projectsDAO;
 
     @GetMapping("/{managerID}")
-    public ResponseEntity<List<Project>> getProjectsByID(@PathVariable("managerID") int managerID) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.getManagerProjects(managerID));
+    public ResponseEntity<List<ProjectVM>> getProjectsByID(@PathVariable("managerID") int managerID) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
     }
 
+    @GetMapping("")
+    public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@RequestParam String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName,pageNumber,limit));
+    }
+
+
+
     @PostMapping("")
-    public ResponseEntity<Project> addProject(@RequestBody Project project) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.add(project));
+    public ResponseEntity<ProjectVM> addProject(@RequestBody ProjectVM projectVM) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.add(projectVM));
 
     }
 }
