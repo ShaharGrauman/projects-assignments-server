@@ -18,7 +18,5 @@ public class EmployeeSkill {
 	private String comment;
 	private Status status;
 	
-	
-	
-	
+
 }
