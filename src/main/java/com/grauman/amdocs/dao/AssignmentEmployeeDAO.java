@@ -2,7 +2,7 @@ package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IAssignmentEmployeeDAO;
 import com.grauman.amdocs.models.vm.AssignmentEmployeeVM;
-import com.grauman.amdocs.models.FinalEmployeeSkill;
+import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +21,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     @Override
     public List<AssignmentEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentEmployeeVM> employees = new ArrayList<>();
-        List<FinalEmployeeSkill> technicalSkillList = new ArrayList<FinalEmployeeSkill>();
-        List<FinalEmployeeSkill> productSkillList = new ArrayList<FinalEmployeeSkill>();
+        List<FinalEmployeeSkillVM> technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
+        List<FinalEmployeeSkillVM> productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
         if (pageNumber.intValue() < 1) {
             pageNumber = 1;
@@ -49,7 +49,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
 
                             try (ResultSet tsSkill = skill.executeQuery()) {
                                 while (tsSkill.next()) {
-                                    FinalEmployeeSkill technicalSkill = new FinalEmployeeSkill(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                                    FinalEmployeeSkillVM technicalSkill = new FinalEmployeeSkillVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
@@ -61,7 +61,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
 
                             try (ResultSet psSkill = skill.executeQuery()) {
                                 while (psSkill.next()) {
-                                    FinalEmployeeSkill productSkill = new FinalEmployeeSkill(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                                    FinalEmployeeSkillVM productSkill = new FinalEmployeeSkillVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -73,8 +73,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<FinalEmployeeSkill>();
-                        productSkillList = new ArrayList<FinalEmployeeSkill>();
+                        technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
+                        productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
                     }
                 }
@@ -84,15 +84,11 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
         return employees;
     }
 
-    //    @Override
-//    public List<AssignmentEmployee> getEmployeesByProjectID(Integer projectid) throws SQLException {
-//        return null;
-//    }
     @Override
     public List<AssignmentEmployeeVM> getEmployeesByProjectID(Integer projectid) throws SQLException {
         List<AssignmentEmployeeVM> employees = new ArrayList<>();
-        List<FinalEmployeeSkill> technicalskillList = new ArrayList<FinalEmployeeSkill>();
-        List<FinalEmployeeSkill> productskillList = new ArrayList<FinalEmployeeSkill>();
+        List<FinalEmployeeSkillVM> technicalskillList = new ArrayList<FinalEmployeeSkillVM>();
+        List<FinalEmployeeSkillVM> productskillList = new ArrayList<FinalEmployeeSkillVM>();
         try (Connection conn = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     "from users u join assignment a on u.id = a.employee_id where a.project_id = ?";
@@ -108,7 +104,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                             skill.setInt(1, result.getInt("u.id"));
                             try (ResultSet tsSkill = skill.executeQuery()) {
                                 while (tsSkill.next()) {
-                                    FinalEmployeeSkill technicalSkill = new FinalEmployeeSkill(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                                    FinalEmployeeSkillVM technicalSkill = new FinalEmployeeSkillVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
                                     technicalskillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
@@ -119,7 +115,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                             skill.setInt(1, result.getInt("u.id"));
                             try (ResultSet psSkill = skill.executeQuery()) {
                                 while (psSkill.next()) {
-                                    FinalEmployeeSkill productSkill = new FinalEmployeeSkill(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                                    FinalEmployeeSkillVM productSkill = new FinalEmployeeSkillVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
                                     productskillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -131,8 +127,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 result.getString("name"),
                                 technicalskillList, productskillList);
                         employees.add(employee);
-                        technicalskillList = new ArrayList<FinalEmployeeSkill>();
-                        productskillList = new ArrayList<FinalEmployeeSkill>();
+                        technicalskillList = new ArrayList<FinalEmployeeSkillVM>();
+                        productskillList = new ArrayList<FinalEmployeeSkillVM>();
                     }
                 }
             }
@@ -143,8 +139,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     @Override
     public List<AssignmentEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentEmployeeVM> employees = new ArrayList<>();
-        List<FinalEmployeeSkill> technicalSkillList = new ArrayList<FinalEmployeeSkill>();
-        List<FinalEmployeeSkill> productSkillList = new ArrayList<FinalEmployeeSkill>();
+        List<FinalEmployeeSkillVM> technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
+        List<FinalEmployeeSkillVM> productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
         if (pageNumber < 1) {
             pageNumber = 1;
@@ -171,7 +167,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
 
                             try (ResultSet tsSkill = skill.executeQuery()) {
                                 while (tsSkill.next()) {
-                                    FinalEmployeeSkill technicalSkill = new FinalEmployeeSkill(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                                    FinalEmployeeSkillVM technicalSkill = new FinalEmployeeSkillVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
@@ -184,7 +180,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
 
                             try (ResultSet psSkill = skill.executeQuery()) {
                                 while (psSkill.next()) {
-                                    FinalEmployeeSkill productSkill = new FinalEmployeeSkill(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                                    FinalEmployeeSkillVM productSkill = new FinalEmployeeSkillVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -196,8 +192,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<FinalEmployeeSkill>();
-                        productSkillList = new ArrayList<FinalEmployeeSkill>();
+                        technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
+                        productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
                     }
                 }
@@ -210,8 +206,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     @Override
     public List<AssignmentEmployeeVM> searchEmployeesBySkillSet(List<Integer> skillSet, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentEmployeeVM> employees = new ArrayList<>();
-        List<FinalEmployeeSkill> technicalSkillList = new ArrayList<FinalEmployeeSkill>();
-        List<FinalEmployeeSkill> productSkillList = new ArrayList<FinalEmployeeSkill>();
+        List<FinalEmployeeSkillVM> technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
+        List<FinalEmployeeSkillVM> productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
         if (pageNumber < 1) {
             pageNumber = 1;
@@ -248,7 +244,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                             skill.setInt(1, result.getInt("u.id"));
                             try (ResultSet tsSkill = skill.executeQuery()) {
                                 while (tsSkill.next()) {
-                                    FinalEmployeeSkill technicalSkill = new FinalEmployeeSkill(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                                    FinalEmployeeSkillVM technicalSkill = new FinalEmployeeSkillVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
@@ -261,7 +257,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
 
                             try (ResultSet psSkill = skill.executeQuery()) {
                                 while (psSkill.next()) {
-                                    FinalEmployeeSkill productSkill = new FinalEmployeeSkill(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                                    FinalEmployeeSkillVM productSkill = new FinalEmployeeSkillVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -273,8 +269,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                                                              result.getString("name"),
                                                                              technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<FinalEmployeeSkill>();
-                        productSkillList = new ArrayList<FinalEmployeeSkill>();
+                        technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
+                        productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
                     }
                 }
