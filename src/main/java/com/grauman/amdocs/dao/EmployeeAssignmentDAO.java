@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -15,8 +16,11 @@ public class EmployeeAssignmentDAO implements IEmployeeAssignmentDAO {
     private DBManager db;
 
     @Override
-    public List<EmployeeAssignmentVM> getDoneAssignments(Integer managerID, Integer numberOfMonths, Integer pageNumber, Integer limit) throws SQLException {
+    public List<EmployeeAssignmentVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer pageNumber, Integer limit) throws SQLException {
         List<EmployeeAssignmentVM> doneAssignments = new ArrayList<>();
+
+
+
         return doneAssignments;
     }
 

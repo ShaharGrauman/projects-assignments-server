@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -20,8 +21,8 @@ public class EmployeeAssignmentController {
     private EmployeeAssignmentDAO employeeAssignmentDAO;
 
     @GetMapping("")
-    public ResponseEntity<List<EmployeeAssignmentVM>> getDoneAssignments(Integer managerID, Integer numberOfMonths, Integer pageNumber, Integer limit)throws SQLException{
-        List<EmployeeAssignmentVM> employees = employeeAssignmentDAO.getDoneAssignments(managerID, numberOfMonths, pageNumber,limit);
+    public ResponseEntity<List<EmployeeAssignmentVM>> getDoneAssignments(Integer managerID, Date requestedDate, Integer pageNumber, Integer limit)throws SQLException{
+        List<EmployeeAssignmentVM> employees = employeeAssignmentDAO.getDoneAssignments(managerID, requestedDate, pageNumber,limit);
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
