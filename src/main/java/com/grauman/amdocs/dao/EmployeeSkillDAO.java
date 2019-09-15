@@ -104,9 +104,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 				// Employee Skill Exist!!
 				throw new InvalidDataException("Employee Skill Exist!!");
 		} else {
-			Skill skill = skillsDAO.add(new Skill(employeeSkill.getSkillName(), 0, employeeSkill.getType()));
-			return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skill.getSkillid(), null,
-					employeeSkill.getLevel(), "", null));
+            throw new ResultsNotFoundException("Skill is not Exist!!");
 		}
 	}
 
