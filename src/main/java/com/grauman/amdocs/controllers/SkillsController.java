@@ -15,18 +15,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.interfaces.IEmployeeSkillDAO;
+import com.grauman.amdocs.dao.interfaces.ISkillsDAO;
 import com.grauman.amdocs.models.EmployeeSkill;
 import com.grauman.amdocs.models.SkillType;
 import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
 import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
 import com.grauman.amdocs.models.vm.RequestedEmployeeSkillVM;
+import com.grauman.amdocs.models.vm.SkillsVM;
 
 @RestController
 @RequestMapping("/skills")
 public class SkillsController {
 	@Autowired
 	private IEmployeeSkillDAO employeeSkillDAO;
-
+	@Autowired
+	private ISkillsDAO skillDAO;
 	
 	/**
 	 * 
@@ -107,6 +110,15 @@ public class SkillsController {
 	public ResponseEntity<Boolean> deleteEmployeeSkill(@PathVariable int id) throws SQLException {
 		boolean message=employeeSkillDAO.cancelRequestedSkill(id);
 			return ResponseEntity.ok().body(message);
+	}
+	/**
+	 * 
+	 * @return skillsVM pojo that has two skill arrays each with different type
+	 * @throws SQLException
+	 */
+	@GetMapping("")
+	public ResponseEntity<SkillsVM> getAllSkills() throws SQLException{
+		return ResponseEntity.ok().body(skillDAO.findSkills());
 	}
 	
 	
