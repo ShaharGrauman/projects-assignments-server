@@ -64,17 +64,17 @@ public class SkillsDAO implements ISkillsDAO {
 	}
 
 	@Override
-	public int CheckIfSkillExist(int id) throws SQLException {
+	public boolean CheckIfSkillExist(int id) throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement("SELECT * from skills WHERE id=?")) {
 				command.setInt(1, id);
 				try (ResultSet result = command.executeQuery()) {
 					if (result.next())
-						return result.getInt("id");
+						return true;
 				}
 			}
 		}
-		throw new ResultsNotFoundException("Skill is not Exist!!");
+		return false;
 	}
 
 	@Override
