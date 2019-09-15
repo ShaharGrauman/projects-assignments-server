@@ -1,6 +1,8 @@
 package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
+import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
+import com.grauman.amdocs.models.FinalEmployeeSkill;
 import com.grauman.amdocs.models.Project;
 import com.grauman.amdocs.models.SkillsProject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import java.util.List;
 public class ProjectsDAO implements IProjectsDAO {
     @Autowired
     private DBManager db;
+
     @Override
     public List<Project> findAll() throws SQLException {
         return null;
@@ -50,19 +53,19 @@ public class ProjectsDAO implements IProjectsDAO {
                     " VALUES (?, ?,?)");
             int sizeSkillProduct = item.getProductSkill().size();
             int sizeSkillTechnical = item.getTechnicalSkill().size();
-            for (int i = 0; i < (sizeSkillProduct+sizeSkillTechnical) - 1; i++) {
+            for (int i = 0; i < (sizeSkillProduct + sizeSkillTechnical) - 1; i++) {
                 insertProjectSkill.append(", (?, ?, ?)");
             }
 
             try (PreparedStatement fetch = conn.prepareStatement(String.valueOf(insertProjectSkill), Statement.RETURN_GENERATED_KEYS)) {
                 int counter = 0;
-                for (int i = 1; i <= (sizeSkillProduct)*3 ; i += 3) {
+                for (int i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
                     fetch.setString(i, String.valueOf(projectID));
                     fetch.setString(i + 1, String.valueOf(item.getProductSkill().get(counter).getId()));
                     fetch.setString(i + 2, String.valueOf(item.getProductSkill().get(counter).getLevel()));
                     ++counter;
                 }
-                for (int i = 1; i <= (sizeSkillTechnical)*3 ; i += 3) {
+                for (int i = 1; i <= (sizeSkillTechnical) * 3; i += 3) {
                     fetch.setString(i, String.valueOf(projectID));
                     fetch.setString(i + 1, String.valueOf(item.getTechnicalSkill().get(counter).getId()));
                     fetch.setString(i + 2, String.valueOf(item.getTechnicalSkill().get(counter).getLevel()));
@@ -85,20 +88,25 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
+
     @Override
-    public List<Project> getManagerProjects(int managerId) throws SQLException {
+    public List<Project> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
+
+
         List<Project> projectList = new ArrayList<Project>();
         List<SkillsProject> technicalSkillList = new ArrayList<SkillsProject>();
         List<SkillsProject> productSkillList = new ArrayList<SkillsProject>();
 
         try (Connection conn = db.getConnection()) {
-            String projectQuery = "SELECT p.id,p.name,p.start_date,p.description FROM project p where manager_id = ?";
-            String technicalSkillQuery = "SELECT s.id,s.name FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
-            String productSkillQuery = "SELECT s.id,s.name FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+            String projectQuery = "select p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
+                    "                                                      join project p on a.project_id=p.id\n" +
+                    "                                                      where u.manager_id= ? ;";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
             try (PreparedStatement ps = conn.prepareStatement(projectQuery)) {
 
-                ps.setInt(1, managerId);
+                ps.setInt(1, managerID);
 
                 try (ResultSet Rs = ps.executeQuery()) {
 
@@ -111,7 +119,7 @@ public class ProjectsDAO implements IProjectsDAO {
                             try {
                                 ResultSet tsskill = skill.executeQuery();
                                 while (tsskill.next()) {
-                                    SkillsProject technicalSkill = new SkillsProject(tsskill.getInt(1), tsskill.getString(2), 0);
+                                    SkillsProject technicalSkill = new SkillsProject(tsskill.getInt(1), tsskill.getString(2), tsskill.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
@@ -120,19 +128,19 @@ public class ProjectsDAO implements IProjectsDAO {
                         }
                         //GET PRODUCT SKILL FOR EMPLOYEE
                         try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
-                            ps.setInt(1, Rs.getInt("p.id"));
+                            skill.setInt(1, Rs.getInt("p.id"));
 
                             try {
                                 ResultSet psskill = skill.executeQuery();
                                 while (psskill.next()) {
-                                    SkillsProject productSkill = new SkillsProject(psskill.getInt(1), psskill.getString(2), 0);
+                                    SkillsProject productSkill = new SkillsProject(psskill.getInt(1), psskill.getString(2), psskill.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
                         }
-                        Project pro2 = new Project(Rs.getInt(1), Rs.getString(2), Rs.getString(4), Rs.getDate(3), technicalSkillList, productSkillList,managerId);
+                        Project pro2 = new Project(Rs.getInt(1), Rs.getString(2), Rs.getString(4), Rs.getDate(3), technicalSkillList, productSkillList, managerID);
                         projectList.add(pro2);
                         technicalSkillList = new ArrayList<SkillsProject>();
                         productSkillList = new ArrayList<SkillsProject>();

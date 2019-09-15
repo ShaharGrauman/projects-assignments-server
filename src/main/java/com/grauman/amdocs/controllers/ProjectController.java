@@ -1,6 +1,7 @@
 package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.ProjectsDAO;
+import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Project;
 import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,10 @@ public class ProjectController {
 
     @GetMapping("/{managerID}")
     public ResponseEntity<List<Project>> getProjectsByID(@PathVariable("managerID") int managerID) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.getManagerProjects(managerID));
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
     }
+
+
 
     @PostMapping("")
     public ResponseEntity<Project> addProject(@RequestBody Project project) throws SQLException {
