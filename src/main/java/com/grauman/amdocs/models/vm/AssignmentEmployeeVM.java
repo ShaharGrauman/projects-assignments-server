@@ -1,6 +1,6 @@
 package com.grauman.amdocs.models.vm;
 
-import com.grauman.amdocs.models.FinalEmployeeSkill;
+import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +14,6 @@ public class AssignmentEmployeeVM {
     private Integer id;
     private Integer managerID;
     private String name;
-    private List<FinalEmployeeSkill> technicalSkills;
-    private List <FinalEmployeeSkill> productSkills;
+    private List<FinalEmployeeSkillVM> technicalSkills;
+    private List <FinalEmployeeSkillVM> productSkills;
 }

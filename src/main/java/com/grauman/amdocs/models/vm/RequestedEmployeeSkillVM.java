@@ -1,6 +1,8 @@
-package com.grauman.amdocs.models;
+package com.grauman.amdocs.models.vm;
 
 import java.sql.Date;
+
+import com.grauman.amdocs.models.SkillType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RequestedEmployeeSkill {
+public class RequestedEmployeeSkillVM {
 //pending skill for single employee
 
 	private String employeeName;
