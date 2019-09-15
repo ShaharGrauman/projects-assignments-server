@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.interfaces.IEmployeeSkillDAO;
 import com.grauman.amdocs.models.EmployeeSkill;
-import com.grauman.amdocs.models.FinalEmployeeSkill;
-import com.grauman.amdocs.models.RequestedEmployeeSkill;
 import com.grauman.amdocs.models.SkillType;
 import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
+import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
+import com.grauman.amdocs.models.vm.RequestedEmployeeSkillVM;
 
 @RestController
 @RequestMapping("/skills")
@@ -28,38 +28,80 @@ public class SkillsController {
 	private IEmployeeSkillDAO employeeSkillDAO;
 
 	
-	@GetMapping("/approvedskills/{user_id}/{type}")
+	/**
+	 * 
+	 * @param user_id
+	 * @param type
+	 * @return list of approved employee history skills
+	 * @throws SQLException
+	 */
+	@GetMapping("/approvedskillshistory/{user_id}/{type}")
 	public @ResponseBody ResponseEntity<List<ApprovedSkillHistoryVM>> getEmployeeSkillsUpdateByEmployeeIdAndSkillType(@PathVariable int user_id,@PathVariable SkillType type) throws SQLException {
 		List<ApprovedSkillHistoryVM> approvedSkillHistories=employeeSkillDAO.findApprovedSkills(user_id, type);
 		return ResponseEntity.ok().body(approvedSkillHistories);
 	}
+	/**
+	 * 
+	 * @param user_id
+	 * @param type
+	 * @return list of last update of each employee skill
+	 * @throws SQLException
+	 */
 	@GetMapping("/employeeskills/{user_id}/{type}")
-	public @ResponseBody ResponseEntity<List<FinalEmployeeSkill>> getEmployeeSkillsByType(@PathVariable int user_id,@PathVariable SkillType type) throws SQLException {
-		List<FinalEmployeeSkill> finalEmployeeSkills=employeeSkillDAO.findLastSkillsUpdates(user_id, type);
+	public @ResponseBody ResponseEntity<List<FinalEmployeeSkillVM>> getEmployeeSkillsByType(@PathVariable int user_id,@PathVariable SkillType type) throws SQLException {
+		List<FinalEmployeeSkillVM> finalEmployeeSkills=employeeSkillDAO.findLastSkillsUpdates(user_id, type);
 		return ResponseEntity.ok().body(finalEmployeeSkills);
 	}
-	@GetMapping("/{manager_id}")
-	public ResponseEntity<List<RequestedEmployeeSkill>> getAllTeamSkills(@PathVariable int manager_id) throws SQLException{
-		List<RequestedEmployeeSkill> requestedEmployeeSkills=employeeSkillDAO.getManagerTeamPendingSkills(manager_id);
+	/**
+	 * 
+	 * @param manager_id
+	 * @return list of all pending employee skill for manager
+	 * @throws SQLException
+	 */
+	@GetMapping("/teamskills/{manager_id}")
+	public ResponseEntity<List<RequestedEmployeeSkillVM>> getAllTeamSkills(@PathVariable int manager_id) throws SQLException{
+		List<RequestedEmployeeSkillVM> requestedEmployeeSkills=employeeSkillDAO.getManagerTeamPendingSkills(manager_id);
 		return ResponseEntity.ok().body(requestedEmployeeSkills);
 	}
-	
+	/**
+	 * 
+	 * @param employeeSkill
+	 * @return new approved employee skill 
+	 * @throws SQLException
+	 */
 	@PostMapping("/approve")
 	public ResponseEntity<EmployeeSkill> approveSkill(@RequestBody EmployeeSkill employeeSkill) throws SQLException {
 		EmployeeSkill newEmployeeSkill=employeeSkillDAO.update(employeeSkill);
 			return ResponseEntity.ok().body(newEmployeeSkill);
 	}
+	/**
+	 * 
+	 * @param employeeSkill
+	 * @return new added employee skill
+	 * @throws SQLException
+	 */
 	@PostMapping("")
-	public ResponseEntity<EmployeeSkill> addSkill(@RequestBody RequestedEmployeeSkill employeeSkill) throws SQLException {
+	public ResponseEntity<EmployeeSkill> addSkill(@RequestBody RequestedEmployeeSkillVM employeeSkill) throws SQLException {
 		EmployeeSkill newEmployeeSkill=employeeSkillDAO.addEmployeeSkill(employeeSkill);
 			return ResponseEntity.ok().body(newEmployeeSkill);
 	}
-	
+	/**
+	 * 
+	 * @param employeeSkill
+	 * @return new updated employee skill
+	 * @throws SQLException
+	 */
 	@PostMapping("/updatelevel")
 	public ResponseEntity<EmployeeSkill> updateSkillLevel(@RequestBody EmployeeSkill employeeSkill) throws SQLException {
 		EmployeeSkill newEmployeeSkill=employeeSkillDAO.updateLevel(employeeSkill.getId(),employeeSkill.getLevel());
 			return ResponseEntity.ok().body(newEmployeeSkill);
 	}
+	/**
+	 * 
+	 * @param id
+	 * @return true if deleted successfully otherwise false
+	 * @throws SQLException
+	 */
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Boolean> deleteEmployeeSkill(@PathVariable int id) throws SQLException {

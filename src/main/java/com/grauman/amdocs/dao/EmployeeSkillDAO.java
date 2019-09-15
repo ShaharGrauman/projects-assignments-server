@@ -16,12 +16,12 @@ import com.grauman.amdocs.dao.interfaces.ISkillsDAO;
 import com.grauman.amdocs.errors.custom.InvalidDataException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.EmployeeSkill;
-import com.grauman.amdocs.models.FinalEmployeeSkill;
-import com.grauman.amdocs.models.RequestedEmployeeSkill;
 import com.grauman.amdocs.models.Skill;
 import com.grauman.amdocs.models.SkillType;
 import com.grauman.amdocs.models.Status;
 import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
+import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
+import com.grauman.amdocs.models.vm.RequestedEmployeeSkillVM;
 import com.grauman.amdocs.models.vm.SkillUpdatesHistoryVM;
 
 @Service
@@ -65,14 +65,42 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 		}
 	}
 
+	/**
+	 * (used in addEmployeeSkill method)
+	 * 
+	 * @param employeeId
+	 * @param skillID
+	 * @return true if pending employee skills already exist
+	 * @throws SQLException
+	 */
+	private boolean CheckIfPendingEmployeeSkillExist(int employeeId, int skillID) throws SQLException {
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement command = conn
+					.prepareStatement("SELECT * from employeeskill WHERE skill_id=? and user_id=? and status=?")) {
+				command.setInt(1, skillID);
+				command.setInt(2, employeeId);
+				command.setString(3, Status.PENDING.toString());
+				ResultSet result = command.executeQuery();
+				return result.next();
+			}
+		}
+	}
+
 	@Override
-	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkill employeeSkill) throws SQLException {
+	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException {
 		int skillid = skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId());
 		if (skillid != 0) {
 			if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), skillid, employeeSkill.getLevel())) {
-				// Employee's skill added successfully
-				return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skillid, null,
-						employeeSkill.getLevel(), null, null));
+				if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
+					if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), skillid)) {
+						// Employee's skill added successfully
+						return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skillid, null,
+								employeeSkill.getLevel(), null, null));
+					} else {
+						throw new  InvalidDataException("Pending employee skill Exist with different level!!");
+					}
+				} else
+					throw new InvalidDataException("Employee Skill leve must be between 1-5!!");
 			} else
 				// Employee Skill Exist!!
 				throw new InvalidDataException("Employee Skill Exist!!");
@@ -89,7 +117,8 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	public EmployeeSkill add(EmployeeSkill employeeSkill) throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(
-					"insert into employeeskill (user_id,skill_id,level,date) values (?, ?, ? ,NOW())",Statement.RETURN_GENERATED_KEYS)) {
+					"insert into employeeskill (user_id,skill_id,level,date) values (?, ?, ? ,NOW())",
+					Statement.RETURN_GENERATED_KEYS)) {
 				command.setInt(1, employeeSkill.getEmployeeId());
 				command.setInt(2, employeeSkill.getSkillId());
 				command.setInt(3, employeeSkill.getLevel());
@@ -197,15 +226,14 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	@Override
 	public EmployeeSkill updateLevel(int employeeskillId, int level) throws SQLException {
 		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement("UPDATE employeeskill" + " SET level = ?, date=now()"
-					+ " WHERE id = ? and status=?")) {
+			try (PreparedStatement command = conn.prepareStatement(
+					"UPDATE employeeskill" + " SET level = ?, date=now()" + " WHERE id = ? and status=?")) {
 				command.setInt(1, level);
 				command.setInt(2, employeeskillId);
 				command.setString(3, Status.PENDING.toString());
 				if (command.executeUpdate() == 0)
 					throw new InvalidDataException("Couldn't find employee skill to update");
-				try (PreparedStatement command2 = conn
-						.prepareStatement("select * from employeeskill WHERE id=?")) {
+				try (PreparedStatement command2 = conn.prepareStatement("select * from employeeskill WHERE id=?")) {
 					command2.setInt(1, employeeskillId);
 					try (ResultSet result = command2.executeQuery()) {
 						result.next();
@@ -234,9 +262,9 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	}
 
 	@Override
-	public List<FinalEmployeeSkill> findLastSkillsUpdates(int employeeId, SkillType skillType) throws SQLException {
+	public List<FinalEmployeeSkillVM> findLastSkillsUpdates(int employeeId, SkillType skillType) throws SQLException {
 		// TODO Auto-generated method stub
-		List<FinalEmployeeSkill> finalEmployeeSkill = new ArrayList<FinalEmployeeSkill>();
+		List<FinalEmployeeSkillVM> finalEmployeeSkill = new ArrayList<FinalEmployeeSkillVM>();
 
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement("SELECT * from employeeskill em1 join skills on "
@@ -249,7 +277,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 				ResultSet result = command.executeQuery();
 				while (result.next()) {
 					// skill update object (POJO)
-					FinalEmployeeSkill lastSkillUpdate = new FinalEmployeeSkill(result.getInt("id"),
+					FinalEmployeeSkillVM lastSkillUpdate = new FinalEmployeeSkillVM(result.getInt("id"),
 							result.getString("name"), result.getDate("date"), result.getInt("level"),
 							result.getString("comment"), Status.valueOf(result.getString("status")));
 					finalEmployeeSkill.add(lastSkillUpdate);
@@ -270,20 +298,20 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	}
 
 	@Override
-	public List<RequestedEmployeeSkill> getManagerTeamPendingSkills(int managerId) throws SQLException {
-		List<RequestedEmployeeSkill> requestedEmployeeSkills = new ArrayList<>();
+	public List<RequestedEmployeeSkillVM> getManagerTeamPendingSkills(int managerId) throws SQLException {
+		List<RequestedEmployeeSkillVM> requestedEmployeeSkills = new ArrayList<>();
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(
 					"select es.id,es.user_id,concat(u.first_name,' ',u.last_name) name,es.skill_id, s.name skillName"
 							+ ",es.date,es.level,es.comment,s.type from employeeskill es join users u on es.user_id=u.id "
-							+ "join skills s on es.skill_id=s.id where u.manager_id=?")) {
+							+ "join skills s on es.skill_id=s.id where u.manager_id=? and es.status='PENDING'")) {
 				command.setInt(1, managerId);
 				try (ResultSet result = command.executeQuery()) {
 					while (result.next()) {
-						requestedEmployeeSkills
-								.add(new RequestedEmployeeSkill(result.getString("name"), result.getInt("id"),
-										result.getInt("user_id"),result.getInt("skill_id"), result.getString("skillName"), result.getDate("date"),
-										result.getInt("level"), SkillType.valueOf(result.getString("type"))));
+						requestedEmployeeSkills.add(new RequestedEmployeeSkillVM(result.getString("name"),
+								result.getInt("id"), result.getInt("user_id"), result.getInt("skill_id"),
+								result.getString("skillName"), result.getDate("date"), result.getInt("level"),
+								SkillType.valueOf(result.getString("type"))));
 					}
 				}
 			}
