@@ -1,7 +1,7 @@
 package com.grauman.amdocs.dao;
 
-import com.grauman.amdocs.dao.interfaces.IAssignmentEmployeeDAO;
-import com.grauman.amdocs.models.vm.AssignmentEmployeeVM;
+import com.grauman.amdocs.dao.interfaces.IAssignmentSkillEmployeeDAO;
+import com.grauman.amdocs.models.vm.AssignmentSkillEmployeeVM;
 import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
+public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Autowired
     private DBManager db;
 
     @Override
-    public List<AssignmentEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer pageNumber, Integer limit) throws SQLException {
-        List<AssignmentEmployeeVM> employees = new ArrayList<>();
+    public List<AssignmentSkillEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer pageNumber, Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<FinalEmployeeSkillVM> technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
         List<FinalEmployeeSkillVM> productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
@@ -68,7 +68,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 System.out.println(e);
                             }
                         }
-                        AssignmentEmployeeVM employee = new AssignmentEmployeeVM(result.getInt("u.id"),
+                        AssignmentSkillEmployeeVM employee = new AssignmentSkillEmployeeVM(result.getInt("u.id"),
                                 result.getInt("u.manager_id"),
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
@@ -85,8 +85,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentEmployeeVM> getEmployeesByProjectID(Integer projectid) throws SQLException {
-        List<AssignmentEmployeeVM> employees = new ArrayList<>();
+    public List<AssignmentSkillEmployeeVM> getEmployeesByProjectID(Integer projectid) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<FinalEmployeeSkillVM> technicalskillList = new ArrayList<FinalEmployeeSkillVM>();
         List<FinalEmployeeSkillVM> productskillList = new ArrayList<FinalEmployeeSkillVM>();
         try (Connection conn = db.getConnection()) {
@@ -122,7 +122,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 System.out.println(e);
                             }
                         }
-                        AssignmentEmployeeVM employee = new AssignmentEmployeeVM(result.getInt("u.id"),
+                        AssignmentSkillEmployeeVM employee = new AssignmentSkillEmployeeVM(result.getInt("u.id"),
                                 result.getInt("u.manager_id"),
                                 result.getString("name"),
                                 technicalskillList, productskillList);
@@ -137,8 +137,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer pageNumber, Integer limit) throws SQLException {
-        List<AssignmentEmployeeVM> employees = new ArrayList<>();
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer pageNumber, Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<FinalEmployeeSkillVM> technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
         List<FinalEmployeeSkillVM> productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
@@ -187,7 +187,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 System.out.println(e);
                             }
                         }
-                        AssignmentEmployeeVM employee = new AssignmentEmployeeVM(result.getInt("u.id"),
+                        AssignmentSkillEmployeeVM employee = new AssignmentSkillEmployeeVM(result.getInt("u.id"),
                                 result.getInt("u.manager_id"),
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
@@ -204,8 +204,8 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentEmployeeVM> searchEmployeesBySkillSet(List<Integer> skillSet, Integer pageNumber, Integer limit) throws SQLException {
-        List<AssignmentEmployeeVM> employees = new ArrayList<>();
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<Integer> skillSet, Integer pageNumber, Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<FinalEmployeeSkillVM> technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
         List<FinalEmployeeSkillVM> productSkillList = new ArrayList<FinalEmployeeSkillVM>();
 
@@ -264,7 +264,7 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
                                 System.out.println(e);
                             }
                         }
-                        AssignmentEmployeeVM employee = new AssignmentEmployeeVM(result.getInt("u.id"),
+                        AssignmentSkillEmployeeVM employee = new AssignmentSkillEmployeeVM(result.getInt("u.id"),
                                                                              result.getInt("u.manager_id"),
                                                                              result.getString("name"),
                                                                              technicalSkillList, productSkillList);
@@ -281,27 +281,27 @@ public class AssignmentEmployeeDAO implements IAssignmentEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentEmployeeVM> findAll() throws SQLException {
+    public List<AssignmentSkillEmployeeVM> findAll() throws SQLException {
         return null;
     }
 
     @Override
-    public AssignmentEmployeeVM find(int id) throws SQLException {
+    public AssignmentSkillEmployeeVM find(int id) throws SQLException {
         return null;
     }
 
     @Override
-    public AssignmentEmployeeVM add(AssignmentEmployeeVM movie) throws SQLException {
+    public AssignmentSkillEmployeeVM add(AssignmentSkillEmployeeVM movie) throws SQLException {
         return null;
     }
 
     @Override
-    public AssignmentEmployeeVM update(AssignmentEmployeeVM movie) throws SQLException {
+    public AssignmentSkillEmployeeVM update(AssignmentSkillEmployeeVM movie) throws SQLException {
         return null;
     }
 
     @Override
-    public AssignmentEmployeeVM delete(int id) throws SQLException {
+    public AssignmentSkillEmployeeVM delete(int id) throws SQLException {
         return null;
     }
 

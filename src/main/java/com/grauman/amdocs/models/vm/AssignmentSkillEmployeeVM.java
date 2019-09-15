@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AssignmentEmployeeVM {
+public class AssignmentSkillEmployeeVM {
     private Integer id;
     private Integer managerID;
     private String name;
