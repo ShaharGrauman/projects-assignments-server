@@ -1,6 +1,7 @@
 package com.grauman.amdocs.models;
 
 import java.sql.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class Audit {
 	private Date dateTime;
 	private Integer userId;
 	private String activity;
-	
+	private List<Role> roles;
 	
 	public Audit(Integer id,Integer employeeNumber, Date dateTime,Integer userId,String activity) {
         this.id=id;
@@ -34,13 +35,15 @@ public class Audit {
         this.dateTime=dateTime;
         this.activity=activity;
     }
-    public Audit(Integer id,Integer employeeNumber,String firstName,String lastName, Date dateTime,String activity) {
+    public Audit(Integer id,Integer employeeNumber,Integer userId,String firstName,String lastName, Date dateTime,String activity,List<Role> roles) {
         this.id=id;
         this.employeeNumber=employeeNumber;
+        this.userId=userId;
         this.firstName=firstName;
         this.lastName=lastName;
         this.dateTime=dateTime;
         this.activity=activity;
+        this.roles=roles;
     }
 	
 }

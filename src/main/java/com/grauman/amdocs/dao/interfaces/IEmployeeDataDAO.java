@@ -12,7 +12,7 @@ import com.grauman.amdocs.models.WorkSite;
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	//List<EmployeeData> findAll()throws SQLException;
 	
-	EmployeeData findEmployeeById(int id) throws SQLException;
+	EmployeeData findByEmployeeNumber(int number) throws SQLException;
 	
 	
 	List<EmployeeData> filterByName(String name) throws SQLException;
