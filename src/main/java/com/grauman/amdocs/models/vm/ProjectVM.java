@@ -12,11 +12,11 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class ProjectVM {
-    private int id;
+    private Integer id;
     private String name;
     private String description;
     private Date startDate;
     private List<SkillsProjectVM> technicalSkill;
     private List<SkillsProjectVM> productSkill;
-    private int managerID;
+    private Integer managerID;
 }
