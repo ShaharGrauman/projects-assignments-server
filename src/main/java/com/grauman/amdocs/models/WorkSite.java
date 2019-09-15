@@ -12,8 +12,7 @@ import lombok.Setter;
 public class WorkSite {
 	private Integer id;
 	private String name;
-	private Integer countryId;
-	private String countryName;
+	private Country country;
 	private String city;
 
 	public WorkSite(Integer id, String name) {
@@ -21,20 +20,15 @@ public class WorkSite {
 		this.name = name;
 	}
 
-	public WorkSite(Integer id, String name, Integer countryId) {
+	public WorkSite(Integer id, String name, Country country) {
 		this(id, name);
-		this.countryId = countryId;
+		this.country = country;
 	}
 
-	public WorkSite(Integer id, String name, Integer countryId, String countryName) {
-		this(id, name, countryId);
-		this.countryName = countryName;
-	}
-
-	public WorkSite(String name, String city, String countryName) {
+	public WorkSite(String name, String city, Country country) {
 		this.name = name;
 		this.city = city;
-		this.countryName = countryName;
+		this.country = country;
 	}
 
 }

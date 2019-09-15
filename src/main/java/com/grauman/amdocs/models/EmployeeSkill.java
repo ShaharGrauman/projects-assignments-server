@@ -17,8 +17,4 @@ public class EmployeeSkill {
 	private int level;
 	private String comment;
 	private Status status;
-	
-	
-	
-	
 }

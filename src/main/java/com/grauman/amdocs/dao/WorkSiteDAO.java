@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IWorkSiteDAO;
+import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.WorkSite;
 @Service
 public class WorkSiteDAO implements IWorkSiteDAO{
@@ -35,7 +36,7 @@ public class WorkSiteDAO implements IWorkSiteDAO{
         String sqlFindCommand="Select id FROM country WHERE name=?";
         try(Connection conn = db.getConnection()){
             try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)){
-                command.setString(1, workSite.getCountryName());
+                command.setString(1, workSite.getName());
                 ResultSet result = command.executeQuery();
                 if(result.next()) {
                     
@@ -55,12 +56,11 @@ public class WorkSiteDAO implements IWorkSiteDAO{
                             command2.setInt(1,workSiteId);
                             ResultSet result2=command2.executeQuery();
                             result2.next();
-                            newWorkSite=new WorkSite(result2.getInt(1), result2.getString(2),
-                                    result2.getInt(3),result2.getString(4));
-                            
-                            
+                            newWorkSite=new WorkSite(result2.getInt(1),
+                            						 result2.getString(2),
+                            						 new Country(result2.getInt(3)),
+                            						 result2.getString(4));
                         }
-                        
                     }
                     
                 }

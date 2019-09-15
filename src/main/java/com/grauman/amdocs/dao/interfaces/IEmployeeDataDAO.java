@@ -29,6 +29,13 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	
 	
 	 EmployeeData unlock(int id) throws SQLException;
+
+
+//	 List<EmployeeData> getEmployeesByManagerID (int managerID,int pageNumber,int limit) throws SQLException;
+//	 List<EmployeeData> getEmployeesByProjectID(int projectid) throws SQLException;
+//	 List<EmployeeData> searchEmployeesBySkillID(int skillID, int pageNumber, int limit) throws SQLException;
+//	 List<EmployeeData> searchEmployeesBySkillSet(List<Integer> skillSet, int pageNumber, int limit) throws SQLException;
+
 	 
 	 
 	 List<Role> getEmployeeRoles(int id)throws SQLException;
@@ -38,4 +45,5 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	 Integer countRoles() throws SQLException;
 	 Integer countDepartments() throws SQLException;
 	 Integer countWorkSites() throws SQLException;
+
 }

@@ -4,10 +4,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import com.grauman.amdocs.models.EmployeeSkill;
-import com.grauman.amdocs.models.FinalEmployeeSkill;
-import com.grauman.amdocs.models.RequestedEmployeeSkill;
 import com.grauman.amdocs.models.SkillType;
 import com.grauman.amdocs.models.vm.ApprovedSkillHistoryVM;
+import com.grauman.amdocs.models.vm.FinalEmployeeSkillVM;
+import com.grauman.amdocs.models.vm.RequestedEmployeeSkillVM;
 import com.grauman.amdocs.models.vm.SkillUpdatesHistoryVM;
 
 public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
@@ -18,12 +18,12 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 	 * @return manager team list of requested employees skills
 	 * @throws SQLException
 	 */
-	public List<RequestedEmployeeSkill> getManagerTeamPendingSkills(int managerId) throws SQLException;
+	public List<RequestedEmployeeSkillVM> getManagerTeamPendingSkills(int managerId) throws SQLException;
 
 	/**
 	 * 
 	 * @param skillId
-	 * @param employeeid
+	 * @param skillType
 	 * @return list of skill updates by skill id and employee id that are approved
 	 * @throws SQLException
 	 */
@@ -41,16 +41,15 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 
 	/**
 	 * 
-	 * @param employeeeskill
+	 * @param employeeSkill
 	 * @return message if employee skill added successfully
 	 * @throws SQLException
 	 */
-	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkill employeeSkill) throws SQLException;
+	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException;
 
 	/**
 	 * 
-	 * @param employeeId
-	 * @param skillId
+	 * @param employeeSkillId
 	 * @param level
 	 * @return message if employee skill level updated successfully
 	 * @throws SQLException
@@ -73,6 +72,6 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 	 *         last) for single employee
 	 * @throws SQLException
 	 */
-	public List<FinalEmployeeSkill> findLastSkillsUpdates(int employeeId, SkillType skillType) throws SQLException;
+	public List<FinalEmployeeSkillVM> findLastSkillsUpdates(int employeeId, SkillType skillType) throws SQLException;
 
 }
