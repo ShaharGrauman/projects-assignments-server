@@ -10,12 +10,12 @@ import java.sql.Date;
 @Setter
 @AllArgsConstructor
 public class Assignment {
-    private int id;
-    private int projectID;
-    private int employeeID;
+    private Integer id;
+    private Integer projectID;
+    private Integer employeeID;
     private Date startDate;
     private Date endDate;
-    private int requestFromManagerID;
-    private int requestToManagerID;
+    private Integer requestFromManagerID;
+    private Integer requestToManagerID;
     private String status;
 }

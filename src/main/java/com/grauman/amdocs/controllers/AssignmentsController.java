@@ -4,6 +4,7 @@ package com.grauman.amdocs.controllers;
 import com.grauman.amdocs.dao.AssignmentsDAO;
 import com.grauman.amdocs.models.Assignment;
 import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
+import com.grauman.amdocs.models.vm.AssignmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ public class AssignmentsController {
 
     @PostMapping("/")
     public ResponseEntity<Assignment> addAssignment(@RequestBody Assignment assignment) throws SQLException {
-
         return new ResponseEntity<>(assignmentsDAO.add(assignment), HttpStatus.OK);
     }
 
@@ -29,6 +29,11 @@ public class AssignmentsController {
     public ResponseEntity<List<AssignmentHistoryVM>> getAssignmentsHistoryForEmployee(@RequestParam int employeeId, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
         List<AssignmentHistoryVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeId, pageNumber, limit);
         return ResponseEntity.ok().body(assignments);
-        //return new ResponseEntity<>(assignments, HttpStatus.OK);
+    }
+
+    @GetMapping("/assignmentsrequest")
+    public ResponseEntity<List<AssignmentRequest>> getAssignmentsRequestByManagerID(@RequestParam int managerid, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
+        List<AssignmentRequest> assignments = assignmentsDAO.getAssignmentsRequestByManagerID(managerid, pageNumber, limit);
+        return ResponseEntity.ok().body(assignments);
     }
 }
