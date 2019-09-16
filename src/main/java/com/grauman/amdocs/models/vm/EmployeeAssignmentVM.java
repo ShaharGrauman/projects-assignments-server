@@ -12,8 +12,8 @@ import java.sql.Date;
 @Setter
 //@AllArgsConstructor
 public class EmployeeAssignmentVM extends Assignment {
-    String employeeName;
-    String projectName;
+    String employeeName ;
+    String projectName ;
 
     public EmployeeAssignmentVM(Integer id, Integer projectID, Integer employeeID, Date startDate, Date endDate, Integer requestFromManagerID, Integer requestToManagerID, String status, String employeeName, String projectName) {
         super(id, projectID, employeeID, startDate, endDate, requestFromManagerID, requestToManagerID, status);
