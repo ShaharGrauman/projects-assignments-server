@@ -10,19 +10,19 @@ import lombok.Setter;
 @Getter
 @Setter
 public class WorkSite {
-    private Integer id;
-    private String name;
-    private Country country;
-    private String city;
-    
-    public WorkSite(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-    
-    public WorkSite(String name, String city, Country country) {
-        this.name = name;
-        this.city = city;
-        this.country = country;
-    }
+	private Integer id;
+	private String name;
+	private Country country;
+	private String city;
+	
+	public WorkSite(Integer id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+	
+	public WorkSite(String name, String city, Country country) {
+		this.name = name;
+		this.city = city;
+		this.country = country;
+	}
 }
