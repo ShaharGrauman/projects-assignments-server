@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/assignments")
+@CrossOrigin
 public class AssignmentsController {
     @Autowired
     private AssignmentsDAO assignmentsDAO;
