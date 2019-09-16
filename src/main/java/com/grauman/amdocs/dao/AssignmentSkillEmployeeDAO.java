@@ -192,8 +192,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<SkillsLevelVM>();
-                        productSkillList = new ArrayList<SkillsLevelVM>();
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
 
                     }
                 }
@@ -206,8 +206,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillName(String skillName, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<SkillsLevelVM>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         if (pageNumber < 1) {
             pageNumber = 1;
@@ -263,8 +263,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<SkillsLevelVM>();
-                        productSkillList = new ArrayList<SkillsLevelVM>();
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
 
                     }
                 }
@@ -279,8 +279,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<Integer> skillSet, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<SkillsLevelVM>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         if (pageNumber < 1) {
             pageNumber = 1;
@@ -341,8 +341,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<SkillsLevelVM>();
-                        productSkillList = new ArrayList<SkillsLevelVM>();
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
 
                     }
                 }
