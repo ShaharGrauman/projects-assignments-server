@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.AuditDAO;
 import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 
 @RestController
 @RequestMapping("/audit")
@@ -23,22 +24,22 @@ public class AuditController {
 	private AuditDAO auditDAO;
 	
 	@GetMapping("")
-	public ResponseEntity<List<Audit>> all() throws SQLException{
-		List<Audit> audit=auditDAO.findAll();
+	public ResponseEntity<List<AuditEmployee>> all() throws SQLException{
+		List<AuditEmployee> audit=auditDAO.findAll();
  		return ResponseEntity.ok().body(audit);  
 	}
 	@GetMapping("/number")
-    public ResponseEntity<List<Audit>> findBynumber(@RequestParam int number) throws SQLException{
-        List<Audit>employeeAudit=auditDAO.searchAuditByEmployeeNumber(number);
+    public ResponseEntity<List<AuditEmployee>> findBynumber(@RequestParam int number) throws SQLException{
+        List<AuditEmployee>employeeAudit=auditDAO.searchAuditByEmployeeNumber(number);
  		return ResponseEntity.ok().body(employeeAudit);  
 
     }
 	//***************************************
     @GetMapping("/date")
-    public ResponseEntity<List<Audit>> searchAuditByDateBetween(
+    public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(
     	@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date datefrom,
      	@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateto)throws SQLException{ 
-         List<Audit> auditByDateFrom=auditDAO.searchAuditByDateBetween(datefrom,dateto);
+         List<AuditEmployee> auditByDateFrom=auditDAO.searchAuditByDateBetween(datefrom,dateto);
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
