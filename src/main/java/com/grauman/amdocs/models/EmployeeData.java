@@ -77,7 +77,7 @@ public class EmployeeData {
 		this.loginStatus = loginStatus;
 		this.locked = locked;
 		this.deactivated = deactivated;
-		this.password=password;
+		setPassword(password);
 		
 	}
 
@@ -100,7 +100,7 @@ public class EmployeeData {
 		this.loginStatus = loginStatus;
 		this.locked = locked;
 		this.deactivated = deactivated;
-		this.password=password;
+		setPassword(password);
 		this.roles=roles;
 	}
 
@@ -120,7 +120,14 @@ public class EmployeeData {
 		this.loginStatus = loginStatus;
 		this.locked = locked;
 		this.deactivated = deactivated;
-		this.password=password;
+		setPassword(password);
+	}
+	
+	
+	public void setPassword(String password) {
+		String salt = PasswordUtils.getSalt(30);
+		String mySecuredPassword = PasswordUtils.generateSecurePassword(password, salt);
+		this.password = mySecuredPassword;
 	}
 	
 }
