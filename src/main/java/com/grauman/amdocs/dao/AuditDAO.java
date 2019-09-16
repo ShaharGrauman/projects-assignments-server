@@ -99,7 +99,7 @@ public class AuditDAO implements IAuditDAO{
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where date(date_time)>? and date(A.date_time)<?";
+        		 					+ " where date(A.date_time)>? and date(A.date_time)<?";
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
                 command.setDate(1,datefrom);
