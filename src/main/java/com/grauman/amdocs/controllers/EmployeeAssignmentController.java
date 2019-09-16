@@ -20,7 +20,6 @@ public class EmployeeAssignmentController {
     public ResponseEntity<List<EmployeeAssignmentVM>> getDoneAssignments(@RequestParam Integer managerID,
                                                                          @RequestParam String requestedDate,
                                                                          @RequestParam Integer pageNumber, @RequestParam Integer limit)throws SQLException{
-        System.out.println("sssssssssssssssssssss");
         List<EmployeeAssignmentVM> employees = employeeAssignmentDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), pageNumber,limit);
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
