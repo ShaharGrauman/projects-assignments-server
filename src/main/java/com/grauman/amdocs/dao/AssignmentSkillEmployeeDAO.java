@@ -21,8 +21,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Override
     public List<AssignmentSkillEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<SkillsLevelVM>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         if (pageNumber.intValue() < 1) {
             pageNumber = 1;
@@ -73,8 +73,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                                 result.getString("name"),
                                 technicalSkillList, productSkillList);
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<SkillsLevelVM>();
-                        productSkillList = new ArrayList<SkillsLevelVM>();
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
 
                     }
                 }
@@ -87,8 +87,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Override
     public List<AssignmentSkillEmployeeVM> getEmployeesByProjectID(Integer projectid) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
-        List<SkillsLevelVM> technicalskillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productskillList = new ArrayList<SkillsLevelVM>();
+        List<SkillsLevelVM> technicalskillList = new ArrayList<>();
+        List<SkillsLevelVM> productskillList = new ArrayList<>();
         try (Connection conn = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     "from users u join assignment a on u.id = a.employee_id where a.project_id = ?";
@@ -127,8 +127,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                                 result.getString("name"),
                                 technicalskillList, productskillList);
                         employees.add(employee);
-                        technicalskillList = new ArrayList<SkillsLevelVM>();
-                        productskillList = new ArrayList<SkillsLevelVM>();
+                        technicalskillList = new ArrayList<>();
+                        productskillList = new ArrayList<>();
                     }
                 }
             }
@@ -139,8 +139,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<SkillsLevelVM>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         if (pageNumber < 1) {
             pageNumber = 1;
