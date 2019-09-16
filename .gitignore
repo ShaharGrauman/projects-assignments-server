@@ -8,6 +8,9 @@
 *.war
 *.ear
 
+#dbConfig
+db.config
+
 #Gradle temporary files
 target/
 

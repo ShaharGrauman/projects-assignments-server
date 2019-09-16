@@ -1,18 +1,20 @@
 package com.grauman.amdocs.models;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Country {
-    private Integer id;
-    private String name;
-    public Country(Integer id) {
-    	this.id=id;
-    }
+@ToString
+public class RolePermissions extends Role{
+	private Role role;
+	private List<Permission> permissions;
+	
 }
