@@ -15,7 +15,7 @@ public class EmployeeAssignmentVM extends Assignment {
     String employeeName;
     String projectName;
 
-    public EmployeeAssignmentVM(int id, int projectID, int employeeID, Date startDate, Date endDate, int requestFromManagerID, int requestToManagerID, String status, String employeeName, String projectName) {
+    public EmployeeAssignmentVM(Integer id, Integer projectID, Integer employeeID, Date startDate, Date endDate, Integer requestFromManagerID, Integer requestToManagerID, String status, String employeeName, String projectName) {
         super(id, projectID, employeeID, startDate, endDate, requestFromManagerID, requestToManagerID, status);
         this.employeeName = employeeName;
         this.projectName = projectName;

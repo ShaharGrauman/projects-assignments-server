@@ -2,7 +2,6 @@ package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IEmployeeAssignmentDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
-import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
 import com.grauman.amdocs.models.vm.EmployeeAssignmentVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,8 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+//import java.util.Calendar;
+import java.sql.Date;
 import java.util.List;
 
 @Service
@@ -32,7 +31,7 @@ public class EmployeeAssignmentDAO implements IEmployeeAssignmentDAO {
         Integer offset = (pageNumber - 1) * limit;
 
         try (Connection conn = db.getConnection()) {
-            String sqlCommand = " select u.id, concat(u.first_name, \" \" , u.last_name) as name, a.id, p.name,\n" +
+            String sqlCommand = " select u.id, concat(u.first_name, \" \" , u.last_name) as name, a.project_id ,a.id, p.name,\n" +
                     "             a.start_date, a.end_date, a.requested_from_manager_id, a.requested_to_manager_id, a.status\n" +
                     "             from users u join assignment a on u.id=a.employee_id join project p on a.project_id=p.id \n" +
                     "             where u.manager_id = ? and a.status='Done!' and\n" +
@@ -41,7 +40,7 @@ public class EmployeeAssignmentDAO implements IEmployeeAssignmentDAO {
 
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
                 command.setInt(1, managerID);
-                command.setDate(2, (java.sql.Date) requestedDate);
+                command.setDate(2,  requestedDate);
                 command.setInt(3, limit);
                 command.setInt(4, offset);
 
@@ -56,7 +55,7 @@ public class EmployeeAssignmentDAO implements IEmployeeAssignmentDAO {
                                 result.getInt("a.requested_from_manager_id"),
                                 result.getInt("a.requested_to_manager_id"),
                                 result.getString("a.status"),
-                                result.getString("u.name"),
+                                result.getString("name"),
                                 result.getString("p.name"))
 
                         );
