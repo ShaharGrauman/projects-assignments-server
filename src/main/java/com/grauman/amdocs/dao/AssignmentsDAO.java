@@ -4,6 +4,7 @@ import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
 import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
+import com.grauman.amdocs.models.vm.AssignmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,6 +94,50 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 result.getString("p.name"),
                                 result.getInt("a.project_id"),
                                 employeeID,
+                                result.getDate("a.start_date"),
+                                result.getDate("a.end_date"),
+                                result.getInt("a.requested_from_manager_id"),
+                                result.getInt("a.requested_to_manager_id"),
+                                result.getString("a.status"))
+                        );
+                    }
+                }
+            }
+
+        }
+        if (assignments.isEmpty()) {
+            throw new ResultsNotFoundException("Couldn't find assignments for this employee");
+
+        }
+        return assignments;
+    }
+
+    @Override
+    public List<AssignmentRequest> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException {
+        List<AssignmentRequest> assignments = new ArrayList<AssignmentRequest>();
+
+        if (currPage < 1)
+            currPage = 1;
+
+        int offset = (currPage - 1) * limit; // index of which row to start retrieving data
+
+        try (Connection conn = db.getConnection()) {
+
+            String sqlCommand = "Select concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
+                    "from user u join assignment a on u.id = a.employeeid join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = 'Pending approval' limit ? offset ?";
+
+            try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
+                command.setInt(1, managerid);
+                command.setInt(2, limit);
+                command.setInt(3, offset);
+
+                try (ResultSet result = command.executeQuery()) {
+                    while (result.next()) {
+                        assignments.add(new AssignmentRequest(
+                                result.getInt("a.id"),
+                                result.getString("p.name"),
+                                result.getInt("a.project_id"),
+                                managerid,
                                 result.getDate("a.start_date"),
                                 result.getDate("a.end_date"),
                                 result.getInt("a.requested_from_manager_id"),
