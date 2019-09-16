@@ -116,8 +116,8 @@ public class ProjectsDAO implements IProjectsDAO {
 
 
         List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<SkillsLevelVM>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection conn = db.getConnection()) {
             String projectQuery = "select p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
@@ -164,8 +164,8 @@ public class ProjectsDAO implements IProjectsDAO {
                         }
                         ProjectVM pro2 = new ProjectVM(Rs.getInt(1), Rs.getString(2), Rs.getString(4), Rs.getDate(3), technicalSkillList, productSkillList, managerID);
                         projectVMList.add(pro2);
-                        technicalSkillList = new ArrayList<SkillsLevelVM>();
-                        productSkillList = new ArrayList<SkillsLevelVM>();
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
                     }
                 }
             }
@@ -178,9 +178,9 @@ public class ProjectsDAO implements IProjectsDAO {
     @Override
     public List<ProjectVM> searchProjectByProjectName(String projectName, Integer pageNumber, Integer limit) throws SQLException {
 
-        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<SkillsLevelVM>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<SkillsLevelVM>();
+        List<ProjectVM> projectVMList = new ArrayList<>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection conn = db.getConnection()) {
             String projectQuery = "select p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
@@ -225,8 +225,8 @@ public class ProjectsDAO implements IProjectsDAO {
                         }
                         ProjectVM pro2 = new ProjectVM(Rs.getInt(1), Rs.getString(2), Rs.getString(4), Rs.getDate(3), technicalSkillList, productSkillList, Rs.getInt(5));
                         projectVMList.add(pro2);
-                        technicalSkillList = new ArrayList<SkillsLevelVM>();
-                        productSkillList = new ArrayList<SkillsLevelVM>();
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
                     }
                 }
             }
