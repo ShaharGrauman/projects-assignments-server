@@ -10,7 +10,8 @@ import java.sql.Date;
 public class AssignmentRequest extends AssignmentHistoryVM {
     String employeeName;
 
-    public AssignmentRequest(int id, String projectName, int projectID, int employeeID, Date startDate, Date endDate, int requestFromManagerID, int requestToManagerID, String status) {
+    public AssignmentRequest(int id, String projectName, int projectID, int employeeID,String employeeName ,Date startDate, Date endDate, int requestFromManagerID, int requestToManagerID, String status) {
         super(id, projectName, projectID, employeeID, startDate, endDate, requestFromManagerID, requestToManagerID, status);
+        this.employeeName=employeeName;
     }
 }

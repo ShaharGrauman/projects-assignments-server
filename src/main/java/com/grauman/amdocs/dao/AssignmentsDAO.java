@@ -123,8 +123,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
         try (Connection conn = db.getConnection()) {
 
-            String sqlCommand = "Select concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
-                    "from user u join assignment a on u.id = a.employeeid join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = 'Pending approval' limit ? offset ?";
+            String sqlCommand = "Select a.id,concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
+                    "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = 'Pending approval' limit ? offset ?";
 
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
                 command.setInt(1, managerid);
@@ -137,7 +137,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
                                 result.getInt("a.project_id"),
-                                managerid,
+                                result.getInt("u.id"),
+                                result.getString("name"),
                                 result.getDate("a.start_date"),
                                 result.getDate("a.end_date"),
                                 result.getInt("a.requested_from_manager_id"),
@@ -150,7 +151,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
         }
         if (assignments.isEmpty()) {
-            throw new ResultsNotFoundException("Couldn't find assignments for this employee");
+            throw new ResultsNotFoundException("Couldn't find assignments for this manager");
 
         }
         return assignments;
