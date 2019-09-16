@@ -10,5 +10,5 @@ public interface IAssignmentSkillEmployeeDAO extends IDAO<AssignmentSkillEmploye
     public List<AssignmentSkillEmployeeVM> getEmployeesByProjectID(Integer projectid) throws SQLException;
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer pageNumber, Integer limit) throws SQLException;
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<Integer> skillSet, Integer pageNumber, Integer limit) throws SQLException;
-
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillName(String skillName, Integer pageNumber, Integer limit) throws SQLException;
 }
