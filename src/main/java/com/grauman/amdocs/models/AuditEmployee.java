@@ -1,5 +1,8 @@
 package com.grauman.amdocs.models;
 
+import java.sql.Date;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,13 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Country {
-    private Integer id;
-    private String name;
-    public Country(Integer id) {
-    	this.id=id;
-    }
-    public Country(String name) {
-    	this.name=name;
-    }
+
+public class AuditEmployee {
+	private Audit audit;
+	private String firstname;
+	private String lastname;
+	private List<Role> roles;
+
 }

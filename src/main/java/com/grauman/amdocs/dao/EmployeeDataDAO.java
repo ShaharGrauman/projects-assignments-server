@@ -47,7 +47,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	@Override
 	public List<EmployeeData> findAll() throws SQLException {
 		int userId;
-    	List<EmployeeData> users=new ArrayList<EmployeeData>();
+    	List<EmployeeData> users=new ArrayList<>();
 		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,U.department,"
 								+ "WS.name as worksite,WS.city,C.name as country "
 								+ "From users U JOIN worksite WS ON U.work_site_id=WS.id "
@@ -61,18 +61,16 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					userId=result.getInt(1);
 					List<Role> roles=new ArrayList<>();
 					roles=getEmployeeRoles(userId);
-					users.add(
-							new EmployeeData(
-									result.getInt(1),
-									result.getInt(2),
-									result.getString(3),
-									result.getString(4),
-									roles,
-									result.getString(5),
-									result.getString(6),
-									result.getString(7),
-									result.getString(8)
-									));
+					users.add(new EmployeeData(new Employee(
+											result.getInt(1),
+											result.getInt(2),
+											result.getString(3),
+											result.getString(4),
+											result.getString(5),
+											new WorkSite(result.getString(6),result.getString(7)),
+											new Country(result.getString(8))),roles));
+										
+					
 				}
 			}
 		}
@@ -94,18 +92,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					userId=result.getInt(1);
 					List<Role> roles=new ArrayList<>();
 					roles=getEmployeeRoles(userId);
-					users.add(
-							new EmployeeData(
-									result.getInt(1),
-									result.getInt(2),
-									result.getString(3),
-									result.getString(4),
-									roles,
-									result.getString(5),
-									result.getString(6),
-									result.getString(7),
-									result.getString(8)
-									));
+					users.add(new EmployeeData(new Employee(
+							result.getInt(1),
+							result.getInt(2),
+							result.getString(3),
+							result.getString(4),
+							result.getString(5),
+							new WorkSite(result.getString(6),result.getString(7)),
+							new Country(result.getString(8))),roles));
 				}
 			}
 		}
@@ -155,14 +149,22 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							}
 						}
 					}
-					found = new EmployeeData(result.getInt("U1.id"), result.getInt("U1.employee_number"),
-							result.getString("U1.first_name"), result.getString("U1.last_name"),
-							result.getString("U1.email"), result.getString("U2.first_name"), result.getInt("U1.manager_id"),
-							result.getString("U1.department"), result.getString("WS.name"),
-							result.getInt("U1.work_site_id"), result.getString("U1.country"),
-							result.getString("U1.phone"),auditDate,
-							result.getBoolean("U1.login_status"), result.getBoolean("U1.locked"),
-							result.getBoolean("U1.deactivated"), result.getString("U1.password"), roles);
+					found = new EmployeeData(new Employee(
+														  result.getInt("U1.id"),
+														  result.getInt("U1.employee_number"),
+														  result.getString("U1.first_name"),
+														  result.getString("U1.last_name"),
+														  result.getString("U1.email"),
+														  result.getInt("U1.manager_id"),
+														  result.getString("U1.department"),
+														  new WorkSite(result.getInt("U1.work_site_id"),result.getString("WS.name")),
+														  new Country(result.getString("U1.country")),
+														  result.getString("U1.phone"),
+														  result.getBoolean("U1.login_status"),
+														  result.getBoolean("U1.locked"),
+														  result.getBoolean("U1.deactivated")),
+														  result.getString("U2.first_name"),auditDate,roles);
+							
 				}
 			}
 		}} catch (Exception e) {
@@ -198,13 +200,21 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							roles.add(new Role(result2.getString("R.name")));
 						}
 						System.out.println(roles);
-					found = new EmployeeData(result.getInt("U1.id"), result.getInt("U1.employee_number"),
-							result.getString("U1.first_name"), result.getString("U1.last_name"), result.getString("U1.email"),
-							result.getString("U2.first_name"), result.getInt("U1.manager_id"),
-							result.getString("U1.department"), result.getString("WS.name"), result.getInt("U1.work_site_id"),
-							result.getString("U1.country"), result.getString("U1.phone"),
-							result.getBoolean("U1.login_status"), result.getBoolean("U1.locked"),
-							result.getBoolean("U1.deactivated"), result.getString("U1.password"), roles);
+					found = new EmployeeData(new Employee(
+							  result.getInt("U1.id"),
+							  result.getInt("U1.employee_number"),
+							  result.getString("U1.first_name"),
+							  result.getString("U1.last_name"),
+							  result.getString("U1.email"),
+							  result.getInt("U1.manager_id"),
+							  result.getString("U1.department"),
+							  new WorkSite(result.getInt("U1.work_site_id"),result.getString("WS.name")),
+							  new Country(result.getString("U1.country")),
+							  result.getString("U1.phone"),
+							  result.getBoolean("U1.login_status"),
+							  result.getBoolean("U1.locked"),
+							  result.getBoolean("U1.deactivated")),
+							  result.getString("U2.first_name"),roles);
 					  }
 				}
 			}
@@ -226,19 +236,20 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			try (PreparedStatement statement = conn.prepareStatement(sqlAddEmployeeStatement,
 					Statement.RETURN_GENERATED_KEYS)) {
 
-				statement.setInt(1, employee.getNumber());
-				statement.setString(2, employee.getFirstName());
-				statement.setString(3, employee.getLastName());
-				statement.setString(4, employee.getEmail());
-				statement.setInt(5, employee.getManagerId());
-				statement.setString(6, employee.getDepartment());
-				statement.setInt(7, employee.getWorkSiteId());
-				statement.setString(8, employee.getCountry());
-				statement.setString(9, employee.getPhone());
-				statement.setBoolean(10, employee.getLoginStatus());
-				statement.setBoolean(11, employee.getLocked());
-				statement.setBoolean(12, employee.getDeactivated());
-				statement.setString(13, employee.getPassword());
+				statement.setInt(1, employee.getEmployee().getNumber());
+				statement.setString(2, employee.getEmployee().getFirstName());
+				statement.setString(3, employee.getEmployee().getLastName());
+				statement.setString(4, employee.getEmployee().getEmail());
+				statement.setInt(5, employee.getEmployee().getManagerId());
+				statement.setString(6, employee.getEmployee().getDepartment());
+				statement.setInt(7, employee.getEmployee().getWorksite().getId());
+				statement.setString(8, employee.getEmployee().getCountry().getName());
+				statement.setString(9, employee.getEmployee().getPhone());
+				statement.setBoolean(10, employee.getEmployee().getLoginStatus());
+				statement.setBoolean(11, employee.getEmployee().getLocked());
+				statement.setBoolean(12, employee.getEmployee().getDeactivated());
+				//change it to the generated password!
+				statement.setString(13, employee.getEmployee().getPassword());
 
 				int rowCountUpdated = statement.executeUpdate();
 
@@ -273,23 +284,23 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
         List<Role> roles=new ArrayList<>();
         String sqlDelEmployeeStatement = "update users set employee_number=?,first_name=?,last_name=?,"
                 + "email=?,manager_id=?,department=?,work_site_id=?,"
-                + "country=?,phone=?,login_status=?,locked=?,deactivated=?,password=? where id=?";
+                + "country=?,phone=?,login_status=?,locked=?,deactivated=? where id=?";
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement statement = conn.prepareStatement(sqlDelEmployeeStatement)) {
-                statement.setInt(1, employee.getNumber());
-                statement.setString(2, employee.getFirstName());
-                statement.setString(3, employee.getLastName());
-                statement.setString(4, employee.getEmail());
-                statement.setInt(5, employee.getManagerId());
-                statement.setString(6, employee.getDepartment());
-                statement.setInt(7, employee.getWorkSiteId());
-                statement.setString(8, employee.getCountry());
-                statement.setString(9, employee.getPhone());
-                statement.setBoolean(10, employee.getLoginStatus());
-                statement.setBoolean(11, employee.getLocked());
-                statement.setBoolean(12, employee.getDeactivated());
-                statement.setString(13, employee.getPassword());
-                statement.setInt(14, employee.getId());
+            	statement.setInt(1, employee.getEmployee().getNumber());
+				statement.setString(2, employee.getEmployee().getFirstName());
+				statement.setString(3, employee.getEmployee().getLastName());
+				statement.setString(4, employee.getEmployee().getEmail());
+				statement.setInt(5, employee.getEmployee().getManagerId());
+				statement.setString(6, employee.getEmployee().getDepartment());
+				statement.setInt(7, employee.getEmployee().getWorksite().getId());
+				statement.setString(8, employee.getEmployee().getCountry().getName());
+				statement.setString(9, employee.getEmployee().getPhone());
+				statement.setBoolean(10, employee.getEmployee().getLoginStatus());
+				statement.setBoolean(11, employee.getEmployee().getLocked());
+				statement.setBoolean(12, employee.getEmployee().getDeactivated());
+                
+                statement.setInt(13, employee.getEmployee().getId());
                 int rowCountUpdated = statement.executeUpdate();
             }
             String sqlUpdateRole="update userrole set role_id=? where user_id=?";
@@ -297,13 +308,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
                 roles=employee.getRoles();
                 for(int i=0;i<roles.size();i++) {
                 statement.setInt(1,roles.get(i).getId());
-                statement.setInt(2,employee.getId());
+                statement.setInt(2,employee.getEmployee().getId());
                 
                 int rowCountUpdated=statement.executeUpdate();
                 }
             }
         }
-        updatedEmployee = find(employee.getId());
+        updatedEmployee = find(employee.getEmployee().getId());
         
     return updatedEmployee;
 
@@ -344,17 +355,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					ResultSet result = command.executeQuery();
 					if(result.next()) {
 						employeeRoles=getEmployeeRoles(result.getInt(1));
-						found.add(new EmployeeData(
+						found.add(new EmployeeData(new Employee(
 								result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							employeeRoles,
-							result.getString(5),
-							result.getString(6),
-							result.getString(7),
-							result.getString(8)
-							));
+								result.getInt(2),
+								result.getString(3),
+								result.getString(4),
+								result.getString(5),
+								new WorkSite(result.getString(6),result.getString(7)),
+								new Country(result.getString(8))),employeeRoles));
 					}
 					}}
 				 catch (Exception e) {
@@ -380,17 +388,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				
 					while(result.next()) {
 						employeeRoles=getEmployeeRoles(result.getInt(1));
-						found.add(new EmployeeData(
+						found.add(new EmployeeData(new Employee(
 								result.getInt(1),
 								result.getInt(2),
 								result.getString(3),
 								result.getString(4),
-								employeeRoles,
 								result.getString(5),
-								result.getString(6),
-								result.getString(7),
-								result.getString(8)
-								));
+								new WorkSite(result.getString(6),result.getString(7)),
+								new Country(result.getString(8))),employeeRoles));
 					}
 				}
 			} 
@@ -416,17 +421,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			
 				while(result.next()) {
 					employeeRoles=getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(
+					found.add(new EmployeeData(new Employee(
 							result.getInt(1),
 							result.getInt(2),
 							result.getString(3),
 							result.getString(4),
-							employeeRoles,
 							result.getString(5),
-							result.getString(6),
-							result.getString(7),
-							result.getString(8)
-							));
+							new WorkSite(result.getString(6),result.getString(7)),
+							new Country(result.getString(8))),employeeRoles));
 				}
 			}
 		} 
@@ -451,17 +453,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			
 				while(result.next()) {
 					employeeRoles=getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(
+					found.add(new EmployeeData(new Employee(
 							result.getInt(1),
 							result.getInt(2),
 							result.getString(3),
 							result.getString(4),
-							employeeRoles,
 							result.getString(5),
-							result.getString(6),
-							result.getString(7),
-							result.getString(8)
-								));
+							new WorkSite(result.getString(6),result.getString(7)),
+							new Country(result.getString(8))),employeeRoles));
 				}
 			}
 		} 
@@ -486,17 +485,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		        
 		      while(result.next()) {
 		            employeeRoles=getEmployeeRoles(result.getInt(1));
-		            found.add(new EmployeeData(
-		                  		    result.getInt(1),
-									result.getInt(2),
-									result.getString(3),
-									result.getString(4),
-									employeeRoles,
-									result.getString(5),
-									result.getString(6),
-									result.getString(7),
-									result.getString(8)
-		                           ));
+		            found.add(new EmployeeData(new Employee(
+							result.getInt(1),
+							result.getInt(2),
+							result.getString(3),
+							result.getString(4),
+							result.getString(5),
+							new WorkSite(result.getString(6),result.getString(7)),
+							new Country(result.getString(8))),employeeRoles));
 		          }
 		      }
 		  }
@@ -588,8 +584,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 // get all Managers (Name+ID)
-	public List<EmployeeData> findAllManagers() throws SQLException {
-		List<EmployeeData> managers = new ArrayList<EmployeeData>();
+	public List<Employee> findAllManagers() throws SQLException {
+		List<Employee> managers = new ArrayList<Employee>();
 		String sqlSitesCommand = "select DISTINCT U1.id,U1.first_name " 
 							+ "From users U1 JOIN users U2 ON U1.id=U2.manager_id "
 							+ "JOIN userrole UR ON U1.id=UR.user_id JOIN roles R ON UR.role_id=R.id"
@@ -600,7 +596,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 				ResultSet result = command.executeQuery(sqlSitesCommand);
 				while (result.next()) {
-					managers.add(new EmployeeData(result.getInt(1), result.getString(2)));
+					managers.add(new Employee(result.getInt(1), result.getString(2)));
 				}
 			}
 		}

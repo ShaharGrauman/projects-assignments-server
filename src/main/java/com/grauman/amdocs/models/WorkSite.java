@@ -19,7 +19,10 @@ public class WorkSite {
 		this.id = id;
 		this.name = name;
 	}
-	
+	public WorkSite(String name,String city) {
+		this.name=name;
+		this.city=city;
+	}
 	public WorkSite(String name, String city, Country country) {
 		this.name = name;
 		this.city = city;
