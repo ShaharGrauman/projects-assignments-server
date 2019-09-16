@@ -422,6 +422,7 @@ ALTER TABLE `assignments`.`permissions`
 DROP FOREIGN KEY role_id,
 DROP COLUMN `role_id`,
 DROP INDEX `role_id` ;
+ALTER TABLE project ADD UNIQUE (name);
 
 
 CREATE TABLE rolepermissions (
