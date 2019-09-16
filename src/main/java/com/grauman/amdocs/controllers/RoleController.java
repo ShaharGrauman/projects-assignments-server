@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grauman.amdocs.dao.RoleDAO;
 import com.grauman.amdocs.models.Department;
 import com.grauman.amdocs.models.Role;
+import com.grauman.amdocs.models.RolePermissions;
 
 @RestController
 @RequestMapping("/roles")
@@ -22,14 +23,14 @@ public class RoleController {
 	private RoleDAO roleDAO;
 	
 	@GetMapping("")
-	public ResponseEntity<List<Role>> all() throws SQLException{
-		List<Role> roles = roleDAO.findAll();
+	public ResponseEntity<List<RolePermissions>> all() throws SQLException{
+		List<RolePermissions> roles = roleDAO.findAll();
 		return ResponseEntity.ok().body(roles);
 	}
 //Add Role
 	@PostMapping("")
-	public ResponseEntity<Role> newRole(@RequestBody Role role) throws SQLException{
- 		Role newRole=roleDAO.add(role);
+	public ResponseEntity<RolePermissions> newRole(@RequestBody RolePermissions role) throws SQLException{
+		RolePermissions newRole=roleDAO.add(role);
  		return ResponseEntity.ok().body(newRole);  
  		}
 }

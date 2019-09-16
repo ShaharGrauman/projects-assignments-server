@@ -424,12 +424,12 @@ DROP COLUMN `role_id`,
 DROP INDEX `role_id` ;
 
 
-CREATE TABLE `assignments`.`rolepermissions` (
-  `role_permission_id ` INT NOT NULL,
-  `permission_id` INT NOT NULL,
-  PRIMARY KEY (`role_permission_id `, `permission_id`));
-
-ALTER TABLE rolepermissions
-ADD CONSTRAINT role_permission_id FOREIGN KEY (role_permission_id) REFERENCES roles(id),
-ADD CONSTRAINT Permission_id FOREIGN KEY (Permission_id) REFERENCES permissions(id);
+CREATE TABLE rolepermissions (
+ role_permission_id int(11) NOT NULL,
+ permission_id int(11) NOT NULL,
+ KEY permission_id_idx (permission_id),
+ KEY role_permission_id (role_permission_id),
+ CONSTRAINT permission_id FOREIGN KEY (permission_id) REFERENCES permissions (id),
+ CONSTRAINT role_permission_id FOREIGN KEY (role_permission_id) REFERENCES roles (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

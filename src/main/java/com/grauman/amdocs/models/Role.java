@@ -17,7 +17,6 @@ public class Role {
 	private Integer id;
 	private String name;
 	private String description;
-	private List<Permission> permissions;
 	
 	public Role(String name) {
 		this.name=name;
@@ -26,13 +25,4 @@ public class Role {
 		this.id=id;
 		this.name=name;
 	}
-	public Role(Integer id,String name, List<Permission> permissions) {
-		this(id, name);
-		this.permissions = permissions;
-	}
-	public Role(Integer id,String name,String description) {
-		this(id, name);
-		this.description=description;
-	}
-
 }

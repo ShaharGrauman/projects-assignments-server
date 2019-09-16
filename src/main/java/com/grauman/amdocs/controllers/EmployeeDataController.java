@@ -29,18 +29,34 @@ public class EmployeeDataController {
 	@Autowired
 	private EmployeeDataDAO employeeDataDAO;
 	
-//All Employees
-	@GetMapping("")
-	public ResponseEntity<List<EmployeeData>> all() throws SQLException {
+//All Employees Which are locked
+	@GetMapping("locked")
+	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
 		}
-//Employee
+  
+//All Employees	
+	@GetMapping("")
+	public ResponseEntity<List<EmployeeData>> all() throws SQLException {
+		List<EmployeeData> employee= employeeDataDAO.findAllEmployees();
+		return ResponseEntity.ok().body(employee);
+	}
+
+//Employee by employee number
+	@GetMapping("/employeenumber")
+	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeenumber) throws SQLException {
+		EmployeeData employee=employeeDataDAO.findByEmployeeNumber(employeenumber);
+		return ResponseEntity.ok().body(employee);
+	}
+//Employee by employee id
+
 	@GetMapping("/id")
-	public ResponseEntity<EmployeeData> findEmployeeById(@RequestParam int id) throws SQLException {
+	public ResponseEntity<EmployeeData> find(@RequestParam int id) throws SQLException {
 		EmployeeData employee=employeeDataDAO.find(id);
 		return ResponseEntity.ok().body(employee);
 	}
+	
 //Add Employee
 	@PostMapping("")
 	public ResponseEntity<EmployeeData> newEmployee(@RequestBody EmployeeData employee) throws SQLException{
@@ -48,13 +64,13 @@ public class EmployeeDataController {
 		return ResponseEntity.ok().body(employeeResult);
 	}
 //Update Employee
-	@PutMapping("/update/id")
+	@PutMapping("/id")
 	public ResponseEntity<EmployeeData> updateEmployeeInfo(@RequestParam int id, @RequestBody EmployeeData employee) throws SQLException {
 		EmployeeData employeeByID = employeeDataDAO.update(employee);
 		return ResponseEntity.ok().body(employeeByID); 
 	}
 //Delete Employee
-	@DeleteMapping("/delete/id")
+	@DeleteMapping("/id")
 	public ResponseEntity<EmployeeData> deleteEmployee(@RequestParam Integer id) throws SQLException {
 		EmployeeData deletedEmployee = employeeDataDAO.delete(id);
 		return ResponseEntity.ok().body(deletedEmployee);   

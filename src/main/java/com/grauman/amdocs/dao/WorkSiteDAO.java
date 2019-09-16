@@ -1,3 +1,5 @@
+
+
 package com.grauman.amdocs.dao;
 
 import java.sql.Connection;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IWorkSiteDAO;
+import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.WorkSite;
 @Service
 public class WorkSiteDAO implements IWorkSiteDAO{
@@ -32,45 +35,45 @@ public class WorkSiteDAO implements IWorkSiteDAO{
     public WorkSite add(WorkSite workSite) throws SQLException{
         int workSiteId;
         WorkSite newWorkSite=null;
-        String sqlFindCommand="Select id FROM country WHERE name=?";
+        String FindCountryId="Select id FROM country WHERE name=?";
         try(Connection conn = db.getConnection()){
-            try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)){
-                command.setString(1, workSite.getCountryName());
+            try (PreparedStatement command = conn.prepareStatement(FindCountryId)){
+                command.setString(1, workSite.getCountry().getName());
+
                 ResultSet result = command.executeQuery();
                 if(result.next()) {
-                    
-                String sqlInsertWorkSite="INSERT into worksite(name,country_id,city) values(?,?,?)";
-                try (PreparedStatement statement = conn.prepareStatement(sqlInsertWorkSite,Statement.RETURN_GENERATED_KEYS)){
-                    statement.setString(1,workSite.getName());
-                    statement.setInt(2,result.getInt(1));
-                    statement.setString(3,workSite.getCity());
-                    
-                    int row=statement.executeUpdate();
-                    ResultSet ids=statement.getGeneratedKeys();
-                    
-                    while (ids.next()) {
-                        workSiteId=ids.getInt(1);
-                        String sqlresult="SELECT * FROM worksite WHERE id=?";
-                        try(PreparedStatement command2 = conn.prepareStatement(sqlresult)){
-                            command2.setInt(1,workSiteId);
-                            ResultSet result2=command2.executeQuery();
-                            result2.next();
-                            newWorkSite=new WorkSite(result2.getInt(1), result2.getString(2),
-                                    result2.getInt(3),result2.getString(4));
-                            
-                            
-                        }
-                        
-                    }
-                    
+	                String InsertWorkSite="INSERT into worksite(name,country_id,city) values(?,?,?)";
+	                try (PreparedStatement statement = conn.prepareStatement(InsertWorkSite,Statement.RETURN_GENERATED_KEYS)){
+	                    statement.setString(1,workSite.getName());
+	                    statement.setInt(2,result.getInt(1));
+	                    statement.setString(3,workSite.getCity());
+	                    
+	                    int row=statement.executeUpdate();
+	                    ResultSet ids=statement.getGeneratedKeys();
+	                    while (ids.next()) {
+	                        workSiteId=ids.getInt(1);
+	                        String workSiteById="SELECT * FROM worksite WHERE id=?";
+	                        try(PreparedStatement command2 = conn.prepareStatement(workSiteById)){
+	                            command2.setInt(1,workSiteId);
+	                            ResultSet result2=command2.executeQuery();
+	
+	                            if(result2.next()) {
+	                            newWorkSite=new WorkSite(
+	                            						result2.getInt(1),
+	                            						result2.getString(2),
+	                            						new Country(result2.getInt(3),workSite.getCountry().getName()),
+	                            						result2.getString(4));
+	                            }
+	
+	                        }
+	                    }                
+	                }
                 }
-                }
-                
-                
             }
         }
         return newWorkSite;
     }
+	
 	@Override
 	public WorkSite update(WorkSite movie) throws SQLException {
 		// TODO Auto-generated method stub

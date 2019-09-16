@@ -3,14 +3,11 @@ package com.grauman.amdocs.dao;
 import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.AssignmentHistory;
+import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 @Service
@@ -29,8 +26,35 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public Assignment add(Assignment movie) throws SQLException {
-        return null;
+    public Assignment add(Assignment item) throws SQLException {
+        System.out.println(item.getEmployeeID());
+        try (Connection conn = db.getConnection()) {
+            // fetch project id by name since project is a unique name which
+            // guarantees retrieving the appropriate id
+            String insertQuery = "INSERT INTO assignment (project_id, employee_id, start_date, end_date, requested_from_manager_id," +
+                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?,?)";
+
+            // preparing a statement that guarantees returning the auto generated id
+            try (PreparedStatement command = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+                command.setInt(1, item.getProjectID());
+                command.setInt(2, item.getEmployeeID());
+                command.setDate(3, item.getStartDate());
+                command.setDate(4, item.getEndDate());
+                command.setInt(5, item.getRequestFromManagerID());
+                command.setInt(6, item.getRequestToManagerID());
+                command.setString(7, item.getStatus());
+                command.executeUpdate();
+                try (ResultSet generatedID = command.getGeneratedKeys()) {
+                    if (generatedID.next())
+                        item.setId(generatedID.getInt(1));
+                    else
+                        throw new SQLException("Assignment insertion failed.");
+                }
+            }
+
+
+        }
+        return item;
     }
 
     @Override
@@ -44,8 +68,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public List<AssignmentHistory> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
-        List<AssignmentHistory> assignments = new ArrayList<AssignmentHistory>();
+    public List<AssignmentHistoryVM> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
+        List<AssignmentHistoryVM> assignments = new ArrayList<AssignmentHistoryVM>();
 
         if (currPage < 1)
             currPage = 1;
@@ -64,7 +88,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        assignments.add(new AssignmentHistory(
+                        assignments.add(new AssignmentHistoryVM(
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
                                 result.getInt("a.project_id"),

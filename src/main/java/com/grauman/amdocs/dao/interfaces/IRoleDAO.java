@@ -1,7 +1,7 @@
 package com.grauman.amdocs.dao.interfaces;
 
-import com.grauman.amdocs.models.Role;
+import com.grauman.amdocs.models.RolePermissions;
 
-public interface IRoleDAO extends IDAO<Role> {
-
+public interface IRoleDAO extends IDAO<RolePermissions> {
+	
 }
