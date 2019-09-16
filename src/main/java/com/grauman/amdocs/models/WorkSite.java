@@ -19,19 +19,7 @@ public class WorkSite {
 		this.id = id;
 		this.name = name;
 	}
-<<<<<<< HEAD
-	public WorkSite(Integer id, String name,Country country) {
-		this(id, name);
-		this.country = country;
-	}
-=======
 
-	public WorkSite(Integer id, String name, Country country) {
-		this(id, name);
-		this.country = country;
-	}
-
->>>>>>> origin/master
 	public WorkSite(String name, String city, Country country) {
 		this.name = name;
 		this.city = city;

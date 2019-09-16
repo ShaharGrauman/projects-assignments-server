@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IAuditDAO;
 import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 import com.grauman.amdocs.models.Role;
 
 
@@ -22,8 +23,8 @@ public class AuditDAO implements IAuditDAO{
 	 @Autowired DBManager db;
 
 	 @Override
-	    public List<Audit> findAll() throws SQLException {
-	        List<Audit> audit=new ArrayList<>();
+	    public List<AuditEmployee> findAll() throws SQLException {
+	        List<AuditEmployee> audit=new ArrayList<>();
 	        List<Role> roles=new ArrayList<>();
 	        
 	        String sqlAllUserscommand="select A.id,A.employee_number, A.date_time,U.first_name,U.last_name,U.id as Employeeid,A.activity "+
@@ -35,16 +36,11 @@ public class AuditDAO implements IAuditDAO{
 						while(result.next()) {
 							roles=getEmployeeRoles(result.getInt(6));
 	                    audit.add(
-	                            new Audit(
-	                                    result.getInt(1),
-	                                    result.getInt(2),
-	                                    result.getInt(6),
-	                                    result.getString(4),
-	                                    result.getString(5),
-	                                    result.getDate(3),
-	                                    result.getString(7),
-	                                    roles
-	                                    ));
+	                            new AuditEmployee(new Audit(result.getInt(1)
+	                            		,result.getInt(2),result.getDate(3),result.getInt(6),result.getString(7)),
+	                            		result.getString(4),result.getString(5),roles)
+	                                    
+	                                    );
 	                	}
 	                	}
 	                }
@@ -69,8 +65,8 @@ public class AuditDAO implements IAuditDAO{
 	  		return employeeRoles;
 	  	}
 //search all Employee's Audit by his Employee Number
-	public List<Audit> searchAuditByEmployeeNumber(int number) throws SQLException {
-        List<Audit> audit = new ArrayList<>();
+	public List<AuditEmployee> searchAuditByEmployeeNumber(int number) throws SQLException {
+        List<AuditEmployee> audit = new ArrayList<>();
         List<Role> roles=new ArrayList<>();
         
         String sqlUsercommand="select A.id,A.employee_number, A.date_time,U.first_name,U.last_name,U.id as Employeeid,A.activity "+
@@ -82,16 +78,11 @@ public class AuditDAO implements IAuditDAO{
         		while(result.next()) {
         			roles=getEmployeeRoles(result.getInt(6));
                     audit.add(
-                            new Audit(
-                                    result.getInt(1),
-                                    result.getInt(2),
-                                    result.getInt(6),
-                                    result.getString(4),
-                                    result.getString(5),
-                                    result.getDate(3),
-                                    result.getString(7),
-                                    roles
-                                    ));
+                            new AuditEmployee(new Audit(result.getInt(1)
+                            		,result.getInt(2),result.getDate(3),result.getInt(6),result.getString(7)),
+                            		result.getString(4),result.getString(5),roles)
+                                   
+                                    );
         		}
         	}
         }
@@ -100,9 +91,9 @@ public class AuditDAO implements IAuditDAO{
     
     }
 // search by date from to
-   public List<Audit> searchAuditByDateBetween(Date datefrom,Date dateto) throws SQLException{
+   public List<AuditEmployee> searchAuditByDateBetween(Date datefrom,Date dateto) throws SQLException{
       
-	   List<Audit> audit = new ArrayList<>();
+	   List<AuditEmployee> audit = new ArrayList<>();
        List<Role> roles=new ArrayList<>();
 
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
@@ -118,48 +109,37 @@ public class AuditDAO implements IAuditDAO{
                 	while(result.next()) {
             			roles=getEmployeeRoles(result.getInt(6));
                         audit.add(
-                                new Audit(
-                                        result.getInt(1),
-                                        result.getInt(2),
-                                        result.getInt(6),
-                                        result.getString(4),
-                                        result.getString(5),
-                                        result.getDate(3),
-                                        result.getString(7),
-                                        roles
+                                new AuditEmployee(new Audit(result.getInt(1)
+                                		,result.getInt(2),result.getDate(3),result.getInt(6),result.getString(7)),
+                                		result.getString(4),result.getString(5),roles
+                                       
                                         ));
             		}
                 }
             }
          }
          return audit;
-   }         
+   }
+@Override
+public AuditEmployee find(int id) throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}
+@Override
+public AuditEmployee add(AuditEmployee movie) throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}
+@Override
+public AuditEmployee update(AuditEmployee movie) throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}
+@Override
+public AuditEmployee delete(int id) throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}        
+}
                 
       
-
-	@Override
-	public Audit find(int id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Audit add(Audit movie) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Audit update(Audit movie) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Audit delete(int id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-}
