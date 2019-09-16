@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.Department;
+import com.grauman.amdocs.models.Employee;
 import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.WorkSite;
@@ -24,7 +25,7 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	List<WorkSite> findAllSites() throws SQLException;
 	List<Role> findAllRoles() throws SQLException;
 	List<Department> findAllDepartments() throws SQLException;
-	List<EmployeeData> findAllManagers() throws SQLException;
+	List<Employee> findAllManagers() throws SQLException;
 	List<Country> findAllCountries() throws SQLException;
 	
 	
