@@ -26,6 +26,7 @@ import com.grauman.amdocs.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.grauman.amdocs.controllers.EmployeeDataController;
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.mail.MailManager;
 
@@ -88,13 +89,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					List<Role> roles=new ArrayList<>();
 					roles=getEmployeeRoles(userId);
 					users.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							result.getString(5),
-							new WorkSite(result.getString(6),result.getString(7)),
-							new Country(result.getString(8))),roles));
+							result.getInt("U.id"),
+							result.getInt("U.employee_number"),
+							result.getString("U.first_name"),
+							result.getString("U.last_name"),
+							result.getString("U.department"),
+							new WorkSite(result.getString("WS.name"),result.getString("WS.city")),
+							new Country(result.getString("C.name"))),roles));
 				}
 			}
 		}
@@ -244,7 +245,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				statement.setBoolean(11, employee.getEmployee().getLocked());
 				statement.setBoolean(12, employee.getEmployee().getDeactivated());
 				//change it to the generated password!
-				statement.setString(13, employee.getEmployee().getPassword());
+				statement.setString(13, EmployeeDataDAO.generatePassword(6));
 
 				int rowCountUpdated = statement.executeUpdate();
 
@@ -653,12 +654,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
  }
  
 //done Exceptions
+//	@SuppressWarnings("null")
 	public void resetPassword(String toEmail) throws SQLException, EmployeeException {
 		boolean catchTimeOut = false;
 		int retries = 0;
 		String findEmployeeByEmail = "SELECT * from users where email=?";
 		String newPassword;
-		Employee employee;
+		EmployeeData employee = null;
 		ResultSet result = null;
 
 		if (!isValid(toEmail))
@@ -700,9 +702,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	//				employee = findEmployeeById(result.getInt(1)); // find gets the id of employee and returns the employee
 					
 					try {
-						employee = find(result.getInt("id")); // find gets the id of employee and returns the employee
+						employee.setEmployee((find(result.getInt("id")).getEmployee())); // find gets the id of employee and returns the employee
 						System.out.println("found employee...");
-						employee.setPassword(PasswordUtils.generateSecurePassword(newPassword));
+						employee.getEmployee().setPassword(PasswordUtils.generateSecurePassword(newPassword));
 						update(employee); // update the new password of this employee in the database.
 						System.out.println("updated...");
 					} catch (SQLException e) {
@@ -742,7 +744,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return email.matches(regex);
 	}
 
-	private String generatePassword(int length) {
+	private static String generatePassword(int length) {
 		Random random = new Random();
 		Random random2 = new Random();
 		String capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
