@@ -200,6 +200,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	@Override
 	public EmployeeData add(EmployeeData employee) throws SQLException {
 		int newEmployeeId = -1;
+		EmployeeData newEmployee = null;
+		
         List<Role> roles=employee.getRoles();
 		String sqlAddEmployeeStatement = "Insert INTO users (employee_number,first_name,last_name,email,manager_id,"
 				+ "department,work_site_id,country,phone,login_status,locked,deactivated,password)"
@@ -229,8 +231,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				while (ids.next()) {
 					newEmployeeId = ids.getInt(1);
 					//find employee by ID
-					newEmployee = find(employeeId);
-					System.out.println(newEmployee.toString());
+					newEmployee = find(newEmployeeId);
+					System.out.println(newEmployeeId);
 				}
 			}
             
@@ -245,7 +247,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
             }
         }
 
-		return findEmployeeById(newEmployeeId);
+		return find(newEmployeeId);
 	}
 
 //should update the userrole table

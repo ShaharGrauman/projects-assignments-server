@@ -13,16 +13,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Role {
-	private Integer id;
-	private String name;
-	private String description;
+public class RolePermissions extends Role{
+	private Role role;
+	private List<Permission> permissions;
 	
-	public Role(String name) {
-		this.name=name;
-	}
-	public Role(Integer id,String name) {
-		this.id=id;
-		this.name=name;
-	}
 }

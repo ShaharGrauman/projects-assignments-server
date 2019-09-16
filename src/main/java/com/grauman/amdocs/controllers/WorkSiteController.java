@@ -19,12 +19,12 @@ import com.grauman.amdocs.models.WorkSite;
 public class WorkSiteController {
     
     @Autowired
-    private WorkSiteDAO workSiteService;
+    private WorkSiteDAO worksiteDAO;
     
     //Add work site
      @PostMapping("")
      public ResponseEntity<WorkSite> newWorkSite(@RequestBody WorkSite worksite) throws SQLException{
-        WorkSite addedSite=workSiteService.add(worksite);
+        WorkSite addedSite=worksiteDAO.add(worksite);
         return ResponseEntity.ok().body(addedSite);
  
          
