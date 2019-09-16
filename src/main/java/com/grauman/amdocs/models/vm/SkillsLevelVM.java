@@ -4,15 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
-public class AssignmentSkillEmployeeVM {
+public class SkillsLevelVM {
     private Integer id;
-    private Integer managerID;
     private String name;
-    private List<SkillsLevelVM> technicalSkills;
-    private List <SkillsLevelVM> productSkills;
+    private Integer level;
 }

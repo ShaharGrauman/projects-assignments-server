@@ -1,6 +1,5 @@
 package com.grauman.amdocs.models.vm;
 
-import com.grauman.amdocs.models.vm.SkillsProjectVM;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +15,7 @@ public class ProjectVM {
     private String name;
     private String description;
     private Date startDate;
-    private List<SkillsProjectVM> technicalSkill;
-    private List<SkillsProjectVM> productSkill;
+    private List<SkillsLevelVM> technicalSkill;
+    private List<SkillsLevelVM> productSkill;
     private Integer managerID;
 }
