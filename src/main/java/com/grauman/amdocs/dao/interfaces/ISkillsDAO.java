@@ -12,10 +12,10 @@ public interface ISkillsDAO extends IDAO<Skill>{
 	/**
 	 * 
 	 * @param id
-	 * @return if skill exist return id, else return 0
+	 * @return if skill exist return true, else return false
 	 * @throws SQLException
 	 */
-	public int CheckIfSkillExist(int id) throws SQLException ;
+	public boolean CheckIfSkillExist(int id) throws SQLException ;
 	
 	/**
 	 * (used in findSkills method)

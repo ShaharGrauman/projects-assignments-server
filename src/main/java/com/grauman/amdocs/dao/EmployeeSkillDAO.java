@@ -88,28 +88,23 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException {
-		int skillid = skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId());
-		if (skillid != 0) {
-			if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), skillid, employeeSkill.getLevel())) {
+		if (skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId())) {
+			if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(), employeeSkill.getLevel())) {
 				if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
-					if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), skillid)) {
+					if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId())) {
 						// Employee's skill added successfully
-						return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skillid, null,
+						return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, employeeSkill.getSkillId(), null,
 								employeeSkill.getLevel(), null, null));
 					} else {
 						throw new  InvalidDataException("Pending employee skill Exist with different level!!");
 					}
 				} else
-					throw new InvalidDataException("Employee Skill leve must be between 1-5!!");
+					throw new InvalidDataException("Employee Skill level must be between 1-5!!");
 			} else
 				// Employee Skill Exist!!
 				throw new InvalidDataException("Employee Skill Exist!!");
 		} else {
-
-			Skill skill = skillsDAO.add(new Skill(employeeSkill.getSkillName(), 0, employeeSkill.getType()));
-
-			return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skill.getSkillid(), null,
-					employeeSkill.getLevel(), "", null));
+            throw new ResultsNotFoundException("Skill is not Exist!!");
 		}
 	}
 

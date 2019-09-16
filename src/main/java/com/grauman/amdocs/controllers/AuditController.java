@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,17 +33,14 @@ public class AuditController {
  		return ResponseEntity.ok().body(employeeAudit);  
 
     }
-    @GetMapping("/datefrom")
-    public ResponseEntity<List<Audit>> findByDateFrom(@RequestParam Date datefrom) throws SQLException{
-         List<Audit> auditByDateFrom=auditDAO.searchAuditByDateFrom(datefrom);
+	//***************************************
+    @GetMapping("/date")
+    public ResponseEntity<List<Audit>> searchAuditByDateBetween(
+    	@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date datefrom,
+     	@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateto)throws SQLException{ 
+         List<Audit> auditByDateFrom=auditDAO.searchAuditByDateBetween(datefrom,dateto);
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
-    
-    @GetMapping("/dateto")
-    public ResponseEntity<List<Audit>> findByDateTo(@RequestParam Date dateto) throws SQLException{
-        List<Audit>auditByDateTo= auditDAO.searchAuditByDateTo(dateto);
-  		return ResponseEntity.ok().body(auditByDateTo);  
-
-    }
+ 
 }

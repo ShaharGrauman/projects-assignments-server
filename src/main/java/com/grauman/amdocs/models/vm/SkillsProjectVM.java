@@ -1,4 +1,4 @@
-package com.grauman.amdocs.models;
+package com.grauman.amdocs.models.vm;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SkillsProject {
-    private int id;
+public class SkillsProjectVM {
+    private Integer id;
     private String name;
-    private int level;
+    private Integer level;
 }
