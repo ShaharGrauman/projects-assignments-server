@@ -34,8 +34,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     "from users u where manager_id = ? limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? ";
-            String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = \" +\n" +
-                    "\"es.user_id join skills s on es.skill_id = s.id where type = \\\"PRODUCT\\\" and u.id = ?";
+            String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
+                    "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? ";
 
             try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
                 command.setInt(1, managerID.intValue());
@@ -219,11 +219,10 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     " from users u join employeeskill es on u.id=es.user_id" +
                     " join skills s on es.skill_id=s.id where skill_id in (";
             for (int i = 0; i < skillSet.size(); i++) {
-                if(i==skillSet.size()-1){
-                    employeeQuery += skillSet.get(i) +") group by u.id limit ? offset ? ;";
-                }
-                else{
-                    employeeQuery += skillSet.get(i) + "," ;
+                if (i == skillSet.size() - 1) {
+                    employeeQuery += skillSet.get(i) + ") group by u.id limit ? offset ? ;";
+                } else {
+                    employeeQuery += skillSet.get(i) + ",";
 
                 }
             }
@@ -265,9 +264,9 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                             }
                         }
                         AssignmentSkillEmployeeVM employee = new AssignmentSkillEmployeeVM(result.getInt("u.id"),
-                                                                             result.getInt("u.manager_id"),
-                                                                             result.getString("name"),
-                                                                             technicalSkillList, productSkillList);
+                                result.getInt("u.manager_id"),
+                                result.getString("name"),
+                                technicalSkillList, productSkillList);
                         employees.add(employee);
                         technicalSkillList = new ArrayList<FinalEmployeeSkillVM>();
                         productSkillList = new ArrayList<FinalEmployeeSkillVM>();
