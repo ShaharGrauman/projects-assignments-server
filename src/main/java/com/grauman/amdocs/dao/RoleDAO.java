@@ -14,15 +14,17 @@ import org.springframework.stereotype.Service;
 import com.grauman.amdocs.dao.interfaces.IRoleDAO;
 import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
+import com.grauman.amdocs.models.RolePermissions;
 
 @Service
 public class RoleDAO implements IRoleDAO{
-	 @Autowired DBManager db;
-
+	 @Autowired 
+	 private DBManager db;
+	 
 	@Override
-	public List<Role> findAll() throws SQLException {
+	public List<RolePermissions> findAll() throws SQLException {
 		List<Role> roles = new ArrayList<>();
-		List<Role> rolesWithPermissions = new ArrayList<>();
+		List<RolePermissions> rolesWithPermissions = new ArrayList<>();
 
 		String sqlFindRoles="select id,name from roles";
 		String findRolePermissions="select P.id,P.name"
@@ -53,9 +55,8 @@ public class RoleDAO implements IRoleDAO{
 									result2.getString(2)
 									));
 						}
-						rolesWithPermissions.add(new Role(
-								role.getId(),
-								role.getName(),
+						rolesWithPermissions.add(new RolePermissions(
+								new Role(role.getId(),role.getName()),
 								rolePermissions));
 					}
 				}
@@ -64,7 +65,10 @@ public class RoleDAO implements IRoleDAO{
 	}
 
 	@Override
-	public Role find(int id) throws SQLException {
+	public RolePermissions find(int id) throws SQLException{
+		return null;
+	}
+	public Role findRole(int id) throws SQLException {
 		Role role=null;
 		String sqlRole = "Select * From roles where id=?";
 		try (Connection conn = db.getConnection()) {
@@ -83,10 +87,10 @@ public class RoleDAO implements IRoleDAO{
 	}
 
 	@Override
-	public Role add(Role role) throws SQLException {
-		Role newRole=null;
+	public RolePermissions add(RolePermissions roleWithPermissions) throws SQLException {
+		RolePermissions newRole=null;
 		int roleId;
-		List<Permission> rolePermissions=role.getPermissions();
+		List<Permission> rolePermissions=roleWithPermissions.getPermissions();
 
 		String sqlAddRole="Insert INTO roles (name,description) values(?,?)";
 		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_permission_id,permission_id) values(?,?)";
@@ -94,8 +98,8 @@ public class RoleDAO implements IRoleDAO{
 
 		try(Connection conn = db.getConnection()){
 			try(PreparedStatement statement=conn.prepareStatement(sqlAddRole,Statement.RETURN_GENERATED_KEYS)){
-				statement.setString(1,role.getName());
-				statement.setString(2,role.getDescription());
+				statement.setString(1,roleWithPermissions.getRole().getName());
+				statement.setString(2,roleWithPermissions.getRole().getDescription());
 				
 				int rowCountUpdatedRole = statement.executeUpdate();
 
@@ -118,17 +122,18 @@ public class RoleDAO implements IRoleDAO{
 
 	}
 
-
 	@Override
-	public Role update(Role movie) throws SQLException {
+	public RolePermissions update(RolePermissions role) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Role delete(int id) throws SQLException {
+	public RolePermissions delete(int id) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }
