@@ -35,6 +35,11 @@ public class PasswordUtils {
             spec.clearPassword();
         }
     }
+    
+    public static String generateSecurePassword(String password) {
+    	return generateSecurePassword(password, PasswordUtils.getSalt(30));
+    }
+    
     public static String generateSecurePassword(String password, String salt) {
         String returnValue = null;
         byte[] securePassword = hash(password.toCharArray(), salt.getBytes());

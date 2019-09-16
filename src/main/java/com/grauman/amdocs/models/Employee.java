@@ -51,7 +51,6 @@ public class Employee {
 		this.lastName=lastName;
 		this.email=email;
 		this.managerId=managerId;
-		
 		this.department=department;
 		this.worksite=worksite;
 		this.country=country;
@@ -59,6 +58,5 @@ public class Employee {
 		this.loginStatus=loginStatus;
 		this.locked=locked;
 		this.deactivated=deactivated;
-	}
-	 
+	}	
 }

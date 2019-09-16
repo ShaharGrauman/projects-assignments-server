@@ -28,11 +28,6 @@ import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.mail.MailManager;
-import com.grauman.amdocs.models.Country;
-import com.grauman.amdocs.models.Department;
-import com.grauman.amdocs.models.EmployeeData;
-import com.grauman.amdocs.models.Role;
-import com.grauman.amdocs.models.WorkSite;
 
 
 @Service
@@ -663,7 +658,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		int retries = 0;
 		String findEmployeeByEmail = "SELECT * from users where email=?";
 		String newPassword;
-		EmployeeData employee;
+		Employee employee;
 		ResultSet result = null;
 
 		if (!isValid(toEmail))
@@ -707,12 +702,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					try {
 						employee = find(result.getInt("id")); // find gets the id of employee and returns the employee
 						System.out.println("found employee...");
-						employee.setPassword(newPassword);
+						employee.setPassword(PasswordUtils.generateSecurePassword(newPassword));
 						update(employee); // update the new password of this employee in the database.
 						System.out.println("updated...");
 					} catch (SQLException e) {
 						e.printStackTrace();
-						System.out.println("cant continue from here.......");
+						System.out.println("can't continue from here.......");
 					}
 				}
 				String firstName = result.getString("first_name");
