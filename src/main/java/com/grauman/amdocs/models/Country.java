@@ -12,4 +12,7 @@ import lombok.Setter;
 public class Country {
     private Integer id;
     private String name;
+    public Country(Integer id) {
+    	this.id=id;
+    }
 }

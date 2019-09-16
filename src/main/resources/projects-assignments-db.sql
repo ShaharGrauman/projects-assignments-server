@@ -423,6 +423,7 @@ DROP FOREIGN KEY role_id,
 DROP COLUMN `role_id`,
 DROP INDEX `role_id` ;
 
+
 CREATE TABLE rolepermissions (
  role_permission_id int(11) NOT NULL,
  permission_id int(11) NOT NULL,

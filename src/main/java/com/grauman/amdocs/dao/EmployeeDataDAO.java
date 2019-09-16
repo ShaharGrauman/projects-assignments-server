@@ -27,11 +27,46 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	@Autowired
 	DBManager db;
 
+//Search all employees which are locked
 	@Override
 	public List<EmployeeData> findAll() throws SQLException {
 		int userId;
     	List<EmployeeData> users=new ArrayList<EmployeeData>();
-		String sqlAllUserscommand="select U.id,U.employee_number,U.first_name,U.last_name,"
+		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,U.department,"
+								+ "WS.name as worksite,WS.city,C.name as country "
+								+ "From users U JOIN worksite WS ON U.work_site_id=WS.id "
+								+ "JOIN country C ON WS.country_id=C.id "
+								+ "where U.locked=true";
+		try (Connection conn = db.getConnection()) {
+			try(Statement command = conn.createStatement()){
+				ResultSet result=command.executeQuery(sqlAllUserscommand);
+				
+				while(result.next()) {
+					userId=result.getInt(1);
+					List<Role> roles=new ArrayList<>();
+					roles=getEmployeeRoles(userId);
+					users.add(
+							new EmployeeData(
+									result.getInt(1),
+									result.getInt(2),
+									result.getString(3),
+									result.getString(4),
+									roles,
+									result.getString(5),
+									result.getString(6),
+									result.getString(7),
+									result.getString(8)
+									));
+				}
+			}
+		}
+		return users;
+	}
+//search all employees	
+	public List<EmployeeData> findAllEmployees() throws SQLException {
+		int userId;
+    	List<EmployeeData> users=new ArrayList<EmployeeData>();
+		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,"
 								+ "U.department,WS.name,WS.city,C.name "
 								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
 								+ " JOIN country C ON WS.country_id=C.id";
@@ -58,11 +93,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				}
 			}
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 		return users;
 	}
+	
+	
 	
 // the search will be by Employee Number 
 
@@ -74,7 +108,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 						  + " Group by employee_number"
 						  + " Having employee_number=?";
 		
-		String sqlFindEmployee=" Select U1.*,U2.first_name,WS.name"
+		String sqlFindEmployee=" Select  U1.*,U2.first_name,WS.name"
 						   	 + " From users U1 JOIN users U2 ON U1.manager_id=U2.id"
 						   	 + " JOIN worksite WS ON U1.work_site_id=WS.id"
 							 + " Where U1.work_site_id=WS.id AND U1.employee_number=?";
@@ -163,11 +197,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 	//*******************************************************************************************
 // we should generate a random password and then insert it to the uses table in the data base
-	// the role list is [] null  !!!!!!!!!!
 	@Override
 	public EmployeeData add(EmployeeData employee) throws SQLException {
-		int employeeId;
-		EmployeeData newEmployee = null;
+		int newEmployeeId = -1;
         List<Role> roles=employee.getRoles();
 		String sqlAddEmployeeStatement = "Insert INTO users (employee_number,first_name,last_name,email,manager_id,"
 				+ "department,work_site_id,country,phone,login_status,locked,deactivated,password)"
@@ -195,26 +227,25 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				ResultSet ids = statement.getGeneratedKeys();
 
 				while (ids.next()) {
+					newEmployeeId = ids.getInt(1);
 					//find employee by ID
-					employeeId = ids.getInt(1);
 					newEmployee = find(employeeId);
 					System.out.println(newEmployee.toString());
 				}
-
 			}
             
             String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
             try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
                 for(int i=0;i<roles.size();i++) {
-                    statement1.setInt(1,newEmployee.getId());
-                    statement1.setInt(2,roles.get(i).getId());
+                    statement1.setInt(1, newEmployeeId);
+                    statement1.setInt(2, roles.get(i).getId());
                     
                     int rowCountUpdated=statement1.executeUpdate();
                 }
             }
         }
 
-		return newEmployee;
+		return findEmployeeById(newEmployeeId);
 	}
 
 //should update the userrole table
@@ -314,7 +345,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				return found;
 			}
 	//By Role
-		public List<EmployeeData> filterByRole(String roleName){
+		public List<EmployeeData> filterByRole(String roleName) throws SQLException{
 			List <EmployeeData> found = new ArrayList<>();
 			List<Role> employeeRoles=new ArrayList<>();
 
@@ -352,7 +383,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		
 //By Department
-	public List<EmployeeData> filterByDepartment(String departmentName){
+	public List<EmployeeData> filterByDepartment(String departmentName) throws SQLException{
 		List <EmployeeData> found = new ArrayList<>();
 		List<Role> employeeRoles=new ArrayList<>();
 			String sqlFindCommand ="select DISTINCT U.id,U.employee_number,U.first_name,U.last_name,"
@@ -387,7 +418,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			return found;
 }
 //By WorkSite
-	public List<EmployeeData> filterByWorkSite(String siteName){
+	public List<EmployeeData> filterByWorkSite(String siteName) throws SQLException{
 		List <EmployeeData> found = new ArrayList<>();
 		List<Role> employeeRoles=new ArrayList<>();
 			String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
