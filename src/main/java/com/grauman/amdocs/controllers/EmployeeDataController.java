@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grauman.amdocs.dao.EmployeeDataDAO;
 import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.Department;
+import com.grauman.amdocs.models.Employee;
 import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.WorkSite;
@@ -132,8 +133,8 @@ public class EmployeeDataController {
     }
 //Select Managers	
     @GetMapping("/Managers")
-    public ResponseEntity<List<EmployeeData>> allManagers() throws SQLException {
-    	List<EmployeeData>managers= employeeDataDAO.findAllManagers();
+    public ResponseEntity<List<Employee>> allManagers() throws SQLException {
+    	List<Employee>managers= employeeDataDAO.findAllManagers();
     	return ResponseEntity.ok().body(managers);
     }
 //Select countries	
