@@ -77,13 +77,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					List<Role> roles=new ArrayList<>();
 					roles=getEmployeeRoles(userId);
 					users.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							result.getString(5),
-							new WorkSite(result.getString(6),result.getString(7)),
-							new Country(result.getString(8))),roles));
+							result.getInt("U.id"),
+							result.getInt("U.employee_number"),
+							result.getString("U.first_name"),
+							result.getString("U.last_name"),
+							result.getString("U.department"),
+							new WorkSite(result.getString("WS.name"),result.getString("WS.city")),
+							new Country(result.getString("C.name"))),roles));
 				}
 			}
 		}
