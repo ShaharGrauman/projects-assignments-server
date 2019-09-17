@@ -114,7 +114,7 @@ public class EmployeeDataController {
 //################################################################################
 
 //Select Work Sites
-	@GetMapping("/WorkSites")
+	@GetMapping("/worksites")
 	public ResponseEntity<List<WorkSite>> allSites() throws SQLException {
 		List<WorkSite> workSites=employeeDataDAO.findAllSites();
 		return ResponseEntity.ok().body(workSites);
@@ -134,7 +134,7 @@ public class EmployeeDataController {
 
     }
 //Select Managers	
-    @GetMapping("/Managers")
+    @GetMapping("/managers")
     public ResponseEntity<List<Employee>> allManagers() throws SQLException {
     	List<Employee>managers= employeeDataDAO.findAllManagers();
     	return ResponseEntity.ok().body(managers);
