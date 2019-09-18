@@ -28,8 +28,8 @@ public class RoleDAO implements IRoleDAO{
 
 		String sqlFindRoles="select id,name from roles";
 		String findRolePermissions="select P.id,P.name"
-				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_permission_id"
-				+ " where RP.permission_id=P.id AND RP.role_permission_id=?";
+				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_id"
+				+ " where RP.permission_id=P.id AND RP.role_id=?";
 				
 		
 		try(Connection conn = db.getConnection()){			
@@ -66,34 +66,50 @@ public class RoleDAO implements IRoleDAO{
 
 	@Override
 	public RolePermissions find(int id) throws SQLException{
-		return null;
-	}
-	public Role findRole(int id) throws SQLException {
-		Role role=null;
+		RolePermissions role=null;
 		String sqlRole = "Select * From roles where id=?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement statement=conn.prepareStatement(sqlRole)) {
 				statement.setInt(1,id);
 				ResultSet result=statement.executeQuery();
 				if(result.next()) {
-					role=new Role(result.getInt(1),
+					role=new RolePermissions(new Role(
+								  result.getInt(1),
 								  result.getString(2),
-								  result.getString(3));
+								  result.getString(3)));
 							
 				}
 			}
 		}
 		return role;
 	}
-
+	
+	public List<Permission> getRolePermissions(Role role)throws SQLException{
+		
+		List<Permission> rolePermissionsList=new ArrayList<>();
+		String sqlRolePermissions="select P.* "
+								+ "from permissions P JOIN rolepermissions RP ON P.id=RP.permission_id "
+								+ "where RP.role_id=?";
+		try(Connection conn = db.getConnection()){
+			try(PreparedStatement statement=conn.prepareStatement(sqlRolePermissions)){
+				statement.setInt(1,role.getId());
+				ResultSet result=statement.executeQuery();
+				while(result.next()) {
+					rolePermissionsList.add(new Permission(result.getInt(1),
+											result.getString(2)));
+				}
+			}
+		}
+		return null;
+	}
 	@Override
 	public RolePermissions add(RolePermissions roleWithPermissions) throws SQLException {
 		RolePermissions newRole=null;
 		int roleId;
-		List<Permission> rolePermissions=roleWithPermissions.getPermissions();
+		List<Permission> rolePermissions=getRolePermissions(roleWithPermissions.getRole());
 
 		String sqlAddRole="Insert INTO roles (name,description) values(?,?)";
-		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_permission_id,permission_id) values(?,?)";
+		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_id,permission_id) values(?,?)";
 
 
 		try(Connection conn = db.getConnection()){
@@ -107,11 +123,12 @@ public class RoleDAO implements IRoleDAO{
 				while(ids.next()) {
 					roleId = ids.getInt(1);
 					newRole = find(roleId);
+					
 				}
 			}
 			try(PreparedStatement statement2=conn.prepareStatement(sqlLinkRoleWithpermission)){
 				for(int i=0;i<rolePermissions.size();i++) {
-					statement2.setInt(1,newRole.getId());
+					statement2.setInt(1,newRole.getRole().getId());
 					statement2.setInt(2,rolePermissions.get(i).getId());
 					int rowCountUpdatedPermission = statement2.executeUpdate();
 				}

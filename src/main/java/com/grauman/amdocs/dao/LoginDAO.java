@@ -16,8 +16,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 @Service
 public class LoginDAO implements ILoginDAO {
@@ -55,11 +54,11 @@ public class LoginDAO implements ILoginDAO {
     @Override
     public Login update(Login login) throws SQLException {
     	String updateFailedAttempts=" update login set attempts=attempts+1, last_attempt_time=?"
-									+ " where user_name	=?";
+									+ " where user_id=?";
 		try(Connection conn=db.getConnection()){
 			try(PreparedStatement statement=conn.prepareStatement(updateFailedAttempts)){
 					statement.setDate(1,login.getLastAttemptTime());
-					statement.setString(2,login.getUsername());
+					statement.setInt(2,login.getUserId());
 		
 					int result=statement.executeUpdate();
 
@@ -78,9 +77,10 @@ public class LoginDAO implements ILoginDAO {
     			ResultSet ids = statement.getGeneratedKeys();
     			if(ids.next()) {
     				login=new Login(ids.getInt(1),
-    								ids.getString(2),
-    								ids.getInt(3),
-    								ids.getDate(4));
+    								ids.getInt(2),
+    								ids.getString(3),
+    								ids.getInt(4),
+    								ids.getDate(5));
     			}
     		}
     	}
@@ -115,9 +115,10 @@ public class LoginDAO implements ILoginDAO {
     			ResultSet ids = statement.getGeneratedKeys();
     			if(ids.next()) {
     				login=new Login(ids.getInt(1),
-    								ids.getString(2),
-    								ids.getInt(3),
-    								ids.getDate(4));
+									ids.getInt(2),
+									ids.getString(3),
+									ids.getInt(4),
+									ids.getDate(5));
     			}
     		}
     	}
