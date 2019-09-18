@@ -3,6 +3,7 @@ package com.grauman.amdocs.controllers;
 import java.sql.SQLException;
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -113,7 +114,7 @@ public class EmployeeDataController {
 //lock Employee	
 	@PutMapping("/lock/id")
 	public ResponseEntity<EmployeeData>  lockEmployee(@RequestParam Integer id) throws SQLException {
-		EmployeeData lockedEmployee = employeeDataDAO.unlockEmployee(id);
+		EmployeeData lockedEmployee = employeeDataDAO.lockEmployee(id);
 		return ResponseEntity.ok().body(lockedEmployee);    
 	}
 //################################################################################

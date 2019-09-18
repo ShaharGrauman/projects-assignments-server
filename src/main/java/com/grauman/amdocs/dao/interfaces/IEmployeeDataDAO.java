@@ -2,6 +2,7 @@ package com.grauman.amdocs.dao.interfaces;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.Department;
@@ -28,7 +29,7 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	List<Employee> findAllManagers() throws SQLException;
 	List<Country> findAllCountries() throws SQLException;
 	
-	
+	public Map<EmployeeData, List<EmployeeData>> findEmployeesHierarchy() throws SQLException;
 	public EmployeeData lockEmployee(int id) throws SQLException ;
 	public EmployeeData unlockEmployee(int id) throws SQLException;
 
