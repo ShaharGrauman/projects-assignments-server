@@ -29,15 +29,21 @@ public class Employee {
 	private Boolean deactivated;
 	private String password;
 	
+	public Employee(Integer id) {
+		this.id=id;
+	}
 	public Employee(Integer id, String firstName) {
-		this.id = id;
+		this(id);
 		this.firstName = firstName;
 	}
-	public Employee(Integer id,Integer number,String firstName,String lastName,String department,WorkSite worksite) {
+	public Employee(Integer id,Integer number,String firstName,String lastName) {
 		this.id=id;
 		this.number=number;
 		this.firstName=firstName;
 		this.lastName=lastName;
+	}
+	public Employee(Integer id,Integer number,String firstName,String lastName,String department,WorkSite worksite) {
+		this(id,number,firstName,lastName);
 		this.department=department;
 		this.worksite=worksite;
 	}
