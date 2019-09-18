@@ -34,7 +34,7 @@ public class AssignmentsController {
     }
 
     @GetMapping("/statusassignments")
-    public ResponseEntity<List<EmployeeAssignmentVM>> getDoneAssignments(@RequestParam Integer managerID,
+    public ResponseEntity<List<EmployeeAssignmentVM>> getStatusAssignments(@RequestParam Integer managerID,
                                                                          @RequestParam String requestedDate,
                                                                          @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException {
         List<EmployeeAssignmentVM> employees = assignmentsDAO.getAssignmentsbystatus(managerID, Date.valueOf(requestedDate), pageNumber, limit);
