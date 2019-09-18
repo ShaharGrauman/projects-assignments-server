@@ -16,7 +16,7 @@ public class ProjectController {
     @Autowired
     private ProjectsDAO projectsDAO;
 
-    @GetMapping("managerid/{managerID}")
+    @GetMapping("manager/{managerID}")
     public ResponseEntity<List<ProjectVM>> getProjectsByID(@PathVariable("managerID") int managerID) throws SQLException {
         return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
     }
