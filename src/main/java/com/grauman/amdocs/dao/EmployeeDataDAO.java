@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.grauman.amdocs.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	public List<EmployeeData> findAllEmployees() throws SQLException {
 		int userId;
     	List<EmployeeData> users=new ArrayList<EmployeeData>();
-		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,"
+		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,U.manager_id,"
 								+ "U.department,WS.name,WS.city,C.name "
 								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
 								+ " JOIN country C ON WS.country_id=C.id";
@@ -81,6 +83,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							result.getInt("U.employee_number"),
 							result.getString("U.first_name"),
 							result.getString("U.last_name"),
+							result.getInt("U.manager_id"),
 							result.getString("U.department"),
 							new WorkSite(result.getString("WS.name"),result.getString("WS.city")),
 							new Country(result.getString("C.name"))),roles));
@@ -658,7 +661,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
       }
  }
 
- public Map<EmployeeData, List<EmployeeData>> FindEmployeesHierarchy() throws SQLException {
+ public Map<EmployeeData, List<EmployeeData>> findEmployeesHierarchy() throws SQLException {
 
 		List<EmployeeData> allEmployees = findAllEmployees();
 		Map<Integer, List<Integer>> map = new HashMap<>();
