@@ -32,19 +32,19 @@ public class AssignmentSkillEmployeeController {
 
     }
 
-    @GetMapping("/skill/{id}")
+    @GetMapping("/skill/id/{id}")
     public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillID(@PathVariable("id") Integer skillID, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillID(skillID, pageNumber,limit);
         return ResponseEntity.ok().body(employees);
 
     }
-    @GetMapping("/skill/{name}")
+    @GetMapping("/skill/name/{name}")
     public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillName(@PathVariable("name") String skillName, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillName(skillName, pageNumber,limit);
         return ResponseEntity.ok().body(employees);
 
     }
-    @GetMapping("/skill/{set}")
+    @GetMapping("/skill/set/{set}")
     public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillSet(@PathVariable("set") List<Integer> skillSet, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException{
         List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillSet(skillSet, pageNumber,limit);
         return ResponseEntity.ok().body(employees);

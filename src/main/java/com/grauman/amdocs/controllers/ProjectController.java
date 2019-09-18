@@ -16,13 +16,13 @@ public class ProjectController {
     @Autowired
     private ProjectsDAO projectsDAO;
 
-    @GetMapping("/{managerID}")
+    @GetMapping("managerid/{managerID}")
     public ResponseEntity<List<ProjectVM>> getProjectsByID(@PathVariable("managerID") int managerID) throws SQLException {
         return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@RequestParam String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
+    @GetMapping("name/{name}")
+    public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@PathVariable("name") String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
         return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName, pageNumber, limit));
     }
 
