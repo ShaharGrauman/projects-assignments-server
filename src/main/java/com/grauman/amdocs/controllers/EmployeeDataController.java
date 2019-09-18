@@ -33,7 +33,7 @@ public class EmployeeDataController {
 	private EmployeeDataDAO employeeDataDAO;
 	
 //All Employees Which are locked
-	@GetMapping("locked")
+	@GetMapping("/locked")
 	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
@@ -107,10 +107,15 @@ public class EmployeeDataController {
 //Unlock Employee
 	@PutMapping("/unlock/id")
 	public ResponseEntity<EmployeeData>  unlockEmployee(@RequestParam Integer id) throws SQLException {
-		EmployeeData unlockedEmployee = employeeDataDAO.unlock(id);
+		EmployeeData unlockedEmployee = employeeDataDAO.unlockEmployee(id);
 		return ResponseEntity.ok().body(unlockedEmployee);    
 	}
-	
+//lock Employee	
+	@PutMapping("/lock/id")
+	public ResponseEntity<EmployeeData>  lockEmployee(@RequestParam Integer id) throws SQLException {
+		EmployeeData lockedEmployee = employeeDataDAO.unlockEmployee(id);
+		return ResponseEntity.ok().body(lockedEmployee);    
+	}
 //################################################################################
 
 //Select Work Sites
