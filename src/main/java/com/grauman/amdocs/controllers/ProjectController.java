@@ -23,7 +23,7 @@ public class ProjectController {
 
     @GetMapping("name/{name}")
     public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@PathVariable("name") String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName, pageNumber, limit));
+         return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName, pageNumber, limit));
     }
 
 
