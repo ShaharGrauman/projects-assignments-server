@@ -11,6 +11,6 @@ import java.util.List;
 public interface IAssignmentsDAO extends IDAO<Assignment>{
     List<AssignmentHistoryVM> getAssignmentsByUserID(int id, int currPage, int limit) throws SQLException, ResultsNotFoundException;
     List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException;
-    String assignmentRequestResponse(int assignmentID, byte response) throws SQLException;
+    String updatePendingApprovalStatus(int assignmentID, boolean response) throws SQLException;
 
 }

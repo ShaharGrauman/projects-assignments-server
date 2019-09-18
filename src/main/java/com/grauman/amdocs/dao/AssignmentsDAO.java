@@ -159,12 +159,12 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public String assignmentRequestResponse(int assignmentID, byte response) throws SQLException {
+    public String updatePendingApprovalStatus(int assignmentID, boolean response) throws SQLException {
         String message = "SUCCESS";
         try (Connection conn = db.getConnection()) {
             String updateCommand = " update assignment SET status=?  where id= ? and status= \"Pending approval\"; ";
             try (PreparedStatement command = conn.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
-                if (response != 0) {
+                if (response) {
                     command.setString(1, "In progress");
                 } else {
                     command.setString(1, "Not approved");

@@ -39,8 +39,8 @@ public class AssignmentsController {
     }
     @GetMapping("/assignmentRequestResponse")
     //@ResponseStatus(value = HttpStatus.OK)
-    public ResponseEntity<String> assignmentRequestResponse(@RequestParam int assignmentID, @RequestParam byte response) throws SQLException{
-        String message=assignmentsDAO.assignmentRequestResponse(assignmentID,response);
+    public ResponseEntity<String> updatePendingApprovalStatus(@RequestParam int assignmentID, @RequestParam boolean response) throws SQLException{
+        String message=assignmentsDAO.updatePendingApprovalStatus(assignmentID,response);
         return ResponseEntity.ok().body(message);
     }
 
