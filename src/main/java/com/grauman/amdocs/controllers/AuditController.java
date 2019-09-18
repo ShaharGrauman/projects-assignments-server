@@ -36,10 +36,9 @@ public class AuditController {
     }
 	//***************************************
     @GetMapping("/date")
-    public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(
-    	@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date datefrom,
-     	@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateto)throws SQLException{ 
-         List<AuditEmployee> auditByDateFrom=auditDAO.searchAuditByDateBetween(datefrom,dateto);
+    public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(@RequestParam String datefrom,
+     	@RequestParam String dateto)throws SQLException{ 
+         List<AuditEmployee> auditByDateFrom=auditDAO.searchAuditByDateBetween(Date.valueOf(datefrom),Date.valueOf(dateto));
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
