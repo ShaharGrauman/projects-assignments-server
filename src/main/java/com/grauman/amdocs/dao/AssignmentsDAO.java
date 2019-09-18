@@ -71,7 +71,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public List<AssignmentHistoryVM> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
-        List<AssignmentHistoryVM> assignments = new ArrayList<AssignmentHistoryVM>();
+        List<AssignmentHistoryVM> assignments = new ArrayList<>();
 
         if (currPage < 1)
             currPage = 1;
@@ -115,7 +115,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException {
-        List<AssignmentRequestVM> assignments = new ArrayList<AssignmentRequestVM>();
+        List<AssignmentRequestVM> assignments = new ArrayList<>();
 
         if (currPage < 1)
             currPage = 1;
