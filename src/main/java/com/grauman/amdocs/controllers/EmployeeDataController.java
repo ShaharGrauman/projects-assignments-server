@@ -33,7 +33,7 @@ public class EmployeeDataController {
 	private EmployeeDataDAO employeeDataDAO;
 	
 //All Employees Which are locked
-	@GetMapping("locked")
+	@GetMapping("/locked")
 	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
