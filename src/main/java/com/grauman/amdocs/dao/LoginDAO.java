@@ -123,6 +123,20 @@ public class LoginDAO implements ILoginDAO {
     	}
     	return login;
     }
+//checks if the user is attempting to login for the first time    
+    public boolean firstTime(String username)throws SQLException {
+    	String resetAttempts="select * from login where user_name=?";
+    	try(Connection conn=db.getConnection()){
+    		try(PreparedStatement statement=conn.prepareStatement(resetAttempts)){
+    			statement.setString(1,username);
+				int ids=statement.executeUpdate();
+				if(ids==0) {
+					return true;
+				}
+    		}
+    	}
+		return false;
+    }
 
 //reset the attempts in the database after 24 hour or after unlock the user by the Admin
     public Login resetAttempts(String username)throws SQLException {
@@ -163,14 +177,25 @@ public class LoginDAO implements ILoginDAO {
 /** check how many times did the user attempted to login with wrong password
  *in the last 24 hours, after 3 attempts the user account will be locked
  *(call lockeEmployee function from EmployeeDataDAO)  */
-                    	
-                    	if (!password.equals(set.getString("password"))){
-                            throw new InvalidCredentials("Wrong password");
-                        }
+                    	Login login=null,last_Login=null;
+                    	if(firstTime(username)) {
+                    		login=firstAttempte(username);
+                    	}
+                    	else {
+                    		if (!password.equals(set.getString("password"))){
+                    			//not equals because this time was the last attempt
+                    			if(FailedAttemptsCounter(username)<MAX_ATTEMPTS) {
+                    				login=getLogin(username);
+                    				last_Login=update(login);
+                    			}
+                    			else {
+                    				throw new InvalidCredentials("Wrong password");
+                    			}
+                    		}
+                    	}
                     }
                 }
             }
-
         }
         return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 
