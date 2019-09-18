@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +27,13 @@ import com.grauman.amdocs.models.WorkSite;
 
 @RestController
 @RequestMapping("/employee")
+@CrossOrigin
 public class EmployeeDataController {
 	@Autowired
 	private EmployeeDataDAO employeeDataDAO;
 	
 //All Employees Which are locked
-	@GetMapping("locked")
+	@GetMapping("/locked")
 	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
@@ -105,14 +107,19 @@ public class EmployeeDataController {
 //Unlock Employee
 	@PutMapping("/unlock/id")
 	public ResponseEntity<EmployeeData>  unlockEmployee(@RequestParam Integer id) throws SQLException {
-		EmployeeData unlockedEmployee = employeeDataDAO.unlock(id);
+		EmployeeData unlockedEmployee = employeeDataDAO.unlockEmployee(id);
 		return ResponseEntity.ok().body(unlockedEmployee);    
 	}
-	
+//lock Employee	
+	@PutMapping("/lock/id")
+	public ResponseEntity<EmployeeData>  lockEmployee(@RequestParam Integer id) throws SQLException {
+		EmployeeData lockedEmployee = employeeDataDAO.lockEmployee(id);
+		return ResponseEntity.ok().body(lockedEmployee);    
+	}
 //################################################################################
 
 //Select Work Sites
-	@GetMapping("/WorkSites")
+	@GetMapping("/worksites")
 	public ResponseEntity<List<WorkSite>> allSites() throws SQLException {
 		List<WorkSite> workSites=employeeDataDAO.findAllSites();
 		return ResponseEntity.ok().body(workSites);
@@ -132,7 +139,7 @@ public class EmployeeDataController {
 
     }
 //Select Managers	
-    @GetMapping("/Managers")
+    @GetMapping("/managers")
     public ResponseEntity<List<Employee>> allManagers() throws SQLException {
     	List<Employee>managers= employeeDataDAO.findAllManagers();
     	return ResponseEntity.ok().body(managers);

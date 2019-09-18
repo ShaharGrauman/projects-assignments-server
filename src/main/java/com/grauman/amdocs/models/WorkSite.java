@@ -19,6 +19,10 @@ public class WorkSite {
 		this.id = id;
 		this.name = name;
 	}
+	public WorkSite(Integer id,Country country) {
+		this.id=id;
+		this.country=country;
+	}
 	public WorkSite(String name,String city) {
 		this.name=name;
 		this.city=city;

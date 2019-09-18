@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +16,7 @@ import com.grauman.amdocs.models.Login;
 
 @RestController
 @RequestMapping("/login")
+@CrossOrigin
 public class LoginController {
 
 	@Autowired
@@ -32,4 +34,5 @@ public class LoginController {
 
 		return ResponseEntity.ok().header("auth", header).body("Login...");
 	}
+	
 }

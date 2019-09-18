@@ -4,13 +4,14 @@ import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
 import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
-import com.grauman.amdocs.models.vm.AssignmentRequest;
+import com.grauman.amdocs.models.vm.AssignmentRequestVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 public class AssignmentsDAO implements IAssignmentsDAO {
     @Autowired
@@ -70,7 +71,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public List<AssignmentHistoryVM> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
-        List<AssignmentHistoryVM> assignments = new ArrayList<AssignmentHistoryVM>();
+        List<AssignmentHistoryVM> assignments = new ArrayList<>();
 
         if (currPage < 1)
             currPage = 1;
@@ -80,7 +81,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         try (Connection conn = db.getConnection()) {
 
             String sqlCommand = "Select a.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
-                                 "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
+                    "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
 
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
                 command.setInt(1, employeeID);
@@ -113,8 +114,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public List<AssignmentRequest> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException {
-        List<AssignmentRequest> assignments = new ArrayList<AssignmentRequest>();
+    public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException {
+        List<AssignmentRequestVM> assignments = new ArrayList<>();
 
         if (currPage < 1)
             currPage = 1;
@@ -133,7 +134,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        assignments.add(new AssignmentRequest(
+                        assignments.add(new AssignmentRequestVM(
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
                                 result.getInt("a.project_id"),
@@ -155,5 +156,26 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
         }
         return assignments;
+    }
+
+    @Override
+    public String assignmentRequestResponse(int assignmentID, byte response) throws SQLException {
+        String message = "SUCCESS";
+        try (Connection conn = db.getConnection()) {
+            String updateCommand = " update assignment SET status=?  where id= ? and status= \"Pending approval\"; ";
+            try (PreparedStatement command = conn.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
+                if (response != 0) {
+                    command.setString(1, "In progress");
+                } else {
+                    command.setString(1, "Not approved");
+                }
+                command.setInt(2, assignmentID);
+               // int responseMessage = command.executeUpdate();
+                if (command.executeUpdate() <= 0)
+                    message = "FAILURE";
+            }
+        }
+
+        return message;
     }
 }

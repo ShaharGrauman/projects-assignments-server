@@ -29,7 +29,8 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	List<Country> findAllCountries() throws SQLException;
 	
 	
-	 EmployeeData unlock(int id) throws SQLException;
+	public EmployeeData lockEmployee(int id) throws SQLException ;
+	public EmployeeData unlockEmployee(int id) throws SQLException;
 
 
 //	 List<EmployeeData> getEmployeesByManagerID (int managerID,int pageNumber,int limit) throws SQLException;

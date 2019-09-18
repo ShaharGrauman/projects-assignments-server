@@ -33,32 +33,66 @@ public class Employee {
 		this.id = id;
 		this.firstName = firstName;
 	}
-	public Employee(Integer id,Integer number,String firstName,String lastName,String department,WorkSite worksite,Country country) {
+	public Employee(Integer id,Integer number,String firstName,String lastName,String department,WorkSite worksite) {
 		this.id=id;
 		this.number=number;
 		this.firstName=firstName;
 		this.lastName=lastName;
 		this.department=department;
 		this.worksite=worksite;
+	}
+	public Employee(Integer id,Integer number,String firstName,String lastName,String department,WorkSite worksite,Country country) {
+		this(id,number,firstName,lastName,department,worksite);
 		this.country=country;
 	}
 	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
-					String department,WorkSite worksite,Country country,String phone,Boolean loginStatus,Boolean locked
-					,Boolean deactivated) {
+			String department,WorkSite worksite,String phone,Boolean loginStatus,Boolean locked,Boolean deactivated) {
 		this.id=id;
 		this.number=number;
 		this.firstName=firstName;
 		this.lastName=lastName;
 		this.email=email;
 		this.managerId=managerId;
-		
 		this.department=department;
 		this.worksite=worksite;
-		this.country=country;
 		this.phone=phone;
 		this.loginStatus=loginStatus;
 		this.locked=locked;
 		this.deactivated=deactivated;
 	}
-	 
+	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
+			String department,WorkSite worksite,String phone,Boolean loginStatus,Boolean locked,
+			Boolean deactivated,String password) {
+		this.id=id;
+		this.number=number;
+		this.firstName=firstName;
+		this.lastName=lastName;
+		this.email=email;
+		this.managerId=managerId;
+		this.department=department;
+		this.worksite=worksite;
+		this.phone=phone;
+		this.loginStatus=loginStatus;
+		this.locked=locked;
+		this.deactivated=deactivated;
+		this.password=password;
+	}
+//	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
+//					String department,WorkSite worksite,Country country,String phone,Boolean loginStatus,Boolean locked
+//					,Boolean deactivated) {
+//		this.id=id;
+//		this.number=number;
+//		this.firstName=firstName;
+//		this.lastName=lastName;
+//		this.email=email;
+//		this.managerId=managerId;
+//		this.department=department;
+//		this.worksite=worksite;
+//		this.country=country;
+//		this.phone=phone;
+//		this.loginStatus=loginStatus;
+//		this.locked=locked;
+//		this.deactivated=deactivated;
+//	}
+//	 
 }
