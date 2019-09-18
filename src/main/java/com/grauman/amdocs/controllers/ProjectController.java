@@ -2,6 +2,7 @@ package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.ProjectsDAO;
 import com.grauman.amdocs.errors.custom.LevelValidityException;
+import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.vm.ProjectVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,17 @@ public class ProjectController {
     private ProjectsDAO projectsDAO;
 
     @GetMapping("manager/{managerID}")
-    public ResponseEntity<List<ProjectVM>> getProjectsByID(@PathVariable("managerID") int managerID) throws SQLException {
+    public ResponseEntity<List<ProjectVM>> getProjectsBymanagerID(@PathVariable("managerID") int managerID) throws SQLException {
         return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
     }
 
-    @GetMapping("name/{name}")
+    @GetMapping("user/{userID}")
+    public ResponseEntity<List<ProjectVM>> getProjectsByUserID(@PathVariable("userID") Integer userID) throws SQLException, ResultsNotFoundException {
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByUserID(userID));
+    }
+
+
+        @GetMapping("name/{name}")
     public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@PathVariable("name") String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
         return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName, pageNumber, limit));
     }
