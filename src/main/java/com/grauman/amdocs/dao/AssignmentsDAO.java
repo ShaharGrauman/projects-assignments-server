@@ -117,24 +117,27 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     @Override
     public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException {
         List<AssignmentRequestVM> assignments = new ArrayList<>();
-
         if (currPage < 1)
             currPage = 1;
-
         int offset = (currPage - 1) * limit; // index of which row to start retrieving data
-
         try (Connection conn = db.getConnection()) {
-
             String sqlCommand = "Select a.id,concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
                     "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = 'Pending approval' limit ? offset ?";
-
+            String managerName;
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
                 command.setInt(1, managerid);
                 command.setInt(2, limit);
                 command.setInt(3, offset);
-
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
+                        String sqlmanagerName = "Select concat(u.first_name, \" \" , u.last_name) as name \n" +
+                                "from users u where u.id = ?";
+                        try (PreparedStatement commandManagerName = conn.prepareStatement(sqlmanagerName)) {
+                            commandManagerName.setInt(1, result.getInt(9));
+                            try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
+                                resultManagerName.next();
+                                managerName = resultManagerName.getString(1);
+                            }}
                         assignments.add(new AssignmentRequestVM(
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
@@ -145,16 +148,14 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 result.getDate("a.end_date"),
                                 result.getInt("a.requested_from_manager_id"),
                                 result.getInt("a.requested_to_manager_id"),
-                                result.getString("a.status"))
+                                result.getString("a.status"),managerName)
                         );
                     }
                 }
             }
-
         }
         if (assignments.isEmpty()) {
             throw new ResultsNotFoundException("Couldn't find assignments for this manager");
-
         }
         return assignments;
     }
