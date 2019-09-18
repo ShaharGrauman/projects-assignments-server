@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/team")
+@CrossOrigin
 public class AssignmentSkillEmployeeController {
     @Autowired
     private AssignmentSkillEmployeeDAO employeeDAO;
