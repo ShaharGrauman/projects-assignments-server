@@ -45,6 +45,10 @@ public class Employee {
 		this(id,number,firstName,lastName,department,worksite);
 		this.country=country;
 	}
+	public Employee(Integer id,Integer number,String firstName,String lastName,Integer managerId,String department,WorkSite worksite,Country country) {
+		this(id,number,firstName,lastName,department,worksite,country);
+		this.managerId=managerId;
+	}
 	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
 			String department,WorkSite worksite,String phone,Boolean loginStatus,Boolean locked,Boolean deactivated) {
 		this.id=id;
