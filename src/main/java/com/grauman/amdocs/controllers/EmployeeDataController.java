@@ -107,10 +107,15 @@ public class EmployeeDataController {
 //Unlock Employee
 	@PutMapping("/unlock/id")
 	public ResponseEntity<EmployeeData>  unlockEmployee(@RequestParam Integer id) throws SQLException {
-		EmployeeData unlockedEmployee = employeeDataDAO.unlock(id);
+		EmployeeData unlockedEmployee = employeeDataDAO.unlockEmployee(id);
 		return ResponseEntity.ok().body(unlockedEmployee);    
 	}
-	
+//lock Employee	
+	@PutMapping("/lock/id")
+	public ResponseEntity<EmployeeData>  lockEmployee(@RequestParam Integer id) throws SQLException {
+		EmployeeData lockedEmployee = employeeDataDAO.unlockEmployee(id);
+		return ResponseEntity.ok().body(lockedEmployee);    
+	}
 //################################################################################
 
 //Select Work Sites
