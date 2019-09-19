@@ -30,22 +30,30 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public Assignment add(Assignment item) throws SQLException {
-        System.out.println(item.getEmployeeID());
         try (Connection conn = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
-            String insertQuery = "INSERT INTO assignment (project_id, employee_id, start_date, end_date, requested_from_manager_id," +
-                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?,?)";
+            String insertQuery = "INSERT INTO assignment (project_id, employee_id, start_date, requested_from_manager_id," +
+                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?)";
 
             // preparing a statement that guarantees returning the auto generated id
             try (PreparedStatement command = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                 command.setInt(1, item.getProjectID());
                 command.setInt(2, item.getEmployeeID());
-                command.setDate(3, item.getStartDate());
-                command.setDate(4, item.getEndDate());
-                command.setInt(5, item.getRequestFromManagerID());
-                command.setInt(6, item.getRequestToManagerID());
-                command.setString(7, item.getStatus());
+                command.setDate(3, new java.sql.Date(new java.util.Date().getTime()));
+                item.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
+                command.setInt(4, item.getRequestFromManagerID());
+
+                if (item.getRequestFromManagerID() != (item.getRequestToManagerID())) {
+                    command.setInt(5, item.getRequestToManagerID());
+                    command.setString(6, "Pending approval");
+                    item.setStatus("Pending approval");
+                } else {
+                    System.out.println(item.getRequestToManagerID() + " bbbbbbb");
+                    command.setNull(5, Types.INTEGER);
+                    command.setString(6, "In progress");
+                    item.setStatus("In progress");
+                }
                 command.executeUpdate();
                 try (ResultSet generatedID = command.getGeneratedKeys()) {
                     if (generatedID.next())
