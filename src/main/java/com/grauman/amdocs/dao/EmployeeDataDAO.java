@@ -104,8 +104,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		EmployeeData found = null;
 		List<Role> roles = new ArrayList<>();
 		String sqlFindLastLogin="SELECT max(date_time) as LastLogin FROM audit"
-						  + " Group by user_id"
-						  + " Having user_id=?";
+						  + " Where user_id=?";
 		
 		String sqlFindEmployee = "Select U1.*,U2.first_name as manager_name,"
 								+ " WS.id as work_site_id,WS.name as work_site_name,WS.city as work_site_city,"
