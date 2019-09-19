@@ -97,15 +97,15 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return users;
 	}
 	
-// the search will be by Employee Number 
-	public EmployeeData findByEmployeeNumber(int number) throws SQLException {
+// search the employee profile 
+	public EmployeeData searchEmployeeProfile(int id) throws SQLException {
 		Date auditDate=null;
 		int employeeId;
 		EmployeeData found = null;
 		List<Role> roles = new ArrayList<>();
 		String sqlFindLastLogin="SELECT max(date_time) as LastLogin FROM audit"
-						  + " Group by employee_number"
-						  + " Having employee_number=?";
+						  + " Group by user_id"
+						  + " Having user_id=?";
 		
 		String sqlFindEmployee = "Select U1.*,U2.first_name as manager_name,"
 								+ " WS.id as work_site_id,WS.name as work_site_name,WS.city as work_site_city,"
@@ -113,7 +113,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								+ " From users U1 JOIN users U2 ON U1.manager_id=U2.id"
 								+ " JOIN worksite WS ON U1.work_site_id=WS.id"
 								+ " JOIN country C ON WS.country_id=C.id"
-								+ " Where U1.work_site_id=WS.id AND U1.employee_number=?";
+								+ " Where U1.work_site_id=WS.id AND U1.id=?";
 						
 		String sqlEmployeeRoles = "Select R.*" 
 								+ " From roles R JOIN userrole UR ON R.id=UR.role_id "
@@ -121,13 +121,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command0 = conn.prepareStatement(sqlFindLastLogin)) {
-				command0.setInt(1, number);
+				command0.setInt(1, id);
 				ResultSet result0 = command0.executeQuery();
 				if(result0.next()) {
 					auditDate=result0.getDate(1);
 				}
 				try (PreparedStatement command = conn.prepareStatement(sqlFindEmployee)) {
-					command.setInt(1, number);
+					command.setInt(1, id);
 					ResultSet result = command.executeQuery();
 					if(result.next()) {
 						employeeId = result.getInt(1);
@@ -156,7 +156,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							  result.getString("U1.phone"),
 							  result.getBoolean("U1.login_status"),
 							  result.getBoolean("U1.locked"),
+							  result.getString("U1.image"),
 							  result.getBoolean("U1.deactivated")),
+							
     						  result.getString("manager_name"),auditDate,roles);
 				}
 			
@@ -342,6 +344,40 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	
 //**********************************************************************
 //advanced search
+	//By number
+	public List<EmployeeData> filterByNumber(int number) throws SQLException{
+		List <EmployeeData> found = new ArrayList<>();
+		List<Role> employeeRoles=new ArrayList<>();
+			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
+                + "W.name as workSiteName,W.city,U.country, U.department"
+                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
+                + " JOIN userrole UR ON UR.user_id=U.id"
+                + " JOIN roles R ON R.id=UR.role_id"
+                + " where U.employee_number=?";
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
+			 command.setInt(1,number);
+				ResultSet result = command.executeQuery();
+			
+				while(result.next()) {
+					employeeRoles=getEmployeeRoles(result.getInt(1));
+					found.add(new EmployeeData(new Employee(
+							result.getInt(1),
+							result.getInt(2),
+							result.getString(3),
+							result.getString(4),
+							result.getString(5),
+							new WorkSite(result.getString(6),result.getString(7)),
+							new Country(result.getString(8))),employeeRoles));
+				}
+			}
+		} 
+		 catch (Exception e) {
+			e.printStackTrace();
+		}
+		return found;
+	}
+
 //By Name
 	public List<EmployeeData> filterByName(String name) throws SQLException {
 			
