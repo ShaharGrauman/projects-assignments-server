@@ -17,7 +17,11 @@ public class WorkSite {
 	
 	public WorkSite(Integer id, String name) {
 		this.id = id;
-		this.name = name;
+		this.name =  name;
+	}
+	public WorkSite(Integer id,Country country) {
+		this.id=id;
+		this.country=country;
 	}
 	public WorkSite(String name,String city) {
 		this.name=name;

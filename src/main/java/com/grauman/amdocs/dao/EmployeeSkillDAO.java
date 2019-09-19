@@ -88,23 +88,29 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException {
-		if (skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId())) {
-			if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(), employeeSkill.getLevel())) {
-				if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
-					if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId())) {
-						// Employee's skill added successfully
-						return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, employeeSkill.getSkillId(), null,
-								employeeSkill.getLevel(), null, null));
-					} else {
-						throw new  InvalidDataException("Pending employee skill Exist with different level!!");
-					}
+		if (employeeSkill.getSkillId() != null && skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId())) {
+				if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(), employeeSkill.getLevel())) {
+					if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
+						if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId())) {
+							// Employee's skill added successfully
+							return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, employeeSkill.getSkillId(), null,
+									employeeSkill.getLevel(), null, null));
+						} else {
+							throw new InvalidDataException("Pending employee skill Exist with different level!!");
+						}
+					} else
+						throw new InvalidDataException("Employee Skill level must be between 1-5!!");
 				} else
-					throw new InvalidDataException("Employee Skill level must be between 1-5!!");
-			} else
-				// Employee Skill Exist!!
-				throw new InvalidDataException("Employee Skill Exist!!");
+					// Employee Skill Exist!!
+					throw new InvalidDataException("Employee Skill Exist!!");
 		} else {
-            throw new ResultsNotFoundException("Skill is not Exist!!");
+			if (employeeSkill.getSkillName() != null && employeeSkill.getType()!=null) {
+				//add new skill
+				Skill skill = skillsDAO.add(new Skill(employeeSkill.getSkillName(), 0, employeeSkill.getType()));
+				return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skill.getSkillid(), null,
+						employeeSkill.getLevel(), null, null));
+			} else
+				throw new InvalidDataException("Skill not Exist (must enter skill name and type)!!");
 		}
 	}
 

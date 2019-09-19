@@ -3,6 +3,7 @@ package com.grauman.amdocs.controllers;
 import java.sql.SQLException;
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,7 +34,7 @@ public class EmployeeDataController {
 	private EmployeeDataDAO employeeDataDAO;
 	
 //All Employees Which are locked
-	@GetMapping("locked")
+	@GetMapping("/locked")
 	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
 		List<EmployeeData> employee= employeeDataDAO.findAll();
 		return ResponseEntity.ok().body(employee);
@@ -47,9 +48,9 @@ public class EmployeeDataController {
 	}
 
 //Employee by employee number
-	@GetMapping("/employeenumber")
-	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeenumber) throws SQLException {
-		EmployeeData employee=employeeDataDAO.findByEmployeeNumber(employeenumber);
+	@GetMapping("/employeeid")
+	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeeid) throws SQLException {
+		EmployeeData employee=employeeDataDAO.searchEmployeeProfile(employeeid);
 		return ResponseEntity.ok().body(employee);
 	}
 //Employee by employee id
@@ -78,6 +79,11 @@ public class EmployeeDataController {
 		EmployeeData deletedEmployee = employeeDataDAO.delete(id);
 		return ResponseEntity.ok().body(deletedEmployee);   
 	}
+	@GetMapping("/number")
+	public ResponseEntity<List<EmployeeData>> findByNumber(@RequestParam Integer number) throws SQLException {
+		List<EmployeeData> employeeByName=employeeDataDAO.filterByNumber(number);
+		return ResponseEntity.ok().body(employeeByName);
+		}
 	@GetMapping("/name")
 	public ResponseEntity<List<EmployeeData>> findByName(@RequestParam String name) throws SQLException {
 		List<EmployeeData> employeeByName=employeeDataDAO.filterByName(name);
@@ -107,14 +113,19 @@ public class EmployeeDataController {
 //Unlock Employee
 	@PutMapping("/unlock/id")
 	public ResponseEntity<EmployeeData>  unlockEmployee(@RequestParam Integer id) throws SQLException {
-		EmployeeData unlockedEmployee = employeeDataDAO.unlock(id);
+		EmployeeData unlockedEmployee = employeeDataDAO.unlockEmployee(id);
 		return ResponseEntity.ok().body(unlockedEmployee);    
 	}
-	
+//lock Employee	
+	@PutMapping("/lock/id")
+	public ResponseEntity<EmployeeData>  lockEmployee(@RequestParam Integer id) throws SQLException {
+		EmployeeData lockedEmployee = employeeDataDAO.lockEmployee(id);
+		return ResponseEntity.ok().body(lockedEmployee);    
+	}
 //################################################################################
 
 //Select Work Sites
-	@GetMapping("/WorkSites")
+	@GetMapping("/worksites")
 	public ResponseEntity<List<WorkSite>> allSites() throws SQLException {
 		List<WorkSite> workSites=employeeDataDAO.findAllSites();
 		return ResponseEntity.ok().body(workSites);
@@ -134,7 +145,7 @@ public class EmployeeDataController {
 
     }
 //Select Managers	
-    @GetMapping("/Managers")
+    @GetMapping("/managers")
     public ResponseEntity<List<Employee>> allManagers() throws SQLException {
     	List<Employee>managers= employeeDataDAO.findAllManagers();
     	return ResponseEntity.ok().body(managers);

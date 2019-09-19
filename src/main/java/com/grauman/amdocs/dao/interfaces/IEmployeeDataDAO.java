@@ -2,6 +2,7 @@ package com.grauman.amdocs.dao.interfaces;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.Department;
@@ -13,9 +14,9 @@ import com.grauman.amdocs.models.WorkSite;
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	public List<EmployeeData> findAllEmployees() throws SQLException;
 	
-	EmployeeData findByEmployeeNumber(int number) throws SQLException;
+	public EmployeeData searchEmployeeProfile(int id) throws SQLException;
 	
-	
+	public List<EmployeeData> filterByNumber(int number) throws SQLException;
 	List<EmployeeData> filterByName(String name) throws SQLException;
 	List<EmployeeData> filterByRole(String roleName)throws SQLException;
 	List<EmployeeData> filterByDepartment(String departmentName)throws SQLException;
@@ -28,8 +29,9 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	List<Employee> findAllManagers() throws SQLException;
 	List<Country> findAllCountries() throws SQLException;
 	
-	
-	 EmployeeData unlock(int id) throws SQLException;
+	public Map<EmployeeData, List<EmployeeData>> findEmployeesHierarchy() throws SQLException;
+	public EmployeeData lockEmployee(int id) throws SQLException ;
+	public EmployeeData unlockEmployee(int id) throws SQLException;
 
 
 //	 List<EmployeeData> getEmployeesByManagerID (int managerID,int pageNumber,int limit) throws SQLException;

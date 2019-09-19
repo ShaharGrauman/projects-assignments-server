@@ -13,8 +13,11 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class RolePermissions extends Role{
+public class RolePermissions {
 	private Role role;
 	private List<Permission> permissions;
+	public RolePermissions(Role role) {
+		this.role=role;
+	}
 	
 }

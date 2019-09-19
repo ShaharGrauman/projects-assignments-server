@@ -39,13 +39,12 @@ public class WorkSiteDAO implements IWorkSiteDAO{
         try(Connection conn = db.getConnection()){
             try (PreparedStatement command = conn.prepareStatement(FindCountryId)){
                 command.setString(1, workSite.getCountry().getName());
-
                 ResultSet result = command.executeQuery();
                 if(result.next()) {
 	                String InsertWorkSite="INSERT into worksite(name,country_id,city) values(?,?,?)";
 	                try (PreparedStatement statement = conn.prepareStatement(InsertWorkSite,Statement.RETURN_GENERATED_KEYS)){
 	                    statement.setString(1,workSite.getName());
-	                    statement.setInt(2,result.getInt(1));
+	                    statement.setInt(2,result.getInt("id"));
 	                    statement.setString(3,workSite.getCity());
 	                    
 	                    int row=statement.executeUpdate();

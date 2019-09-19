@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> origin/master
 package com.grauman.amdocs.controllers;
 
 import java.sql.SQLException;
@@ -16,6 +21,7 @@ import com.grauman.amdocs.dao.EmployeeDataDAO;
 import com.grauman.amdocs.models.EmployeeData;
 
 @RestController
+<<<<<<< HEAD
 @RequestMapping("/Hierarchy")
 public class EmployeesHierarchyController {
 
@@ -28,3 +34,17 @@ public class EmployeesHierarchyController {
 		return ResponseEntity.ok().body(map);
 	}
 }
+=======
+@RequestMapping("/hierarchy")
+public class EmployeesHierarchyController {
+
+@Autowired
+private EmployeeDataDAO employeeDataDAO;
+
+@GetMapping("")
+public ResponseEntity<Map<EmployeeData, List<EmployeeData>>> hierarchy() throws SQLException {
+Map<EmployeeData, List<EmployeeData>> map = employeeDataDAO.findEmployeesHierarchy();
+return ResponseEntity.ok().body(map);
+}
+}
+>>>>>>> origin/master

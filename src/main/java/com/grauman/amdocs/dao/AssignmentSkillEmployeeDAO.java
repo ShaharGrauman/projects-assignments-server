@@ -91,11 +91,12 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         List<SkillsLevelVM> productskillList = new ArrayList<>();
         try (Connection conn = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
-                    "from users u join assignment a on u.id = a.employee_id where a.project_id = ?";
+                    "from users u join assignment a on u.id = a.employee_id where a.project_id = ? " +
+                    "and a.status not in ('Pending approval','Not approved')  group by u.id;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                    "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? ";
+                    "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
             String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = \" +\n" +
-                    "\"es.user_id join skills s on es.skill_id = s.id where type = \\\"PRODUCT\\\" and u.id = ?";
+                    "\"es.user_id join skills s on es.skill_id = s.id where type = \\\"PRODUCT\\\" and u.id = ? and es.status='APPROVED'";
             try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
                 command.setInt(1, projectid);
                 try (ResultSet result = command.executeQuery()) {
@@ -149,21 +150,24 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         Integer offset = (pageNumber - 1) * limit;
         try (Connection conn = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
-                    " from users u limit ? offset ?;";
+                    " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where s.id = ?" +
+                    " and es.status='APPROVED' group by u.id " +
+                    "limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and s.id=?; ";
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                    " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and s.id=?; ";
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED'; ";
 
             try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
-                command.setInt(1, limit);
-                command.setInt(2, offset);
+                command.setInt(1, skillID);
+                command.setInt(2, limit);
+                command.setInt(3, offset);
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
                         try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
-                            skill.setInt(2, skillID);
+
 
                             try (ResultSet tsSkill = skill.executeQuery()) {
                                 while (tsSkill.next()) {
@@ -176,7 +180,6 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                         }
                         try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
-                            skill.setInt(2, skillID);
 
                             try (ResultSet psSkill = skill.executeQuery()) {
                                 while (psSkill.next()) {
@@ -216,17 +219,19 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         Integer offset = (pageNumber - 1) * limit;
         try (Connection conn = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
-                    " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where s.name like ?" +
+                    " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where" +
+                    " s.name like ? and es.status='APPROVED' " +
                     " group by u.id " +
                     "limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? ";
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
             String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id =\n" +
-                    "                     es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ?";
+                    "                     es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" " +
+                    " and u.id = ? and es.status='APPROVED'";
 
 
             try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
-                command.setString(1, skillName+"%");
+                command.setString(1, skillName + "%");
                 command.setInt(2, limit);
                 command.setInt(3, offset);
 
@@ -277,7 +282,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
 
 
     @Override
-    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<Integer> skillSet, Integer pageNumber, Integer limit) throws SQLException {
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<SkillsLevelVM> skillsLevelVM, Integer pageNumber, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
@@ -286,26 +291,23 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
             pageNumber = 1;
         }
         int offset = (pageNumber - 1) * limit;
-
         try (Connection conn = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id=es.user_id" +
-                    " join skills s on es.skill_id=s.id where skill_id in (";
-            for (int i = 0; i < skillSet.size(); i++) {
-                if (i == skillSet.size() - 1) {
-                    employeeQuery += skillSet.get(i) + ") group by u.id limit ? offset ? ;";
+                    " where ";
+            for (int i = 0; i < skillsLevelVM.size(); i++) {
+                if (i == skillsLevelVM.size() - 1) {
+                    employeeQuery += " es.skill_id = " + skillsLevelVM.get(i).getId() + " and es.level >= " + +skillsLevelVM.get(i).getLevel() + " and es.status='APPROVED' group by u.id limit ? offset ? ;";
                 } else {
-                    employeeQuery += skillSet.get(i) + ",";
+                    employeeQuery += " es.skill_id = " + skillsLevelVM.get(i).getId() + " and es.level >= " + skillsLevelVM.get(i).getLevel() + " or";
 
                 }
             }
-            //employeeQuery += ") limit ? offset ?;";
-
 
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? ; ";
-            String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = \" +\n" +
-                    " \"es.user_id join skills s on es.skill_id = s.id where type = \\\"PRODUCT\\\" and u.id = ? ;";
+                     " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'; ";
+            String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED'; ";
 
             try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
                 command.setInt(1, limit);
@@ -325,8 +327,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                         }
                         try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
-                            //skill.setInt(2,skellSet);
-
+                            //skill.setInt(2,skellSet)
                             try (ResultSet psSkill = skill.executeQuery()) {
                                 while (psSkill.next()) {
                                     SkillsLevelVM productSkill = new SkillsLevelVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
@@ -343,11 +344,9 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                         employees.add(employee);
                         technicalSkillList = new ArrayList<>();
                         productSkillList = new ArrayList<>();
-
                     }
                 }
             }
-
         }
         return employees;
     }

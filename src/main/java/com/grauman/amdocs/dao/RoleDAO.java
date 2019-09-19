@@ -28,8 +28,8 @@ public class RoleDAO implements IRoleDAO{
 
 		String sqlFindRoles="select id,name from roles";
 		String findRolePermissions="select P.id,P.name"
-				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_permission_id"
-				+ " where RP.permission_id=P.id AND RP.role_permission_id=?";
+				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_id"
+				+ " where RP.permission_id=P.id AND RP.role_id=?";
 				
 		
 		try(Connection conn = db.getConnection()){			
@@ -66,26 +66,38 @@ public class RoleDAO implements IRoleDAO{
 
 	@Override
 	public RolePermissions find(int id) throws SQLException{
-		return null;
-	}
-	public Role findRole(int id) throws SQLException {
+		RolePermissions roleWithPermissions=null;
 		Role role=null;
 		String sqlRole = "Select * From roles where id=?";
+		List<Permission> rolePermissionsList=new ArrayList<>();
+		String sqlRolePermissions="select P.* "
+								+ "from permissions P JOIN rolepermissions RP ON P.id=RP.permission_id "
+								+ "where RP.role_id=?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement statement=conn.prepareStatement(sqlRole)) {
 				statement.setInt(1,id);
 				ResultSet result=statement.executeQuery();
 				if(result.next()) {
-					role=new Role(result.getInt(1),
+					role=new Role(
+								  result.getInt(1),
 								  result.getString(2),
 								  result.getString(3));
 							
 				}
 			}
+			try(PreparedStatement statement1=conn.prepareStatement(sqlRolePermissions)){
+				statement1.setInt(1,role.getId());
+				ResultSet result1=statement1.executeQuery();
+				while(result1.next()) {
+					rolePermissionsList.add(new Permission(result1.getInt(1),
+														   result1.getString(2)));
+				}
+			}
 		}
-		return role;
+		roleWithPermissions=new RolePermissions(role,rolePermissionsList);
+		return roleWithPermissions;
 	}
-
+	
 	@Override
 	public RolePermissions add(RolePermissions roleWithPermissions) throws SQLException {
 		RolePermissions newRole=null;
@@ -93,7 +105,7 @@ public class RoleDAO implements IRoleDAO{
 		List<Permission> rolePermissions=roleWithPermissions.getPermissions();
 
 		String sqlAddRole="Insert INTO roles (name,description) values(?,?)";
-		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_permission_id,permission_id) values(?,?)";
+		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_id,permission_id) values(?,?)";
 
 
 		try(Connection conn = db.getConnection()){
@@ -107,17 +119,18 @@ public class RoleDAO implements IRoleDAO{
 				while(ids.next()) {
 					roleId = ids.getInt(1);
 					newRole = find(roleId);
+					
 				}
 			}
 			try(PreparedStatement statement2=conn.prepareStatement(sqlLinkRoleWithpermission)){
 				for(int i=0;i<rolePermissions.size();i++) {
-					statement2.setInt(1,newRole.getId());
+					statement2.setInt(1,newRole.getRole().getId());
 					statement2.setInt(2,rolePermissions.get(i).getId());
 					int rowCountUpdatedPermission = statement2.executeUpdate();
 				}
 			}
 		}
-	 
+		newRole = find(newRole.getRole().getId());
 		return newRole;
 
 	}

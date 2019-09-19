@@ -14,12 +14,12 @@ public class RequestedEmployeeSkillVM {
 //pending skill for single employee
 
 	private String employeeName;
-	private int employeeSkillId;
-	private int employeeId;
-	private int skillId;
+	private Integer employeeSkillId;
+	private Integer employeeId;
+	private Integer skillId;
 	private String skillName;
 	private Date date;
-	private int level;
+	private Integer level;
 	private SkillType type;
 	
 }
