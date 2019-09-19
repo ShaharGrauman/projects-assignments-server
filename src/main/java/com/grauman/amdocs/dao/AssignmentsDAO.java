@@ -137,7 +137,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
                                 resultManagerName.next();
                                 managerName = resultManagerName.getString(1);
-                            }}
+                            }
+                        }
                         assignments.add(new AssignmentRequestVM(
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
@@ -148,7 +149,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 result.getDate("a.end_date"),
                                 result.getInt("a.requested_from_manager_id"),
                                 result.getInt("a.requested_to_manager_id"),
-                                result.getString("a.status"),managerName)
+                                result.getString("a.status"), managerName)
                         );
                     }
                 }
@@ -158,27 +159,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
             throw new ResultsNotFoundException("Couldn't find assignments for this manager");
         }
         return assignments;
-    }
-
-    @Override
-    public String updatePendingApprovalStatus(int assignmentID, boolean response) throws SQLException {
-        String message = "SUCCESS";
-        try (Connection conn = db.getConnection()) {
-            String updateCommand = " update assignment SET status=?  where id= ? and status= \"Pending approval\"; ";
-            try (PreparedStatement command = conn.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
-                if (response) {
-                    command.setString(1, "In progress");
-                } else {
-                    command.setString(1, "Not approved");
-                }
-                command.setInt(2, assignmentID);
-               // int responseMessage = command.executeUpdate();
-                if (command.executeUpdate() <= 0)
-                    message = "FAILURE";
-            }
-        }
-
-        return message;
     }
 
 
@@ -223,6 +203,27 @@ public class AssignmentsDAO implements IAssignmentsDAO {
             throw new ResultsNotFoundException("Couldn't find done assignments for this manager");
         }
         return doneAssignments;
+    }
+
+    @Override
+    public String updatePendingApprovalStatus(Assignment assignment, boolean response) throws SQLException {
+        String message = "SUCCESS";
+        try (Connection conn = db.getConnection()) {
+            String updateCommand = " update assignment SET status=?  where id= ? and status= \"Pending approval\"; ";
+            try (PreparedStatement command = conn.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
+                if (response) {
+                    command.setString(1, "In progress");
+                } else {
+                    command.setString(1, "Not approved");
+                }
+                command.setInt(2, assignment.getId());
+                // int responseMessage = command.executeUpdate();
+                if (command.executeUpdate() <= 0)
+                    message = "FAILURE";
+            }
+        }
+
+        return message;
     }
 }
 
