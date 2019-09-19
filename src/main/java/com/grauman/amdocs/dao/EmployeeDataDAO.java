@@ -989,7 +989,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					} catch (SQLException e) {
 						e.printStackTrace();
 						System.out.println("can't continue from here.......");
-					}
+					}		
 				
 				String firstName = result.getString("first_name");
 
