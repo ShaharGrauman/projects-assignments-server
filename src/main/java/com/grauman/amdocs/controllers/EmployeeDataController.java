@@ -48,9 +48,9 @@ public class EmployeeDataController {
 	}
 
 //Employee by employee number
-	@GetMapping("/employeenumber")
-	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeenumber) throws SQLException {
-		EmployeeData employee=employeeDataDAO.findByEmployeeNumber(employeenumber);
+	@GetMapping("/employeeid")
+	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeeid) throws SQLException {
+		EmployeeData employee=employeeDataDAO.searchEmployeeProfile(employeeid);
 		return ResponseEntity.ok().body(employee);
 	}
 //Employee by employee id
@@ -79,6 +79,11 @@ public class EmployeeDataController {
 		EmployeeData deletedEmployee = employeeDataDAO.delete(id);
 		return ResponseEntity.ok().body(deletedEmployee);   
 	}
+	@GetMapping("/number")
+	public ResponseEntity<List<EmployeeData>> findByNumber(@RequestParam Integer number) throws SQLException {
+		List<EmployeeData> employeeByName=employeeDataDAO.filterByNumber(number);
+		return ResponseEntity.ok().body(employeeByName);
+		}
 	@GetMapping("/name")
 	public ResponseEntity<List<EmployeeData>> findByName(@RequestParam String name) throws SQLException {
 		List<EmployeeData> employeeByName=employeeDataDAO.filterByName(name);
