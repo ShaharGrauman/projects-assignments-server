@@ -115,10 +115,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
             }
 
         }
-        if (assignments.isEmpty()) {
-            throw new ResultsNotFoundException("Couldn't find assignments for this employee");
-
-        }
         return assignments;
     }
 
@@ -163,9 +159,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                 }
             }
         }
-        if (assignments.isEmpty()) {
-            throw new ResultsNotFoundException("Couldn't find assignments for this manager");
-        }
         return assignments;
     }
 
@@ -206,9 +199,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                     }
                 }
             }
-        }
-        if (doneAssignments.isEmpty()) {
-            throw new ResultsNotFoundException("Couldn't find done assignments for this manager");
         }
         return doneAssignments;
     }
