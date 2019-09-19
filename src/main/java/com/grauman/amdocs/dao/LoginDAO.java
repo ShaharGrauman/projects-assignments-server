@@ -141,23 +141,19 @@ public class LoginDAO implements ILoginDAO {
 //when the user attempts for the first time to login with wrong password
     public Login firstAttempte(String username) throws SQLException {
     	Login login=null;
+    	EmployeeData employee=getEmployeeData(username);
     	String userAttemptInsert="insert into login (user_id,user_name,attempts,last_attempt_time) values (?,?,?,?)";
     	try(Connection conn=db.getConnection()){
-    		try(PreparedStatement statement=conn.prepareStatement(userAttemptInsert,Statement.RETURN_GENERATED_KEYS)){
-    			//the user id
-    			statement.setString(1,username);
-    			statement.setInt(2,0);
-    			statement.setDate(3,null);
+    		try(PreparedStatement statement=conn.prepareStatement(userAttemptInsert)){
+    			statement.setInt(1,employee.getEmployee().getId());
+    			statement.setString(2,username);
+    			statement.setInt(3,0);
+    			statement.setDate(4,null);
     			
-    			ResultSet ids = statement.getGeneratedKeys();
-    			if(ids.next()) {
-    				login=new Login(ids.getInt(1),
-									ids.getInt(2),
-									ids.getString(3),
-									ids.getInt(4),
-									ids.getDate(5));
-    			}
+				int result = statement.executeUpdate();
+    			//
     		}
+    		login=getLogin(username);
     	}
     	return login;
     }
@@ -167,13 +163,13 @@ public class LoginDAO implements ILoginDAO {
     	try(Connection conn=db.getConnection()){
     		try(PreparedStatement statement=conn.prepareStatement(resetAttempts)){
     			statement.setString(1,username);
-				int ids=statement.executeUpdate();
-				if(ids==0) {
-					return true;
+				ResultSet result=statement.executeQuery();
+				if(result.next()) {
+					return false;
 				}
     		}
     	}
-		return false;
+		return true;
     }
 
 //reset the attempts in the database after 24 hour or after unlock the user by the Admin
