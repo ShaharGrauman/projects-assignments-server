@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +30,8 @@ import com.grauman.amdocs.models.WorkSite;
 public class EmployeeDataDAO implements IEmployeeDataDAO {
 	@Autowired
 	DBManager db;
+	@Autowired
+	LoginDAO loginAttemptes;
 
 //Search all employees which are locked
 	@Override
@@ -95,7 +99,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	
 // the search will be by Employee Number 
 	public EmployeeData findByEmployeeNumber(int number) throws SQLException {
-		Date auditDate;int employeeId;
+		Date auditDate=null;
+		int employeeId;
 		EmployeeData found = null;
 		List<Role> roles = new ArrayList<>();
 		String sqlFindLastLogin="SELECT max(date_time) as LastLogin FROM audit"
@@ -120,7 +125,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				ResultSet result0 = command0.executeQuery();
 				if(result0.next()) {
 					auditDate=result0.getDate(1);
-				
+				}
 				try (PreparedStatement command = conn.prepareStatement(sqlFindEmployee)) {
 					command.setInt(1, number);
 					ResultSet result = command.executeQuery();
@@ -154,8 +159,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							  result.getBoolean("U1.deactivated")),
     						  result.getString("manager_name"),auditDate,roles);
 				}
-			}
-		}} catch (Exception e) {
+			
+		}
+			} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return found;
@@ -296,14 +302,22 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
                 statement.setInt(12, employee.getEmployee().getId());
                 int rowCountUpdated = statement.executeUpdate();
 	            }
-	            String sqlUpdateRole="update userrole set role_id=? where user_id=?";
-	            try(PreparedStatement statement=conn.prepareStatement(sqlUpdateRole)){
+            	
+	            String deleteRoles="delete from userrole where user_id=?";
+	            try(PreparedStatement statement=conn.prepareStatement(deleteRoles)){
 	                roles=employee.getRoles();
 	                for(int i=0;i<roles.size();i++) {
-	                statement.setInt(1,roles.get(i).getId());
-	                statement.setInt(2,employee.getEmployee().getId());
-	                
-	                int rowCountUpdated=statement.executeUpdate();
+		                statement.setInt(1,employee.getEmployee().getId());
+		                int rowCountUpdated=statement.executeUpdate();
+	                }
+	            }
+	            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
+	            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
+	                for(int i=0;i<roles.size();i++) {
+	                    statement1.setInt(1,employee.getEmployee().getId());
+	                    statement1.setInt(2, roles.get(i).getId());
+	                    
+	                    int rowCountUpdated=statement1.executeUpdate();
 	                }
 	            }
         }
@@ -506,6 +520,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				unLockedEmployee = find(id);
 			}
 		}
+		loginAttemptes.resetAttempts(unLockedEmployee.getEmployee().getEmail());
 		return unLockedEmployee;
 	}
 //lock Employee after 3 attempts

@@ -4,7 +4,11 @@ package com.grauman.amdocs.dao;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import com.grauman.amdocs.errors.custom.InvalidCredentials;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
+import com.grauman.amdocs.models.Employee;
+import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Login;
+import com.grauman.amdocs.models.Role;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,7 @@ public class LoginDAO implements ILoginDAO {
 	private static final int MAX_ATTEMPTS=3;
 	
     @Autowired DBManager db;
+    @Autowired private EmployeeDataDAO employee;
 
     @Override
     public List<Login> findAll() throws SQLException {
@@ -48,8 +53,40 @@ public class LoginDAO implements ILoginDAO {
             throw new ResultsNotFoundException("Couldn't find any assignment");
         return Users;
     }
-    
-
+//get the user details + roles
+    public EmployeeData getEmployeeData(String username) throws SQLException{
+    	int employeeId;
+    	String employeeData="select id,employee_number,first_name,last_name from users where email=?";
+    	EmployeeData employeeDetails=null;
+    	List<Role> roles=new ArrayList<>();
+    	String employeeRoles="select R.name "
+			    			+ "from users U JOIN  userrole UR ON U.id=UR.user_id"
+			    			+ " JOIN roles R ON UR.role_id=R.id"
+			    			+ " where U.id=?";
+    	try(Connection conn=db.getConnection()){
+			try(PreparedStatement statement=conn.prepareStatement(employeeData)){
+					statement.setString(1,username);
+					ResultSet result=statement.executeQuery();
+					if(result.next()) {
+						employeeId=result.getInt("id");
+						try(PreparedStatement statement1=conn.prepareStatement(employeeRoles)){
+							statement1.setInt(1,employeeId);
+							ResultSet result1=statement1.executeQuery();
+							while(result1.next()) {
+								roles.add(new Role(
+												   result1.getString("R.name")));
+							}
+							employeeDetails=new EmployeeData(new Employee(
+																		  result.getInt("id"),
+																		  result.getInt("employee_number"),
+																		  result.getString("first_name"),
+																		  result.getString("last_name")),roles);
+						}
+					}
+			}
+    	}
+		return employeeDetails;			
+    }
 //after each failed attempt update the counter in the Database
     @Override
     public Login update(Login login) throws SQLException {
@@ -61,7 +98,6 @@ public class LoginDAO implements ILoginDAO {
 					statement.setInt(2,login.getUserId());
 		
 					int result=statement.executeUpdate();
-
 				} 
 		}
 		return getLogin(login.getUsername());
@@ -105,9 +141,10 @@ public class LoginDAO implements ILoginDAO {
 //when the user attempts for the first time to login with wrong password
     public Login firstAttempte(String username) throws SQLException {
     	Login login=null;
-    	String userAttemptInsert="insert into login (user_name,attempts,last_attempt_time) values (?,?,?)";
+    	String userAttemptInsert="insert into login (user_id,user_name,attempts,last_attempt_time) values (?,?,?,?)";
     	try(Connection conn=db.getConnection()){
     		try(PreparedStatement statement=conn.prepareStatement(userAttemptInsert,Statement.RETURN_GENERATED_KEYS)){
+    			//the user id
     			statement.setString(1,username);
     			statement.setInt(2,0);
     			statement.setDate(3,null);
@@ -179,27 +216,31 @@ public class LoginDAO implements ILoginDAO {
  *in the last 24 hours, after 3 attempts the user account will be locked
  *(call lockeEmployee function from EmployeeDataDAO)  */
                     	Login login=null,last_Login=null;
-                    	if(firstTime(username)) {
+                    	if(firstTime(username)) {//checks if the user ever tried to login
                     		login=firstAttempte(username);
                     	}
-                    	else {
+                    	EmployeeData employeeData=getEmployeeData(username);
                     		if (!password.equals(set.getString("password"))){
                     			//not equals because this time was the last attempt
                     			if(FailedAttemptsCounter(username)<MAX_ATTEMPTS) {
+                    				//checks when did the user attempted to login,how many times he failed
                     				login=getLogin(username);
+                    				//update the attempts,date that he inserted a wrong password
                     				last_Login=update(login);
                     			}
                     			else {
+                    				if(FailedAttemptsCounter(username)==MAX_ATTEMPTS) {
+                    					employee.lockEmployee(employeeData.getEmployee().getId());
+                    				}
                     				throw new InvalidCredentials("Wrong password");
                     			}
                     		}
-                    	}
+                    	
                     }
                 }
             }
         }
         return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-
     }
     
     @Override

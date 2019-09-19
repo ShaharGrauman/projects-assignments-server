@@ -11,7 +11,7 @@ public class Login {
 	
 	private Integer id;
 	private Integer userId;
-	private String username;
+	private String username;//employee email
 	private String password;
 	private Integer attempts;
 	private Date lastAttemptTime;
