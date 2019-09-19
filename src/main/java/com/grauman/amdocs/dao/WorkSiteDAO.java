@@ -39,7 +39,6 @@ public class WorkSiteDAO implements IWorkSiteDAO{
         try(Connection conn = db.getConnection()){
             try (PreparedStatement command = conn.prepareStatement(FindCountryId)){
                 command.setString(1, workSite.getCountry().getName());
-
                 ResultSet result = command.executeQuery();
                 if(result.next()) {
 	                String InsertWorkSite="INSERT into worksite(name,country_id,city) values(?,?,?)";

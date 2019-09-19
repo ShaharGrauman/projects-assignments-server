@@ -3,6 +3,7 @@ package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.AssignmentSkillEmployeeDAO;
 import com.grauman.amdocs.models.vm.AssignmentSkillEmployeeVM;
+import com.grauman.amdocs.models.vm.SkillsLevelVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +45,8 @@ public class AssignmentSkillEmployeeController {
         return ResponseEntity.ok().body(employees);
 
     }
-    @GetMapping("/skill/set/{set}")
-    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillSet(@PathVariable("set") List<Integer> skillSet, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException{
-        List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillSet(skillSet, pageNumber,limit);
-        return ResponseEntity.ok().body(employees);
-
+    @PostMapping("")
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillSets(@RequestBody List<SkillsLevelVM> skillsLevelVM,Integer pageNumber,Integer limit) throws SQLException {
+        return new ResponseEntity<>(employeeDAO.searchEmployeesBySkillSet(skillsLevelVM,pageNumber,limit), HttpStatus.OK);
     }
 }
