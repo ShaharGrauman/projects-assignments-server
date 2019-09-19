@@ -561,12 +561,16 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 // get all sites 
 	public List<WorkSite> findAllSites() throws SQLException {
 		List<WorkSite> sites = new ArrayList<WorkSite>();
-		String sqlSitesCommand = "Select id,name from worksite";
+		String sqlSitesCommand = "Select WS.id,WS.name,WS.country_id,C.name,WS.city "
+								+ "from worksite WS JOIN country C ON WS.country_id=C.id";
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
 				ResultSet result = command.executeQuery(sqlSitesCommand);
 				while (result.next()) {
-					sites.add(new WorkSite(result.getInt("id"), result.getString("name")));
+					sites.add(new WorkSite(result.getInt("WS.id"),
+										   result.getString("WS.name"),
+										   new Country(result.getInt("WS.country_id"),result.getString("C.name")),
+										   result.getString("WS.city")));
 				}
 			}
 		}
@@ -576,12 +580,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 // get all roles
 	public List<Role> findAllRoles() throws SQLException {
 		List<Role> roles = new ArrayList<Role>();
-		String sqlSitesCommand = "Select id,name From roles";
+		String sqlSitesCommand = "Select id,name,description From roles";
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
 				ResultSet result = command.executeQuery(sqlSitesCommand);
 				while (result.next()) {
-					roles.add(new Role(result.getInt("id"), result.getString("name")));
+					roles.add(new Role(result.getInt("id"), result.getString("name"),result.getString("description")));
 				}
 			}
 		}
@@ -606,17 +610,21 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 // get all Managers (Name+ID)
 	public List<Employee> findAllManagers() throws SQLException {
 		List<Employee> managers = new ArrayList<Employee>();
-		String sqlSitesCommand = "select DISTINCT U1.id,U1.first_name " 
-							+ "From users U1 JOIN users U2 ON U1.id=U2.manager_id "
-							+ "JOIN userrole UR ON U1.id=UR.user_id JOIN roles R ON UR.role_id=R.id"
-							+ " Where R.name='manager'";
+		String sqlSitesCommand = "select DISTINCT U1.id,U1.employee_number,U1.first_name ,U1.last_name"
+								+ " From users U1 JOIN users U2 ON U1.id=U2.manager_id "
+								+ "JOIN userrole UR ON U1.id=UR.user_id JOIN roles R ON UR.role_id=R.id "
+								+ "Where R.name='manager'";
 
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
 
 				ResultSet result = command.executeQuery(sqlSitesCommand);
 				while (result.next()) {
-					managers.add(new Employee(result.getInt(1), result.getString(2)));
+					managers.add(new Employee(
+											  result.getInt("U1.id"),
+											  result.getInt("U1.employee_number"),
+											  result.getString("U1.first_name"),
+											  result.getString("U1.last_name")));
 				}
 			}
 		}
@@ -630,7 +638,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
             try (Statement command = conn.createStatement()) {
                 ResultSet result = command.executeQuery(sqlDepartmetsCommand);
                 while (result.next()) {
-                    countries.add(new Country(result.getInt(1), result.getString(2)));
+                    countries.add(new Country(result.getInt("id"),result.getString("name")));
                 }
             }
         }
