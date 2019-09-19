@@ -601,10 +601,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //done Exceptions
 //	@SuppressWarnings("null")
-	public void resetPassword(String toEmail) throws SQLException, EmployeeException {
+	@SuppressWarnings("null")
+	public void resetPassword(String toEmail, int number) throws SQLException, EmployeeException {
 		boolean catchTimeOut = false;
 		int retries = 0;
-		String findEmployeeByEmail = "SELECT * from users where email=?";
+		String findEmployeeByEmail = "SELECT * from users where email=? AND employee_number=?";
 		String newPassword;
 		EmployeeData employee = null;
 		ResultSet result = null;
@@ -615,7 +616,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement statment = conn.prepareStatement(findEmployeeByEmail)) {
 				statment.setString(1, toEmail);
-
+				statment.setInt(2, number);
 				do {
 					try {
 						result = statment.executeQuery();
@@ -644,7 +645,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				 * database.
 				 */
 				System.out.println("here...");
-				if (result.next()) {
+				
 					// employee = findEmployeeById(result.getInt(1)); // find gets the id of
 					// employee and returns the employee
 
@@ -659,7 +660,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 						e.printStackTrace();
 						System.out.println("can't continue from here.......");
 					}
-				}
+				
 				String firstName = result.getString("first_name");
 
 				String subject = mail.getSubject();
