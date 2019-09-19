@@ -30,7 +30,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public Assignment add(Assignment item) throws SQLException {
-        System.out.println(item.getEmployeeID());
         try (Connection conn = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
@@ -44,8 +43,16 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                 command.setDate(3, item.getStartDate());
                 command.setDate(4, item.getEndDate());
                 command.setInt(5, item.getRequestFromManagerID());
-                command.setInt(6, item.getRequestToManagerID());
-                command.setString(7, item.getStatus());
+
+                if (item.getRequestFromManagerID() != (item.getRequestToManagerID())) {
+                    System.out.println(item.getRequestToManagerID() + " aaaaaaaa");
+                    command.setInt(6, item.getRequestToManagerID());
+                    command.setString(7, "Pending approval");
+                } else {
+                    System.out.println(item.getRequestToManagerID() + " bbbbbbb");
+                    command.setNull(6, Types.INTEGER);
+                    command.setString(7, "In progress");
+                }
                 command.executeUpdate();
                 try (ResultSet generatedID = command.getGeneratedKeys()) {
                     if (generatedID.next())
