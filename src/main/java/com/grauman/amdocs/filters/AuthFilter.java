@@ -41,11 +41,10 @@ public class AuthFilter implements Filter {
 										.filter(c -> c.getName().equals("auth"))
 										.findFirst()
 										.orElseThrow(() -> new RuntimeException("Not Authorized"));
+
+			String details = new String(Base64.getDecoder().decode(authCookie.getValue()));
 			
 			
-			if(authCookie != null) {
-				chain.doFilter(request, response);
-			}
 			
 //			String authHeader = req.getHeader("auth");
 //
