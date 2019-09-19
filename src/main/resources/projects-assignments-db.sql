@@ -21,28 +21,25 @@ USE `assignments`;
 -- Table structure for table `assignment`
 --
 
-DROP TABLE IF EXISTS `assignment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
-CREATE TABLE `assignment` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) DEFAULT NULL,
-  `employee_id` int(11) DEFAULT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
-  `requested_from_manager_id` int(11) DEFAULT NULL,
-  `requested_to_manager_id` int(11) DEFAULT NULL,
-  `status` enum('Pending approval','Not approved','In progress','Done!') DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `employee_id` (`employee_id`),
-  KEY `project_id` (`project_id`),
-  KEY `requested_from_manager_id` (`requested_from_manager_id`),
-  KEY `requested_to_manager_id` (`requested_to_manager_id`),
-  CONSTRAINT `assignment_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `assignment_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
-  CONSTRAINT `assignment_ibfk_3` FOREIGN KEY (`requested_from_manager_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `assignment_ibfk_4` FOREIGN KEY (`requested_to_manager_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE assignment (
+ id int(11) NOT NULL AUTO_INCREMENT,
+ project_id int(11) NOT NULL,
+ employee_id int(11) NOT NULL,
+ start_date date NOT NULL,
+ end_date date NOT NULL,
+ requested_from_manager_id int(11) NOT NULL,
+ requested_to_manager_id int(11) DEFAULT NULL,
+ status enum('Pending approval','Not approved','In progress','Done!')  NOT NULL,
+ PRIMARY KEY (id),
+ KEY employee_id (employee_id),
+ KEY project_id (project_id),
+ KEY requested_from_manager_id (requested_from_manager_id),
+ KEY requested_to_manager_id (requested_to_manager_id),
+ CONSTRAINT assignment_ibfk_1 FOREIGN KEY (employee_id) REFERENCES users (id),
+ CONSTRAINT assignment_ibfk_2 FOREIGN KEY (project_id) REFERENCES project (id),
+ CONSTRAINT assignment_ibfk_3 FOREIGN KEY (requested_from_manager_id) REFERENCES users (id),
+ CONSTRAINT assignment_ibfk_4 FOREIGN KEY (requested_to_manager_id) REFERENCES users (id)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
