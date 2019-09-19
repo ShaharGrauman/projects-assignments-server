@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeNumber {
+public class ResetPasswordVM {
 	private int employeeNumber;
-
+	private String email;
 
 //	public int getNumber() {
 //		return number;
