@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
@@ -38,9 +39,11 @@ public class AssignmentsController {
         List<AssignmentRequestVM> assignments = assignmentsDAO.getAssignmentsRequestByManagerID(managerid, pageNumber, limit);
         return ResponseEntity.ok().body(assignments);
     }
-    @GetMapping("/updatestatus/{id}")
-    public ResponseEntity<String> updatePendingApprovalStatus(@PathVariable("id") int assignmentID, @RequestParam boolean response) throws SQLException{
-        String message=assignmentsDAO.updatePendingApprovalStatus(assignmentID,response);
+
+
+    @PostMapping("/status")
+    public ResponseEntity<String> updatePendingApprovalStatus(@RequestBody Assignment assignment, @RequestParam boolean response) throws SQLException {
+        String message = assignmentsDAO.updatePendingApprovalStatus(assignment, response);
         return ResponseEntity.ok().body(message);
     }
 

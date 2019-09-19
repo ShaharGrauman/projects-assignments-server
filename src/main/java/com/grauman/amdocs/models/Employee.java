@@ -28,6 +28,7 @@ public class Employee {
 	private Boolean locked;
 	private Boolean deactivated;
 	private String password;
+	private String image;
 	
 	public Employee(Integer id) {
 		this.id=id;
@@ -69,6 +70,23 @@ public class Employee {
 		this.loginStatus=loginStatus;
 		this.locked=locked;
 		this.deactivated=deactivated;
+		
+	}
+	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
+			String department,WorkSite worksite,String phone,Boolean loginStatus,Boolean locked,String image,Boolean deactivated) {
+		this.id=id;
+		this.number=number;
+		this.firstName=firstName;
+		this.lastName=lastName;
+		this.email=email;
+		this.managerId=managerId;
+		this.department=department;
+		this.worksite=worksite;
+		this.phone=phone;
+		this.loginStatus=loginStatus;
+		this.locked=locked;
+		this.deactivated=deactivated;
+		this.image=image;
 	}
 	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
 			String department,WorkSite worksite,String phone,Boolean loginStatus,Boolean locked,

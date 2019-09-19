@@ -20,29 +20,27 @@ USE `assignments`;
 --
 -- Table structure for table `assignment`
 --
-
 DROP TABLE IF EXISTS `assignment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
-CREATE TABLE `assignment` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `project_id` int(11) DEFAULT NULL,
-  `employee_id` int(11) DEFAULT NULL,
-  `start_date` date DEFAULT NULL,
-  `end_date` date DEFAULT NULL,
-  `requested_from_manager_id` int(11) DEFAULT NULL,
-  `requested_to_manager_id` int(11) DEFAULT NULL,
-  `status` enum('Pending approval','Not approved','In progress','Done!') DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `employee_id` (`employee_id`),
-  KEY `project_id` (`project_id`),
-  KEY `requested_from_manager_id` (`requested_from_manager_id`),
-  KEY `requested_to_manager_id` (`requested_to_manager_id`),
-  CONSTRAINT `assignment_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `assignment_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
-  CONSTRAINT `assignment_ibfk_3` FOREIGN KEY (`requested_from_manager_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `assignment_ibfk_4` FOREIGN KEY (`requested_to_manager_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE assignment (
+ id int(11) NOT NULL AUTO_INCREMENT,
+ project_id int(11) NOT NULL,
+ employee_id int(11) NOT NULL,
+ start_date date NOT NULL,
+ end_date date NOT NULL,
+ requested_from_manager_id int(11) NOT NULL,
+ requested_to_manager_id int(11) DEFAULT NULL,
+ status enum('Pending approval','Not approved','In progress','Done!')  NOT NULL,
+ PRIMARY KEY (id),
+ KEY employee_id (employee_id),
+ KEY project_id (project_id),
+ KEY requested_from_manager_id (requested_from_manager_id),
+ KEY requested_to_manager_id (requested_to_manager_id),
+ CONSTRAINT assignment_ibfk_1 FOREIGN KEY (employee_id) REFERENCES users (id),
+ CONSTRAINT assignment_ibfk_2 FOREIGN KEY (project_id) REFERENCES project (id),
+ CONSTRAINT assignment_ibfk_3 FOREIGN KEY (requested_from_manager_id) REFERENCES users (id),
+ CONSTRAINT assignment_ibfk_4 FOREIGN KEY (requested_to_manager_id) REFERENCES users (id)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -434,3 +432,58 @@ CREATE TABLE rolepermissions (
  CONSTRAINT role_permission_id FOREIGN KEY (role_permission_id) REFERENCES roles (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+- MySQL dump 10.13  Distrib 8.0.16, for Win64 (x86_64)
+--
+-- Host: localhost    Database: admin
+-- ------------------------------------------------------
+-- Server version    8.0.16
+/!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT /;
+/!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS /;
+/!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION /;
+SET NAMES utf8 ;
+/!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE /;
+/!40103 SET TIME_ZONE='+00:00' /;
+/!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 /;
+/!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 /;
+/!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' /;
+/!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 /;
+--
+-- Dumping data for table assignment
+--
+LOCK TABLES assignment WRITE;
+/!40000 ALTER TABLE assignment DISABLE KEYS /;
+INSERT INTO assignment VALUES (1,3,1,'2019-01-01','2019-01-04',1,3,'Done!'),(2,3,1,'2019-08-08','2020-08-08',2,3,'In progress'),(3,3,1,'2015-06-11','2017-06-04',1,3,'Done!'),(4,3,2,'2019-01-01','2019-10-23',3,2,'In progress'),(5,3,2,'2013-09-05','2014-12-04',2,2,'Not approved'),(6,3,2,'2012-12-12','2013-03-13',1,2,'Done!'),(7,3,2,'2007-01-01','2010-01-04',1,2,'Done!'),(8,2,3,'2019-01-01','2019-01-04',3,1,'Not approved'),(9,3,3,'2019-09-01','2020-01-20',1,1,'Done!'),(10,3,1,'2019-08-02','2021-01-20',2,1,'Pending approval');
+/!40000 ALTER TABLE assignment ENABLE KEYS /;
+UNLOCK TABLES;
+--
+-- Dumping data for table project
+--
+LOCK TABLES project WRITE;
+/!40000 ALTER TABLE project DISABLE KEYS /;
+INSERT INTO project VALUES (2,'Vodafone',1,'asdksaldkas','2019-10-05'),(3,'Skype',1,'alohaaaa','2001-04-15'),(4,'Viber',1,'heloo','2013-07-23'),(5,'whatsApp',1,'hello','2007-12-27'),(6,'Facebook',1,'no description','2009-09-01'),(7,'Instagram',1,'no description','2018-11-25'),(8,'Paypal',1,'-----','2003-12-23'),(9,'Kiwi',1,'hello','2000-11-14'),(10,'Ask.fm',1,'alohaaaa','2019-10-05'),(11,'Postman',1,'allllohaaaa','2019-10-05'),(12,'Waze',1,'-----','2011-06-06'),(17,'Cellcom',2,'asdksajdksad','2019-08-07'),(49,'ccc',2,'asdksaldkas','2019-10-05'),(50,'aaa',2,'asdksaldkas','2019-10-05'),(51,'bbb',2,'asdksaldkas','2019-10-05');
+/!40000 ALTER TABLE project ENABLE KEYS /;
+UNLOCK TABLES;
+--
+-- Dumping data for table projectskill
+--
+LOCK TABLES projectskill WRITE;
+/!40000 ALTER TABLE projectskill DISABLE KEYS /;
+INSERT INTO projectskill VALUES (1,3,2,5),(2,8,2,5),(3,3,1,4),(4,9,3,5),(5,3,2,5),(6,9,1,4),(7,10,3,3),(8,10,2,5),(9,10,1,4),(10,11,3,3),(11,11,2,5),(12,11,1,4),(13,49,1,4),(14,49,1,3),(15,50,1,4),(16,50,1,3),(18,51,1,4),(19,51,1,3);
+/!40000 ALTER TABLE projectskill ENABLE KEYS /;
+UNLOCK TABLES;
+--
+-- Dumping data for table skills
+--
+LOCK TABLES skills WRITE;
+/!40000 ALTER TABLE skills DISABLE KEYS /;
+INSERT INTO skills VALUES (1,'Java','TECHNICAL'),(2,'C','TECHNICAL'),(3,'CSS','TECHNICAL'),(4,'JS','TECHNICAL'),(5,'CRM','PRODUCT'),(7,'Asp.net','TECHNICAL'),(8,'TypeScript','TECHNICAL'),(9,'C++','TECHNICAL'),(10,'Testing','PRODUCT');
+/!40000 ALTER TABLE skills ENABLE KEYS /;
+UNLOCK TABLES;
+/!40101 SET SQL_MODE=@OLD_SQL_MODE /;
+/!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS /;
+/!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS /;
+/!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT /;
+/!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS /;
+/!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION /;
+/!40111 SET SQL_NOTES=@OLD_SQL_NOTES /;
+-- Dump completed on 2019-09-18 14:42:29
