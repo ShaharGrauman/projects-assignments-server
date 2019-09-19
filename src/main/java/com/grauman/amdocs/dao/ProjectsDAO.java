@@ -115,7 +115,7 @@ public class ProjectsDAO implements IProjectsDAO {
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
 
 
-        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
+        List<ProjectVM> projectVMList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
@@ -177,7 +177,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
     @Override
     public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
-        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
+        List<ProjectVM> projectVMList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
@@ -240,7 +240,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
     @Override
     public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
-        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
+        List<ProjectVM> projectVMList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
