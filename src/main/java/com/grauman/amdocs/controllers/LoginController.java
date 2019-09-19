@@ -1,6 +1,12 @@
 package com.grauman.amdocs.controllers;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Base64;
+
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +34,17 @@ public class LoginController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<String> login(@RequestBody Login login) throws SQLException {
+	public ResponseEntity<String> login(@RequestBody Login login, ServletResponse response) throws SQLException {
 		
-		String header = loginDAO.validate(login.getUsername(),login.getPassword()); // if login successful return encoded string
+		//String header = loginDAO.validate(login.getUsername(),login.getPassword()); // if login successful return encoded string
 
-		return ResponseEntity.ok().header("auth", header).body("Login...");
+		String value = Base64.getEncoder().encodeToString((login.getUsername() + ":" + login.getPassword()).getBytes());
+		
+		HttpServletResponse resp = (HttpServletResponse)response;
+		
+		resp.addCookie(new Cookie("auth", value));
+		
+		return ResponseEntity.ok().header("auth", value).body("Login...");
 	}
 	
 }
