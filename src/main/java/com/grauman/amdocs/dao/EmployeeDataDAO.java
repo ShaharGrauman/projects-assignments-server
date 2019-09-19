@@ -28,6 +28,8 @@ import com.grauman.amdocs.models.WorkSite;
 public class EmployeeDataDAO implements IEmployeeDataDAO {
 	@Autowired
 	DBManager db;
+	@Autowired
+	LoginDAO loginAttemptes;
 
 //Search all employees which are locked
 	@Override
@@ -506,6 +508,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				unLockedEmployee = find(id);
 			}
 		}
+		loginAttemptes.resetAttempts(unLockedEmployee.getEmployee().getEmail());
 		return unLockedEmployee;
 	}
 //lock Employee after 3 attempts

@@ -66,47 +66,43 @@ public class RoleDAO implements IRoleDAO{
 
 	@Override
 	public RolePermissions find(int id) throws SQLException{
-		RolePermissions role=null;
+		RolePermissions roleWithPermissions=null;
+		Role role=null;
 		String sqlRole = "Select * From roles where id=?";
+		List<Permission> rolePermissionsList=new ArrayList<>();
+		String sqlRolePermissions="select P.* "
+								+ "from permissions P JOIN rolepermissions RP ON P.id=RP.permission_id "
+								+ "where RP.role_id=?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement statement=conn.prepareStatement(sqlRole)) {
 				statement.setInt(1,id);
 				ResultSet result=statement.executeQuery();
 				if(result.next()) {
-					role=new RolePermissions(new Role(
+					role=new Role(
 								  result.getInt(1),
 								  result.getString(2),
-								  result.getString(3)));
+								  result.getString(3));
 							
 				}
 			}
-		}
-		return role;
-	}
-	
-	public List<Permission> getRolePermissions(Role role)throws SQLException{
-		
-		List<Permission> rolePermissionsList=new ArrayList<>();
-		String sqlRolePermissions="select P.* "
-								+ "from permissions P JOIN rolepermissions RP ON P.id=RP.permission_id "
-								+ "where RP.role_id=?";
-		try(Connection conn = db.getConnection()){
-			try(PreparedStatement statement=conn.prepareStatement(sqlRolePermissions)){
-				statement.setInt(1,role.getId());
-				ResultSet result=statement.executeQuery();
-				while(result.next()) {
-					rolePermissionsList.add(new Permission(result.getInt(1),
-											result.getString(2)));
+			try(PreparedStatement statement1=conn.prepareStatement(sqlRolePermissions)){
+				statement1.setInt(1,role.getId());
+				ResultSet result1=statement1.executeQuery();
+				while(result1.next()) {
+					rolePermissionsList.add(new Permission(result1.getInt(1),
+														   result1.getString(2)));
 				}
 			}
 		}
-		return null;
+		roleWithPermissions=new RolePermissions(role,rolePermissionsList);
+		return roleWithPermissions;
 	}
+	
 	@Override
 	public RolePermissions add(RolePermissions roleWithPermissions) throws SQLException {
 		RolePermissions newRole=null;
 		int roleId;
-		List<Permission> rolePermissions=getRolePermissions(roleWithPermissions.getRole());
+		List<Permission> rolePermissions=roleWithPermissions.getPermissions();
 
 		String sqlAddRole="Insert INTO roles (name,description) values(?,?)";
 		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_id,permission_id) values(?,?)";
@@ -134,7 +130,7 @@ public class RoleDAO implements IRoleDAO{
 				}
 			}
 		}
-	 
+		newRole = find(newRole.getRole().getId());
 		return newRole;
 
 	}
