@@ -27,6 +27,11 @@ public class ProjectController {
         return ResponseEntity.ok().body(projectsDAO.getProjectsByUserID(userID));
     }
 
+    @GetMapping("user/name/{name}")
+    public ResponseEntity<List<ProjectVM>> getProjectsByUserID(@PathVariable("name") String employeeName) throws SQLException, ResultsNotFoundException {
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByUserName(employeeName));
+    }
+
 
         @GetMapping("name/{name}")
     public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@PathVariable("name") String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {

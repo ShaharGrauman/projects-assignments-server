@@ -115,7 +115,7 @@ public class ProjectsDAO implements IProjectsDAO {
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
 
 
-        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
+        List<ProjectVM> projectVMList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
@@ -177,15 +177,12 @@ public class ProjectsDAO implements IProjectsDAO {
 
     @Override
     public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
-        List<ProjectVM> projectVMList = new ArrayList<ProjectVM>();
+        List<ProjectVM> projectVMList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection conn = db.getConnection()) {
-//            String projectQuery = "select p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
-//                    "                                                      join project p on a.project_id=p.id\n" +
-//                    "                                                      where a.status = \"In progress\" and u.id= ?;";
-            String projectQuery="select p.id,p.name, p.start_date, p.description from assignment a join project p" +
+            String projectQuery = "select p.id,p.name, p.start_date, p.description from assignment a join project p" +
                     " on a.project_id=p.id where a.status= 'In progress' and a.employee_id= ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -227,8 +224,71 @@ public class ProjectsDAO implements IProjectsDAO {
                             }
                         }
                         ProjectVM pro2 = new ProjectVM(Rs.getInt(1), Rs.getString(2),
-                                                        Rs.getString(4), Rs.getDate(3),
-                                                         technicalSkillList, productSkillList, userID);
+                                Rs.getString(4), Rs.getDate(3),
+                                technicalSkillList, productSkillList, userID);
+                        projectVMList.add(pro2);
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
+                    }
+                }
+            }
+        }
+
+
+        return projectVMList;
+    }
+
+    @Override
+    public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
+        List<ProjectVM> projectVMList = new ArrayList<>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
+
+        try (Connection conn = db.getConnection()) {
+            String projectQuery = "select p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
+                    " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'In progress' and u.first_name like ? ";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+
+            try (PreparedStatement ps = conn.prepareStatement(projectQuery)) {
+
+                ps.setString(1, userName + "%");
+
+                try (ResultSet Rs = ps.executeQuery()) {
+
+                    while (Rs.next()) {
+
+                        //GET technical SKILL FOR EMPLOYEE
+                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                            skill.setInt(1, Rs.getInt("p.id"));
+
+                            try {
+                                ResultSet tsskill = skill.executeQuery();
+                                while (tsskill.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(tsskill.getInt(1), tsskill.getString(2), tsskill.getInt(3));
+                                    technicalSkillList.add(technicalSkill);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println(e);
+                            }
+                        }
+                        //GET PRODUCT SKILL FOR EMPLOYEE
+                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                            skill.setInt(1, Rs.getInt("p.id"));
+
+                            try {
+                                ResultSet psskill = skill.executeQuery();
+                                while (psskill.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(psskill.getInt(1), psskill.getString(2), psskill.getInt(3));
+                                    productSkillList.add(productSkill);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println(e);
+                            }
+                        }
+                        ProjectVM pro2 = new ProjectVM(Rs.getInt(1), Rs.getString(2),
+                                Rs.getString(4), Rs.getDate(3),
+                                technicalSkillList, productSkillList, Rs.getInt(6));
                         projectVMList.add(pro2);
                         technicalSkillList = new ArrayList<>();
                         productSkillList = new ArrayList<>();
