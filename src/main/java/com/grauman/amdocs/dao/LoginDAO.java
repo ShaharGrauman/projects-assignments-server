@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -90,6 +91,9 @@ public class LoginDAO implements ILoginDAO {
 //after each failed attempt update the counter in the Database
     @Override
     public Login update(Login login) throws SQLException {
+    	if(login.getLastAttemptTime() == null) {
+    		login.setLastAttemptTime(new Date(System.currentTimeMillis()));
+    	}
     	String updateFailedAttempts=" update login set attempts=attempts+1, last_attempt_time=?"
 									+ " where user_id=?";
 		try(Connection conn=db.getConnection()){
@@ -108,9 +112,9 @@ public class LoginDAO implements ILoginDAO {
     	Login login=null;
     	String failedAttempts="select * from login where user_name=?";
     	try(Connection conn=db.getConnection()){
-    		try(PreparedStatement statement=conn.prepareStatement(failedAttempts,Statement.RETURN_GENERATED_KEYS)){
+    		try(PreparedStatement statement=conn.prepareStatement(failedAttempts)){
     			statement.setString(1,username);
-    			ResultSet ids = statement.getGeneratedKeys();
+    			ResultSet ids = statement.executeQuery();
     			if(ids.next()) {
     				login=new Login(ids.getInt(1),
     								ids.getInt(2),
@@ -123,7 +127,7 @@ public class LoginDAO implements ILoginDAO {
     	return login;
     }
 //check how many times did the user attempted to login
-    public Integer FailedAttemptsCounter(String username) throws SQLException {
+    public Integer failedAttemptsCounter(String username) throws SQLException {
     	int attemptes=0;
     	String failedAttempts="select attempts from login where user_name=?";
     	try(Connection conn=db.getConnection()){
@@ -218,15 +222,17 @@ public class LoginDAO implements ILoginDAO {
                     	EmployeeData employeeData=getEmployeeData(username);
                     		if (!password.equals(set.getString("password"))){
                     			//not equals because this time was the last attempt
-                    			if(FailedAttemptsCounter(username)<MAX_ATTEMPTS) {
+                    			if(failedAttemptsCounter(username)<MAX_ATTEMPTS) {
                     				//checks when did the user attempted to login,how many times he failed
                     				login=getLogin(username);
                     				//update the attempts,date that he inserted a wrong password
                     				last_Login=update(login);
                     			}
                     			else {
-                    				if(FailedAttemptsCounter(username)==MAX_ATTEMPTS) {
+                    				if(failedAttemptsCounter(username)==MAX_ATTEMPTS) {
                     					employee.lockEmployee(employeeData.getEmployee().getId());
+
+                        				throw new InvalidCredentials("You are locked out. Please contact the administrator.");
                     				}
                     				throw new InvalidCredentials("Wrong password");
                     			}
