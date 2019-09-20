@@ -299,55 +299,60 @@ CREATE TABLE `worksite` (
 -- Dump completed on 2019-09-20 14:04:42
 
 
+-- INSERT INTO `assignments`.`country` (`name`) VALUES ('Israel');
 
-INSERT INTO `assignments`.`worksite` (`name`, `country_id`, `city`) VALUES ('HiTech Park', '1', 'Nazareth');
+-- INSERT INTO `assignments`.`worksite` (`name`, `country_id`, `city`) VALUES ('HiTech Park', '1', 'Nazareth');
 
-INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
-VALUES ('1212', 'Shahar', 'Grauman', 'graumanoz@gmail.com', 'R&D', '1', 'Israel', '0541234567', b'1', b'0', b'0', '123456');
+-- INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
+-- VALUES ('1212', 'Shahar', 'Grauman', 'graumanoz@gmail.com', 'R&D', '1', '1', '0541234567', b'1', b'0', b'0', '123456');
 
-INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
-VALUES ('1414', 'Shahar', 'Grauman', 'graumanoz@yahoo.com', 'R&D', '1', 'Israel', '0541234567', b'1', b'0', b'0', '123456');
+-- INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
+-- VALUES ('1414', 'Shahar', 'Grauman', 'graumanoz@yahoo.com', 'R&D', '1', '1', '0541234567', b'1', b'0', b'0', '123456');
 
-INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `manager_id`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
-VALUES ('3232', 'Majd', 'Rizik', 'majdrizik@gmail.com', '1', 'R&D', '1', 'Israel', '0541234568', b'1', b'0', b'0', '123456');
+-- INSERT INTO `assignments`.`users` (`employee_number`, `first_name`, `last_name`, `email`, `manager_id`, `department`, `work_site_id`, `country`, `phone`, `login_status`, `locked`, `deactivated`, `password`) 
+-- VALUES ('3232', 'Majd', 'Rizik', 'majdrizik@gmail.com', '1', 'R&D', '1', '1', '0541234568', b'1', b'0', b'0', '123456');
 
 --
 -- Dumping data for table assignment
 --
 LOCK TABLES assignment WRITE;
-/!40000 ALTER TABLE assignment DISABLE KEYS /;
+/*!40000 ALTER TABLE assignment DISABLE KEYS */;
 INSERT INTO assignment VALUES (1,3,1,'2019-01-01','2019-01-04',1,3,'Done!'),(2,3,1,'2019-08-08','2020-08-08',2,3,'In progress'),(3,3,1,'2015-06-11','2017-06-04',1,3,'Done!'),(4,3,2,'2019-01-01','2019-10-23',3,2,'In progress'),(5,3,2,'2013-09-05','2014-12-04',2,2,'Not approved'),(6,3,2,'2012-12-12','2013-03-13',1,2,'Done!'),(7,3,2,'2007-01-01','2010-01-04',1,2,'Done!'),(8,2,3,'2019-01-01','2019-01-04',3,1,'Not approved'),(9,3,3,'2019-09-01','2020-01-20',1,1,'Done!'),(10,3,1,'2019-08-02','2021-01-20',2,1,'Pending approval');
-/!40000 ALTER TABLE assignment ENABLE KEYS /;
+/*!40000 ALTER TABLE assignment ENABLE KEYS */;
 UNLOCK TABLES;
 --
 -- Dumping data for table project
 --
 LOCK TABLES project WRITE;
-/!40000 ALTER TABLE project DISABLE KEYS /;
+/*!0000 ALTER TABLE project DISABLE KEYS */;
 INSERT INTO project VALUES (2,'Vodafone',1,'asdksaldkas','2019-10-05'),(3,'Skype',1,'alohaaaa','2001-04-15'),(4,'Viber',1,'heloo','2013-07-23'),(5,'whatsApp',1,'hello','2007-12-27'),(6,'Facebook',1,'no description','2009-09-01'),(7,'Instagram',1,'no description','2018-11-25'),(8,'Paypal',1,'-----','2003-12-23'),(9,'Kiwi',1,'hello','2000-11-14'),(10,'Ask.fm',1,'alohaaaa','2019-10-05'),(11,'Postman',1,'allllohaaaa','2019-10-05'),(12,'Waze',1,'-----','2011-06-06'),(17,'Cellcom',2,'asdksajdksad','2019-08-07'),(49,'ccc',2,'asdksaldkas','2019-10-05'),(50,'aaa',2,'asdksaldkas','2019-10-05'),(51,'bbb',2,'asdksaldkas','2019-10-05');
-/!40000 ALTER TABLE project ENABLE KEYS /;
+/*!0000 ALTER TABLE project ENABLE KEYS */;
 UNLOCK TABLES;
 --
 -- Dumping data for table projectskill
 --
 LOCK TABLES projectskill WRITE;
-/!40000 ALTER TABLE projectskill DISABLE KEYS /;
+/*!0000 ALTER TABLE projectskill DISABLE KEYS */;
 INSERT INTO projectskill VALUES (1,3,2,5),(2,8,2,5),(3,3,1,4),(4,9,3,5),(5,3,2,5),(6,9,1,4),(7,10,3,3),(8,10,2,5),(9,10,1,4),(10,11,3,3),(11,11,2,5),(12,11,1,4),(13,49,1,4),(14,49,1,3),(15,50,1,4),(16,50,1,3),(18,51,1,4),(19,51,1,3);
-/!40000 ALTER TABLE projectskill ENABLE KEYS /;
+/*!0000 ALTER TABLE projectskill ENABLE KEYS */;
 UNLOCK TABLES;
+
+
 --
 -- Dumping data for table skills
 --
 LOCK TABLES skills WRITE;
-/!40000 ALTER TABLE skills DISABLE KEYS /;
+/*!0000 ALTER TABLE skills DISABLE KEYS */;
 INSERT INTO skills VALUES (1,'Java','TECHNICAL'),(2,'C','TECHNICAL'),(3,'CSS','TECHNICAL'),(4,'JS','TECHNICAL'),(5,'CRM','PRODUCT'),(7,'Asp.net','TECHNICAL'),(8,'TypeScript','TECHNICAL'),(9,'C++','TECHNICAL'),(10,'Testing','PRODUCT');
-/!40000 ALTER TABLE skills ENABLE KEYS /;
+/*!0000 ALTER TABLE skills ENABLE KEYS */;
 UNLOCK TABLES;
-/!40101 SET SQL_MODE=@OLD_SQL_MODE /;
-/!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS /;
-/!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS /;
-/!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT /;
-/!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS /;
-/!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION /;
-/!40111 SET SQL_NOTES=@OLD_SQL_NOTES /;
+/*!0101 SET SQL_MODE=@OLD_SQL_MODE /;
+/*!0014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!0014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!0101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!0101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!0101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!0111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 -- Dump completed on 2019-09-18 14:42:29
+
+
