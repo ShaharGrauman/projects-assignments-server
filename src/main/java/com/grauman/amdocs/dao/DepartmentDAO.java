@@ -33,27 +33,37 @@ public class DepartmentDAO implements IDepartmentDAO{
 	public Department add(Department department) throws SQLException {
 		int departmentId;
 		Department newD=null;
+		String checkIfDepartmentExists="select * from department where name=?";
 		String sqlAddDepartment="Insert INTO department(name) values(?)";
 		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement statement = conn.prepareStatement(sqlAddDepartment,Statement.RETURN_GENERATED_KEYS)) {
-				statement.setString(1,department.getName());
-				
-				int rowCountUpdated = statement.executeUpdate();
-
-				ResultSet ids = statement.getGeneratedKeys();
-
-				while (ids.next()) {
-					departmentId = ids.getInt(1);
-					String sqlresult="select id,name From department Where id=?";
-					try(PreparedStatement command = conn.prepareStatement(sqlresult)){
-						command.setInt(1,departmentId);
-						ResultSet result=command.executeQuery();
-						result.next();
-						newD=new Department(result.getInt(1), result.getString(2));
-						
+			//check if the department already exists
+			try(PreparedStatement state = conn.prepareStatement(checkIfDepartmentExists)){
+				state.setString(1,department.getName());
+				ResultSet exists=state.executeQuery();
+				//if the result set is false..there is no such department in the database
+				if(!exists.next()) {
+				try (PreparedStatement statement = conn.prepareStatement(sqlAddDepartment,Statement.RETURN_GENERATED_KEYS)) {
+					statement.setString(1,department.getName());
+					
+					int rowCountUpdated = statement.executeUpdate();
+	
+					ResultSet ids = statement.getGeneratedKeys();
+	
+					while (ids.next()) {
+						departmentId = ids.getInt(1);
+						String sqlresult="select id,name From department Where id=?";
+						try(PreparedStatement command = conn.prepareStatement(sqlresult)){
+							command.setInt(1,departmentId);
+							ResultSet result=command.executeQuery();
+							result.next();
+							newD=new Department(result.getInt(1), result.getString(2));
+							
+						}
 					}
+				  }
 				}
-			  }
+				//throw excption
+				}
 			}
 		return newD;
 	}
