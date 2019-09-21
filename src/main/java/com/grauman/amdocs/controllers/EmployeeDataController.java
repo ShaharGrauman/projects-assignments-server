@@ -93,8 +93,8 @@ public class EmployeeDataController {
 		List<EmployeeData> employeeByRole=employeeDataDAO.filterByRole(role);
 		return ResponseEntity.ok().body(employeeByRole);
 	}
-	@GetMapping("/department")
-	public ResponseEntity<List<EmployeeData>> findByDepartment(@RequestParam String department) throws SQLException {
+	@GetMapping("/{department}")
+	public ResponseEntity<List<EmployeeData>> findByDepartment(@PathVariable String department) throws SQLException {
 		List<EmployeeData> employeeByDepartment=employeeDataDAO.filterByDepartment(department);
 		return ResponseEntity.ok().body(employeeByDepartment);
 	}
