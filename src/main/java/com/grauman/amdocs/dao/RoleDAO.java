@@ -103,36 +103,43 @@ public class RoleDAO implements IRoleDAO{
 		RolePermissions newRole=null;
 		int roleId;
 		List<Permission> rolePermissions=roleWithPermissions.getPermissions();
-
+		String checkIfRoleExists="select * from roles where name=?";
 		String sqlAddRole="Insert INTO roles (name,description) values(?,?)";
 		String sqlLinkRoleWithpermission="Insert INTO rolepermissions(role_id,permission_id) values(?,?)";
 
 
 		try(Connection conn = db.getConnection()){
-			try(PreparedStatement statement=conn.prepareStatement(sqlAddRole,Statement.RETURN_GENERATED_KEYS)){
-				statement.setString(1,roleWithPermissions.getRole().getName());
-				statement.setString(2,roleWithPermissions.getRole().getDescription());
-				
-				int rowCountUpdatedRole = statement.executeUpdate();
-
-				ResultSet ids = statement.getGeneratedKeys();
-				while(ids.next()) {
-					roleId = ids.getInt(1);
-					newRole = find(roleId);
-					
-				}
-			}
-			try(PreparedStatement statement2=conn.prepareStatement(sqlLinkRoleWithpermission)){
-				for(int i=0;i<rolePermissions.size();i++) {
-					statement2.setInt(1,newRole.getRole().getId());
-					statement2.setInt(2,rolePermissions.get(i).getId());
-					int rowCountUpdatedPermission = statement2.executeUpdate();
-				}
+			//check if the role already exists
+			try(PreparedStatement state = conn.prepareStatement(checkIfRoleExists)){
+				state.setString(1,roleWithPermissions.getRole().getName());
+				ResultSet exists=state.executeQuery();
+				//if the result set is false..there is no such role in the database
+					if(!exists.next()) {
+						try(PreparedStatement statement=conn.prepareStatement(sqlAddRole,Statement.RETURN_GENERATED_KEYS)){
+							statement.setString(1,roleWithPermissions.getRole().getName());
+							statement.setString(2,roleWithPermissions.getRole().getDescription());
+							
+							int rowCountUpdatedRole = statement.executeUpdate();
+			
+							ResultSet ids = statement.getGeneratedKeys();
+							while(ids.next()) {
+								roleId = ids.getInt(1);
+								newRole = find(roleId);
+							}
+						}
+						try(PreparedStatement statement2=conn.prepareStatement(sqlLinkRoleWithpermission)){
+							for(int i=0;i<rolePermissions.size();i++) {
+								statement2.setInt(1,newRole.getRole().getId());
+								statement2.setInt(2,rolePermissions.get(i).getId());
+								int rowCountUpdatedPermission = statement2.executeUpdate();
+							}
+						}
+						newRole = find(newRole.getRole().getId());
+					}
+					//throw exception
 			}
 		}
-		newRole = find(newRole.getRole().getId());
 		return newRole;
-
 	}
 
 	@Override
