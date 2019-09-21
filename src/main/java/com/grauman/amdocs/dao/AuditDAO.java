@@ -49,8 +49,8 @@ public class AuditDAO implements IAuditDAO{
 	 public List<Role> getEmployeeRoles(int id)throws SQLException{
 	  		List<Role> employeeRoles=new ArrayList<>();
 	  		String sqlFindRoles="SELECT R.id,R.name" + 
-	  				" FROM roles R join userrole US ON R.id=US.role_id" + 
-	  				" WHERE US.user_id=?";
+				  				" FROM roles R join userrole US ON R.id=US.role_id" + 
+				  				" WHERE US.user_id=?";
 	  		try(Connection conn = db.getConnection()){
 	  		try(PreparedStatement command=conn.prepareStatement(sqlFindRoles)){
 	  			 command.setInt(1,id);
@@ -78,11 +78,13 @@ public class AuditDAO implements IAuditDAO{
         		while(result.next()) {
         			roles=getEmployeeRoles(result.getInt(6));
                     audit.add(
-                            new AuditEmployee(new Audit(result.getInt(1)
-                            		,result.getInt(2),result.getDate(3),result.getInt(6),result.getString(7)),
-                            		result.getString(4),result.getString(5),roles)
-                                   
-                                    );
+                            new AuditEmployee(new Audit(result.getInt(1),
+                            						   result.getInt(2),
+                            						   result.getDate(3),
+                            						   result.getInt(6),
+                            						   result.getString(7)),
+                            						   result.getString(4),
+                            						   result.getString(5),roles));
         		}
         	}
         }
@@ -126,7 +128,7 @@ public AuditEmployee find(int id) throws SQLException {
 	return null;
 }
 @Override
-public AuditEmployee add(AuditEmployee movie) throws SQLException {
+public AuditEmployee add(AuditEmployee a) throws SQLException {
 	// TODO Auto-generated method stub
 	return null;
 }
