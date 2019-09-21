@@ -15,11 +15,11 @@ db.config
 target/
 
 #Eclipse files
-**/.projectVM
+**/.project
 **/.classpath
 **/.settings/
 blog/bin/
-**/.tern-projectVM
+**/.tern-project
 **/.metadata/
 
 
