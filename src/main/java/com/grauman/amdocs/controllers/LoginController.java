@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Login;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 @RestController
 @RequestMapping("/login")
@@ -36,8 +39,13 @@ public class LoginController {
 	@PostMapping("")
 	public ResponseEntity<String> login(@RequestBody Login login, ServletResponse response) throws SQLException {
 		
-		//String header = loginDAO.validate(login.getUsername(),login.getPassword()); // if login successful return encoded string
+		EmployeeData header = loginDAO.validate(login.getUsername(),login.getPassword()); // if login successful return encoded string
 
+		String hashedPwd = BCrypt.withDefaults().hashToString(12, login.getPassword().toCharArray());
+		
+		System.out.println(hashedPwd);
+		System.out.println(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd));
+		
 		String value = Base64.getEncoder().encodeToString((login.getUsername() + ":" + login.getPassword()).getBytes());
 		
 		HttpServletResponse resp = (HttpServletResponse)response;
