@@ -82,10 +82,10 @@ public class ProjectsDAO implements IProjectsDAO {
 
                 fetchInsertProjectSkill.executeUpdate();
                 try (ResultSet generatedID = fetchInsertProjectSkill.getGeneratedKeys()) {
-                    if (generatedID.next()) {
+                    if (!generatedID.next()) {
                         String deleteQueryProject = "DELETE FROM project WHERE id = ?";
                         try (PreparedStatement fetchDeleteQueryProject = connection.prepareStatement(deleteQueryProject, Statement.RETURN_GENERATED_KEYS)) {
-                            fetchDeleteQueryProject.setString(1, newProject.getName());
+                            fetchDeleteQueryProject.setInt(1, newProject.getId());
                             fetchDeleteQueryProject.executeUpdate();
                         }
 
