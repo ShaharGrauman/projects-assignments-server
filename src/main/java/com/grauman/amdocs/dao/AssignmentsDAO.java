@@ -80,7 +80,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         List<AssignmentRequestVM> assignments = new ArrayList<>();
 
         if (currentPage < 1)
-            currentPage = 1;
+             currentPage = 1;
 
         int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
         String managerToName;
