@@ -40,7 +40,7 @@ public class PasswordUtils {
     	return generateSecurePassword(password, PasswordUtils.getSalt(30));
     }
     
-    public static String generateSecurePassword(String password, String salt) {
+    private static String generateSecurePassword(String password, String salt) {
         String returnValue = null;
         byte[] securePassword = hash(password.toCharArray(), salt.getBytes());
  

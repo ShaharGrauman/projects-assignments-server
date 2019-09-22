@@ -22,7 +22,13 @@ public class DepartmentController {
 //Add department
   	@PostMapping("")
 	public ResponseEntity<Department> newDepartment(@RequestBody Department department) throws SQLException{
- 		Department newDepartment=departmentDAO.add(department);
+ 		Department newDepartment = null;
+		try {
+			newDepartment = departmentDAO.add(department);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
  		return ResponseEntity.ok().body(newDepartment);  
  		}
 }
