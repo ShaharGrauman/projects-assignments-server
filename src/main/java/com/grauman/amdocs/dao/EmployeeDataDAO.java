@@ -428,6 +428,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
+		 // String sql = "{call advanced_search(?,?,?,?,?)}";
 		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
 	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
 	  				+ " From users U "
@@ -436,7 +437,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
 	  				+ " JOIN country C ON WS.country_id=C.id"
 	  				+ " where ("
-	  				+ (number != 0 ? " U.employee_number=? and " : "")
+	  				+ (number != -1 ? " U.employee_number=? and " : "")
 	  				+ (roleName !=null ? " R.name=? and " : "")
 	  				+ (siteName !=null ? " WS.city=? and " : "")
 	  				+ (departmentName !=null ? " U.department=? and " : "")
