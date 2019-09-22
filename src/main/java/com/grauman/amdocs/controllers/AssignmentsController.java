@@ -3,11 +3,8 @@ package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.AssignmentsDAO;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.vm.AssignmentHistoryVM;
 import com.grauman.amdocs.models.vm.AssignmentRequestVM;
-import com.grauman.amdocs.models.vm.EmployeeAssignmentVM;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +26,8 @@ public class AssignmentsController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<AssignmentHistoryVM>> getAssignmentsHistoryForEmployee(@PathVariable("id") int employeeID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
-        List<AssignmentHistoryVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeID, currentPage, limit);
+    public ResponseEntity<List<AssignmentRequestVM>> getAssignmentsHistoryForEmployee(@PathVariable("id") int employeeID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
+        List<AssignmentRequestVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeID, currentPage, limit);
         return ResponseEntity.ok().body(assignments);
     }
 
@@ -48,10 +45,10 @@ public class AssignmentsController {
     }
 
     @GetMapping("/status/{id}")
-    public ResponseEntity<List<EmployeeAssignmentVM>> getDoneAssignments(@PathVariable("id") Integer managerID,
+    public ResponseEntity<List<AssignmentRequestVM>> getDoneAssignments(@PathVariable("id") Integer managerID,
                                                                            @RequestParam String requestedDate,
                                                                            @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
-        List<EmployeeAssignmentVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), currentPage, limit);
+        List<AssignmentRequestVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), currentPage, limit);
         return ResponseEntity.ok().body(doneAssignments);
     }
 
