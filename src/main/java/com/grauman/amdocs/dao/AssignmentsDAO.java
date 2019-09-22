@@ -30,7 +30,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     //add assignment for employee
     @Override
     public Assignment add(Assignment item) throws SQLException {
-        if(CheckIfAssignmentExist(item)){
+        if(CheckIfAssignment(item)){
             throw new InvalidDataException("Employee already assigned to this project");
         }
         try (Connection connection = db.getConnection()) {
@@ -293,16 +293,26 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return message;
     }
 
-    private boolean CheckIfAssignmentExist(Assignment item)throws SQLException{
-        String checkQuery= "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status='In progress'";
+    private boolean CheckIfAssignment(Assignment item) throws SQLException {
+        boolean check1 ,check2;
+        String checkQuery = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status='In progress'",
+                checkQuery2 = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status='Pending approval'";
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn
-                    .prepareStatement(checkQuery)){
+                    .prepareStatement(checkQuery)) {
                 command.setInt(1, item.getProjectID());
                 command.setInt(2, item.getEmployeeID());
                 ResultSet result = command.executeQuery();
-                return result.next();
+                check1 = result.next();
             }
+            try (PreparedStatement command = conn
+                    .prepareStatement(checkQuery2)) {
+                command.setInt(1, item.getProjectID());
+                command.setInt(2, item.getEmployeeID());
+                ResultSet result2 = command.executeQuery();
+                check2 = result2.next();
+            }
+            return check1&check2;
         }
     }
 }
