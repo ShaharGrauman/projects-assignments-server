@@ -120,7 +120,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
+            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
                     "                                                      join project p on a.project_id=p.id\n" +
                     "                                                      where a.status = \"In progress\" and u.manager_id= ?;";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
@@ -186,7 +186,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id,p.name, p.start_date, p.description from assignment a join project p" +
+            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description from assignment a join project p" +
                     " on a.project_id=p.id where a.status= 'In progress' and a.employee_id= ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -251,7 +251,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
+            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
                     " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'In progress' and u.first_name like ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -318,7 +318,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
+            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
