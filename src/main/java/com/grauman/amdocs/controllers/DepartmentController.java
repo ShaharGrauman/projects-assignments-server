@@ -21,7 +21,7 @@ public class DepartmentController {
 	private DepartmentDAO departmentDAO;
 //Add department
   	@PostMapping("")
-	public ResponseEntity<Department> newDepartment(@RequestBody Department department) throws SQLException{
+	public ResponseEntity<Department> newDepartment(@RequestBody Department department) throws Exception{
  		Department newDepartment=departmentDAO.add(department);
  		return ResponseEntity.ok().body(newDepartment);  
  		}
