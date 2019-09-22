@@ -70,10 +70,10 @@ public class SkillsController {
 	 * 
 	 * @param employeeSkill
 	 * @return new approved employee skill 
-	 * @throws SQLException
+	 * @throws Exception 
 	 */
 	@PostMapping("/approve")
-	public ResponseEntity<EmployeeSkill> approveSkill(@RequestBody EmployeeSkill employeeSkill) throws SQLException {
+	public ResponseEntity<EmployeeSkill> approveSkill(@RequestBody EmployeeSkill employeeSkill) throws Exception {
 		EmployeeSkill newEmployeeSkill=employeeSkillDAO.update(employeeSkill);
 			return ResponseEntity.ok().body(newEmployeeSkill);
 	}
@@ -81,10 +81,10 @@ public class SkillsController {
 	 * 
 	 * @param employeeSkill
 	 * @return new added employee skill
-	 * @throws SQLException
+	 * @throws Exception 
 	 */
 	@PostMapping("")
-	public ResponseEntity<EmployeeSkill> addSkill(@RequestBody RequestedEmployeeSkillVM employeeSkill) throws SQLException {
+	public ResponseEntity<EmployeeSkill> addSkill(@RequestBody RequestedEmployeeSkillVM employeeSkill) throws Exception {
 		EmployeeSkill newEmployeeSkill=employeeSkillDAO.addEmployeeSkill(employeeSkill);
 			return ResponseEntity.ok().body(newEmployeeSkill);
 	}
