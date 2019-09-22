@@ -48,10 +48,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	public List<EmployeeData> findAll() throws SQLException {
 		int userId;
 		List<EmployeeData> users = new ArrayList<>();
-		String sqlAllUserscommand = "select  U.id,U.employee_number,U.first_name,U.last_name,U.department,"
-				+ "WS.name as worksite,WS.city,C.name as country "
-				+ "From users U JOIN worksite WS ON U.work_site_id=WS.id " + "JOIN country C ON WS.country_id=C.id "
-				+ "where U.locked=true";
+		String sqlAllUserscommand = "select  U.id,U.employee_number,U.first_name,U.last_name,U.manager_id,U.department,"
+								+ "WS.name as worksite,WS.city,C.name as country,U.locked,U.deactivated "
+								+ "From users U JOIN worksite WS ON U.work_site_id=WS.id "
+								+ "JOIN country C ON WS.country_id=C.id "
+								+ "where U.locked=true";
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
 				ResultSet result = command.executeQuery(sqlAllUserscommand);
@@ -60,11 +61,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					userId = result.getInt(1);
 					List<Role> roles = new ArrayList<>();
 					roles = getEmployeeRoles(userId);
-					users.add(new EmployeeData(new Employee(result.getInt(1), result.getInt(2), result.getString(3),
-							result.getString(4), result.getString(5),
-							new WorkSite(result.getString(6), result.getString(7)), new Country(result.getString(8))),
-							roles));
-
+					users.add(new EmployeeData(new Employee(
+												result.getInt("U.id"),
+												result.getInt("U.employee_number"),
+												result.getString("U.first_name"),
+												result.getString("U.last_name"),
+												result.getInt("U.manager_id"),
+												result.getString("U.department"),
+												new WorkSite(result.getString("WS.name"), result.getString("WS.city")),
+												new Country(result.getString("C.name")),
+												result.getBoolean("U.locked"),
+												result.getBoolean("U.deactivated")), roles));
 				}
 			}
 		}
@@ -76,7 +83,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		int userId;
     	List<EmployeeData> users=new ArrayList<EmployeeData>();
 		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,U.manager_id,"
-								+ "U.department,WS.name,WS.city,C.name "
+								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated "
 								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
 								+ " JOIN country C ON WS.country_id=C.id";
 		try (Connection conn = db.getConnection()) {
@@ -88,14 +95,16 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					List<Role> roles=new ArrayList<>();
 					roles=getEmployeeRoles(userId);
 					users.add(new EmployeeData(new Employee(
-							result.getInt("U.id"),
-							result.getInt("U.employee_number"),
-							result.getString("U.first_name"),
-							result.getString("U.last_name"),
-							result.getInt("U.manager_id"),
-							result.getString("U.department"),
-							new WorkSite(result.getString("WS.name"), result.getString("WS.city")),
-							new Country(result.getString("C.name"))), roles));
+												result.getInt("U.id"),
+												result.getInt("U.employee_number"),
+												result.getString("U.first_name"),
+												result.getString("U.last_name"),
+												result.getInt("U.manager_id"),
+												result.getString("U.department"),
+												new WorkSite(result.getString("WS.name"), result.getString("WS.city")),
+												new Country(result.getString("C.name")),
+												result.getBoolean("U.locked"),
+												result.getBoolean("U.deactivated")), roles));
 				}
 			}
 		}
@@ -191,8 +200,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								+ " Where U1.work_site_id=WS.id AND U1.id=?";
 		
 		String sqlEmployeeRoles = "Select R.*" 
-				+ " From roles R JOIN userrole UR ON R.id=UR.role_id "
-				+ "Where UR.user_id=?";
+								+ " From roles R JOIN userrole UR ON R.id=UR.role_id "
+								+ "Where UR.user_id=?";
 
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlFindEmployee)) {
@@ -209,8 +218,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 											   result2.getString(2),
 											   result2.getString(3)));
 						}
-						System.out.println(roles);
-
 						found = new EmployeeData(new Employee(
 								  result.getInt("U1.id"),
 								  result.getInt("U1.employee_number"),
@@ -242,8 +249,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 		List<Role> roles = employee.getRoles();
 		String sqlAddEmployeeStatement = "Insert INTO users (employee_number,first_name,last_name,email,manager_id,"
-				+ "department,work_site_id,country,phone,login_status,locked,deactivated,password)"
-				+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				+ "department,work_site_id,country,phone,login_status,locked,deactivated,password,image)"
+				+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement statement = conn.prepareStatement(sqlAddEmployeeStatement,
 					Statement.RETURN_GENERATED_KEYS)) {
@@ -255,13 +262,14 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				statement.setInt(5, employee.getEmployee().getManagerId());
 				statement.setString(6, employee.getEmployee().getDepartment());
 				statement.setInt(7, employee.getEmployee().getWorksite().getId());
-				statement.setString(8, employee.getEmployee().getCountry().getName());
+				statement.setString(8, employee.getEmployee().getWorksite().getCountry().getName());
 				statement.setString(9, employee.getEmployee().getPhone());
 				statement.setBoolean(10, employee.getEmployee().getLoginStatus());
 				statement.setBoolean(11, employee.getEmployee().getLocked());
 				statement.setBoolean(12, employee.getEmployee().getDeactivated());
 				// change it to the generated password!
 				statement.setString(13, EmployeeDataDAO.generatePassword(6));
+				statement.setString(14, employee.getEmployee().getImage());
 
 				int rowCountUpdated = statement.executeUpdate();
 
@@ -295,8 +303,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		EmployeeData updatedEmployee=null;
         List<Role> roles=new ArrayList<>();
         String sqlDelEmployeeStatement = "update users set first_name=?,last_name=?,"
-                + "email=?,manager_id=?,department=?,work_site_id=?,"
-                + "country=?,phone=?,login_status=?,locked=?,deactivated=? where id=?";
+						                + "email=?,manager_id=?,department=?,work_site_id=?,"
+						                + "country=?,phone=?,login_status=?,locked=?,deactivated=? "
+						                + "where id=?";
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement statement = conn.prepareStatement(sqlDelEmployeeStatement)) {
             	//statement.setInt(1, employee.getEmployee().getNumber());
@@ -361,11 +370,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		List <EmployeeData> found = new ArrayList<>();
 		List<Role> employeeRoles=new ArrayList<>();
 			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
-                + "W.name as workSiteName,W.city,U.country, U.department"
-                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
-                + " JOIN userrole UR ON UR.user_id=U.id"
-                + " JOIN roles R ON R.id=UR.role_id"
-                + " where U.employee_number=?";
+					                + "W.name as workSiteName,W.city,U.country, U.department,U.locked,U.deactivated "
+					                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
+					                + " JOIN userrole UR ON UR.user_id=U.id"
+					                + " JOIN roles R ON R.id=UR.role_id"
+					                + " where U.employee_number=?"
+					                + " Group by U.id";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 			 command.setInt(1,number);
@@ -378,9 +388,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							result.getInt(2),
 							result.getString(3),
 							result.getString(4),
-							result.getString(5),
-							new WorkSite(result.getString(6),result.getString(7)),
-							new Country(result.getString(8))),employeeRoles));
+							null,
+							result.getString(8),
+							new WorkSite(result.getString(5),result.getString(6)),
+							new Country(result.getString(7)),
+							result.getBoolean(9),
+							result.getBoolean(10)),employeeRoles));
 				}
 			}
 		} 
@@ -398,7 +411,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		//remove all the white space
 		name=name.toLowerCase().trim();
 		String sqlFindCommand ="select U.id,U.employee_number,LOWER(U.first_name),LOWER(U.last_name),"
-								+ "U.department,WS.name,WS.city,C.name "
+								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
 								+ "From users U JOIN worksite WS ON U.work_site_id=WS.id"
 								+ " JOIN country C ON WS.country_id=C.id "
 								+ "where concat(LOWER(U.first_name),' ',LOWER(U.last_name)) like ?";
@@ -414,9 +427,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								result.getInt(2),
 								result.getString(3),
 								result.getString(4),
-								result.getString(5),
-								new WorkSite(result.getString(6),result.getString(7)),
-								new Country(result.getString(8))),employeeRoles));
+								null,
+								result.getString(8),
+								new WorkSite(result.getString(5),result.getString(6)),
+								new Country(result.getString(7)),
+								result.getBoolean(9),
+								result.getBoolean(10)),employeeRoles));
 					}
 					}}
 				 catch (Exception e) {
@@ -430,11 +446,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		List <EmployeeData> found = new ArrayList<>();
 		List<Role> employeeRoles=new ArrayList<>();
 			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
-                + "W.name as workSiteName,W.city,U.country, U.department"
-                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
-                + " JOIN userrole UR ON UR.user_id=U.id"
-                + " JOIN roles R ON R.id=UR.role_id"
-                + " where R.name=?";
+				                + "W.name as workSiteName,W.city,U.country, U.department,U.locked,U.deactivated "
+				                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
+				                + " JOIN userrole UR ON UR.user_id=U.id"
+				                + " JOIN roles R ON R.id=UR.role_id"
+				                + " where R.name=?"
+				                + " Group by U.id";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 			 command.setString(1,roleName);
@@ -447,9 +464,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							result.getInt(2),
 							result.getString(3),
 							result.getString(4),
-							result.getString(5),
-							new WorkSite(result.getString(6),result.getString(7)),
-							new Country(result.getString(8))),employeeRoles));
+							null,
+							result.getString(8),
+							new WorkSite(result.getString(5),result.getString(6)),
+							new Country(result.getString(7)),
+							result.getBoolean(9),
+							result.getBoolean(10)),employeeRoles));
 				}
 			}
 		} 
@@ -463,9 +483,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	public List<EmployeeData> filterByDepartment(String departmentName) throws SQLException {
 		List<EmployeeData> found = new ArrayList<>();
 		List<Role> employeeRoles = new ArrayList<>();
-		String sqlFindCommand = "select DISTINCT U.id,U.employee_number,U.first_name,U.last_name,"
-				+ "U.department,WS.name,WS.city,C.name " + " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-				+ " JOIN country C ON WS.country_id=C.id" + " where U.department=?";
+		String sqlFindCommand = "select U.id,U.employee_number,U.first_name,U.last_name,"
+							+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated " 
+							+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
+							+ " JOIN country C ON WS.country_id=C.id"
+							+ " where U.department=?"
+							+ " Group by U.id";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 				command.setString(1, departmentName);
@@ -473,10 +496,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 				while (result.next()) {
 					employeeRoles = getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(result.getInt(1), result.getInt(2), result.getString(3),
-							result.getString(4), result.getString(5),
-							new WorkSite(result.getString(6), result.getString(7)), new Country(result.getString(8))),
-							employeeRoles));
+					found.add(new EmployeeData(new Employee(
+							result.getInt(1),
+							result.getInt(2),
+							result.getString(3),
+							result.getString(4),
+							null,
+							result.getString(8),
+							new WorkSite(result.getString(5),result.getString(6)),
+							new Country(result.getString(7)),
+							result.getBoolean(9),
+							result.getBoolean(10)),employeeRoles));
 				}
 			}
 		} catch (Exception e) {
@@ -490,8 +520,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		List<EmployeeData> found = new ArrayList<>();
 		List<Role> employeeRoles = new ArrayList<>();
 		String sqlFindCommand = "select U.id,U.employee_number,U.first_name,U.last_name,"
-				+ "U.department,WS.name,WS.city,C.name " + " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-				+ " JOIN country C ON WS.country_id=C.id" + " where WS.city=?";
+								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated "
+								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
+								+ " JOIN country C ON WS.country_id=C.id"
+								+ " where WS.city=?"
+								+ " Group by U.id";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 				command.setString(1, siteName);
@@ -499,10 +532,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 				while (result.next()) {
 					employeeRoles = getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(result.getInt(1), result.getInt(2), result.getString(3),
-							result.getString(4), result.getString(5),
-							new WorkSite(result.getString(6), result.getString(7)), new Country(result.getString(8))),
-							employeeRoles));
+					found.add(new EmployeeData(new Employee(
+							result.getInt(1),
+							result.getInt(2),
+							result.getString(3),
+							result.getString(4),
+							null,
+							result.getString(8),
+							new WorkSite(result.getString(5),result.getString(6)),
+							new Country(result.getString(7)),
+							result.getBoolean(9),
+							result.getBoolean(10)),employeeRoles));
 				}
 			}
 		} catch (Exception e) {
@@ -516,10 +556,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  List <EmployeeData> found = new ArrayList<>();
 		  List<Role> employeeRoles=new ArrayList<>();
 	      String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
-	    		  				+ "U.department,WS.name,WS.city,C.name "
-							+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-							+ " JOIN country C ON WS.country_id=C.id"
-			              + " where U.country=?";
+	    		  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
+	    		  				+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
+	    		  				+ " JOIN country C ON WS.country_id=C.id"
+	    		  				+ " where U.country=?"
+	    		  				+ " Group by U.id";
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 			       command.setString(1,countryName);
@@ -532,9 +573,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								result.getInt(2),
 								result.getString(3),
 								result.getString(4),
-								result.getString(5),
-								new WorkSite(result.getString(6),result.getString(7)),
-								new Country(result.getString(8))),employeeRoles));
+								null,
+								result.getString(8),
+								new WorkSite(result.getString(5),result.getString(6)),
+								new Country(result.getString(7)),
+								result.getBoolean(9),
+								result.getBoolean(10)),employeeRoles));
 			          }
 			      }
 			  }
@@ -580,8 +624,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 //Helping function used in findAll Employees
 	public List<Role> getEmployeeRoles(int id) throws SQLException {
 		List<Role> employeeRoles = new ArrayList<>();
-		String sqlFindRoles = "SELECT R.id,R.name" + " FROM roles R join userrole US ON R.id=US.role_id"
-				+ " WHERE US.user_id=?";
+		String sqlFindRoles = "SELECT R.id,R.name"
+							+ " FROM roles R join userrole US ON R.id=US.role_id"
+							+ " WHERE US.user_id=?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlFindRoles)) {
 				command.setInt(1, id);
@@ -646,10 +691,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 // get all Managers (Name+ID)
 	public List<Employee> findAllManagers() throws SQLException {
 		List<Employee> managers = new ArrayList<Employee>();
-		String sqlSitesCommand = "select DISTINCT U1.id,U1.employee_number,U1.first_name ,U1.last_name"
+		String sqlSitesCommand = "select U1.id,U1.employee_number,U1.first_name ,U1.last_name"
 								+ " From users U1 JOIN users U2 ON U1.id=U2.manager_id "
 								+ "JOIN userrole UR ON U1.id=UR.user_id JOIN roles R ON UR.role_id=R.id "
-								+ "Where R.name='manager'";
+								+ "Where R.name='manager' "
+								+ "Group By U1.id";
 
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {

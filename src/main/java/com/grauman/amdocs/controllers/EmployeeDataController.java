@@ -47,19 +47,18 @@ public class EmployeeDataController {
 		return ResponseEntity.ok().body(employee);
 	}
 
-//Employee by employee number
+//Employee profile
 	@GetMapping("/employeeid")
-	public ResponseEntity<EmployeeData> findByEmployeeNumber(@RequestParam int employeeid) throws SQLException {
+	public ResponseEntity<EmployeeData> findEmployeeProfile(@RequestParam int employeeid) throws SQLException {
 		EmployeeData employee=employeeDataDAO.searchEmployeeProfile(employeeid);
 		return ResponseEntity.ok().body(employee);
 	}
 //Employee by employee id
-
-	@GetMapping("/id")
-	public ResponseEntity<EmployeeData> find(@RequestParam int id) throws SQLException {
-		EmployeeData employee=employeeDataDAO.find(id);
-		return ResponseEntity.ok().body(employee);
-	}
+//	@GetMapping("/id")
+//	public ResponseEntity<EmployeeData> find(@RequestParam int id) throws SQLException {
+//		EmployeeData employee=employeeDataDAO.find(id);
+//		return ResponseEntity.ok().body(employee);
+//	}
 	
 //Add Employee
 	@PostMapping("")
@@ -94,8 +93,8 @@ public class EmployeeDataController {
 		List<EmployeeData> employeeByRole=employeeDataDAO.filterByRole(role);
 		return ResponseEntity.ok().body(employeeByRole);
 	}
-	@GetMapping("/department")
-	public ResponseEntity<List<EmployeeData>> findByDepartment(@RequestParam String department) throws SQLException {
+	@GetMapping("/{department}")
+	public ResponseEntity<List<EmployeeData>> findByDepartment(@PathVariable String department) throws SQLException {
 		List<EmployeeData> employeeByDepartment=employeeDataDAO.filterByDepartment(department);
 		return ResponseEntity.ok().body(employeeByDepartment);
 	}
