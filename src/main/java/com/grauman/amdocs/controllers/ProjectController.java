@@ -1,7 +1,6 @@
 package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.ProjectsDAO;
-import com.grauman.amdocs.errors.custom.LevelValidityException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.vm.ProjectVM;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
+@CrossOrigin
 public class ProjectController {
     @Autowired
     private ProjectsDAO projectsDAO;
