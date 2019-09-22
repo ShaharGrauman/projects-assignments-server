@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/projects")
 public class ProjectController {
     @Autowired

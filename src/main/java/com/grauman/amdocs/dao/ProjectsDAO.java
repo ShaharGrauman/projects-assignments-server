@@ -120,7 +120,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection conn = db.getConnection()) {
-            String projectQuery = "select p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
+            String projectQuery = "select distinct  p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
                     "                                                      join project p on a.project_id=p.id\n" +
                     "                                                      where a.status = \"In progress\" and u.manager_id= ?;";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
