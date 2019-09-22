@@ -35,22 +35,22 @@ public class EmployeeDataController {
 	
 //All Employees Which are locked
 	@GetMapping("/locked")
-	public ResponseEntity<List<EmployeeData>> allLocked() throws SQLException {
-		List<EmployeeData> employee= employeeDataDAO.findAll();
+	public ResponseEntity<List<EmployeeData>> allLocked(@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employee= employeeDataDAO.findAll(page,limit);
 		return ResponseEntity.ok().body(employee);
 		}
   
 //All Employees	
 	@GetMapping("")
-	public ResponseEntity<List<EmployeeData>> all() throws SQLException {
-		List<EmployeeData> employee= employeeDataDAO.findAllEmployees();
+	public ResponseEntity<List<EmployeeData>> all(@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employee= employeeDataDAO.findAllEmployees(page,limit);
 		return ResponseEntity.ok().body(employee);
 	}
 
 //Employee profile
-	@GetMapping("/employeeid")
-	public ResponseEntity<EmployeeData> findEmployeeProfile(@RequestParam int employeeid) throws SQLException {
-		EmployeeData employee=employeeDataDAO.searchEmployeeProfile(employeeid);
+	@GetMapping("/id")
+	public ResponseEntity<EmployeeData> findEmployeeProfile(@RequestParam int id) throws SQLException {
+		EmployeeData employee=employeeDataDAO.searchEmployeeProfile(id);
 		return ResponseEntity.ok().body(employee);
 	}
 //Employee by employee id
@@ -84,28 +84,28 @@ public class EmployeeDataController {
 		return ResponseEntity.ok().body(employeeByName);
 		}
 	@GetMapping("/name")
-	public ResponseEntity<List<EmployeeData>> findByName(@RequestParam String name) throws SQLException {
-		List<EmployeeData> employeeByName=employeeDataDAO.filterByName(name);
+	public ResponseEntity<List<EmployeeData>> findByName(@RequestParam String name,@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employeeByName=employeeDataDAO.filterByName(name,page,limit);
 		return ResponseEntity.ok().body(employeeByName);
 		}
 	@GetMapping("/role")
-	public ResponseEntity<List<EmployeeData>> findByRole(@RequestParam String role) throws SQLException {
-		List<EmployeeData> employeeByRole=employeeDataDAO.filterByRole(role);
+	public ResponseEntity<List<EmployeeData>> findByRole(@RequestParam String role,@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employeeByRole=employeeDataDAO.filterByRole(role,page,limit);
 		return ResponseEntity.ok().body(employeeByRole);
 	}
-	@GetMapping("/department")
-	public ResponseEntity<List<EmployeeData>> findByDepartment(@RequestParam String department) throws SQLException {
-		List<EmployeeData> employeeByDepartment=employeeDataDAO.filterByDepartment(department);
+	@GetMapping("/{department}")
+	public ResponseEntity<List<EmployeeData>> findByDepartment(@PathVariable String department,@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employeeByDepartment=employeeDataDAO.filterByDepartment(department,page,limit);
 		return ResponseEntity.ok().body(employeeByDepartment);
 	}
 	@GetMapping("/worksite")
-	public ResponseEntity<List<EmployeeData>> findByWorkSite(@RequestParam String worksite) throws SQLException {
-		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByWorkSite(worksite);
+	public ResponseEntity<List<EmployeeData>> findByWorkSite(@RequestParam String worksite,@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByWorkSite(worksite,page,limit);
 		return ResponseEntity.ok().body(employeeByWorSite);
 	}
 	@GetMapping("/country")
-	public ResponseEntity<List<EmployeeData>> findByCountry(@RequestParam String country) throws SQLException {
-		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByCountry(country);
+	public ResponseEntity<List<EmployeeData>> findByCountry(@RequestParam String country,@RequestParam int page,@RequestParam int limit) throws SQLException {
+		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByCountry(country,page,limit);
 		return ResponseEntity.ok().body(employeeByWorSite);
 	}
 	

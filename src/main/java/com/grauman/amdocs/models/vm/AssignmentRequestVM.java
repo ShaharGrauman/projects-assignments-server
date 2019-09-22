@@ -9,10 +9,12 @@ import java.sql.Date;
 @Setter
 public class AssignmentRequestVM extends AssignmentHistoryVM {
     String employeeName;
+    String toManagerName;
     String fromManagerName;
-    public AssignmentRequestVM(int id, String projectName, int projectID, int employeeID, String employeeName , Date startDate, Date endDate, int requestFromManagerID, int requestToManagerID, String status,String fromManagerName) {
+    public AssignmentRequestVM(int id, String projectName, int projectID, int employeeID, String employeeName , Date startDate, Date endDate, int requestFromManagerID, int requestToManagerID, String status,String fromManagerName,String toManagerName) {
         super(id, projectName, projectID, employeeID, startDate, endDate, requestFromManagerID, requestToManagerID, status);
         this.employeeName=employeeName;
         this.fromManagerName=fromManagerName;
+        this.toManagerName=toManagerName;
     }
 }
