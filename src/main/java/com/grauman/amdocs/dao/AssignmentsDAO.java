@@ -87,7 +87,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         String managerFromName;
         try (Connection connection = db.getConnection()) {
 
-            String sqlCommand = "Select a.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
+            String sqlCommand = "Select a.id, a.project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
                     "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
 
             try (PreparedStatement command = connection.prepareStatement(sqlCommand)) {
@@ -122,7 +122,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 resultAssignment.getInt("a.id"),
                                 resultAssignment.getString("p.name"),
                                 resultAssignment.getInt("a.project_id"),
-                                resultAssignment.getInt(employeeID),
+                                employeeID,
                                 resultAssignment.getString("name"),
                                 resultAssignment.getDate("a.start_date"),
                                 resultAssignment.getDate("a.end_date"),
