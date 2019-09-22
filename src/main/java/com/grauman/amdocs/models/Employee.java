@@ -52,14 +52,12 @@ public class Employee {
 		this(id,number,firstName,lastName,department,worksite);
 		this.country=country;
 	}
-<<<<<<< HEAD
-	
-=======
+
 	public Employee(Integer id,Integer number,String firstName,String lastName,Integer managerId,String department,WorkSite worksite,Country country) {
 		this(id,number,firstName,lastName,department,worksite,country);
 		this.managerId=managerId;
 	}
->>>>>>> origin/master
+
 	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
 			String department,WorkSite worksite,String phone,Boolean loginStatus,Boolean locked,Boolean deactivated) {
 		this.id=id;
@@ -68,8 +66,7 @@ public class Employee {
 		this.lastName=lastName;
 		this.email=email;
 		this.managerId=managerId;
-<<<<<<< HEAD
-=======
+
 		this.department=department;
 		this.worksite=worksite;
 		this.phone=phone;
@@ -103,16 +100,15 @@ public class Employee {
 		this.lastName=lastName;
 		this.email=email;
 		this.managerId=managerId;
->>>>>>> origin/master
+
 		this.department=department;
 		this.worksite=worksite;
 		this.phone=phone;
 		this.loginStatus=loginStatus;
 		this.locked=locked;
 		this.deactivated=deactivated;
-<<<<<<< HEAD
-	}	
-=======
+
+
 		this.password=password;
 	}
 //	public Employee(Integer id,Integer number,String firstName,String lastName,String email,Integer managerId,
@@ -133,5 +129,5 @@ public class Employee {
 //		this.deactivated=deactivated;
 //	}
 //	 
->>>>>>> origin/master
+
 }
