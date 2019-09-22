@@ -46,7 +46,7 @@ public class AssignmentSkillEmployeeController {
 
     }
     @PostMapping("")
-    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillSets(@RequestBody List<SkillsLevelVM> skillSet,Integer currentPage,Integer limit) throws SQLException {
-        return new ResponseEntity<>(employeeDAO.searchEmployeesBySkillSet(skillSet,currentPage,limit), HttpStatus.OK);
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillSets(@RequestBody List<SkillsLevelVM> skillsLevelVM,Integer pageNumber,Integer limit) throws SQLException {
+        return ResponseEntity.ok().body(employeeDAO.searchEmployeesBySkillSet(skillsLevelVM,pageNumber,limit));
     }
 }
