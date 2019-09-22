@@ -25,14 +25,14 @@ public class RoleController {
 	private RoleDAO roleDAO;
 	
 	@GetMapping("")
-	public ResponseEntity<List<RolePermissions>> all() throws SQLException{
+	public ResponseEntity<List<RolePermissions>> all() throws Exception{
 		List<RolePermissions> roles = roleDAO.findAll();
 		return ResponseEntity.ok().body(roles);
 	}
 //Add Role
 	@PostMapping("")
-	public ResponseEntity<RolePermissions> newRole(@RequestBody RolePermissions role) throws SQLException{
+	public ResponseEntity<RolePermissions> newRole(@RequestBody RolePermissions role) throws Exception{
 		RolePermissions newRole=roleDAO.add(role);
- 		return ResponseEntity.ok().body(newRole);  
- 		}
+		return ResponseEntity.ok().body(newRole);  
+	}
 }

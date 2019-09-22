@@ -44,8 +44,9 @@ public interface IEmployeeSkillDAO extends IDAO<EmployeeSkill> {
 	 * @param employeeSkill
 	 * @return message if employee skill added successfully
 	 * @throws SQLException
+	 * @throws Exception 
 	 */
-	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException;
+	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException, Exception;
 
 	/**
 	 * 

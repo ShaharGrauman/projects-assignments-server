@@ -87,7 +87,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	}
 
 	@Override
-	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws SQLException {
+	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws Exception {
 		if (employeeSkill.getSkillId() != null && skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId())) {
 				if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(), employeeSkill.getLevel())) {
 					if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
