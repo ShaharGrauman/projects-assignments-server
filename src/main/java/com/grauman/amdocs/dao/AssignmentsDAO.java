@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
+import com.grauman.amdocs.errors.custom.InvalidDataException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
 import com.grauman.amdocs.models.vm.AssignmentRequestVM;
@@ -28,6 +29,9 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public Assignment add(Assignment item) throws SQLException {
+        if(CheckIfAssignmentExist(item)){
+            throw new InvalidDataException("Employee already assigned to this project");
+        }
         try (Connection connection = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
@@ -283,6 +287,19 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         }
 
         return message;
+    }
+
+    private boolean CheckIfAssignmentExist(Assignment item)throws SQLException{
+        String checkQuery= "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status='In progress'";
+        try (Connection conn = db.getConnection()) {
+            try (PreparedStatement command = conn
+                    .prepareStatement(checkQuery)){
+                command.setInt(1, item.getProjectID());
+                command.setInt(2, item.getEmployeeID());
+                ResultSet result = command.executeQuery();
+                return result.next();
+            }
+        }
     }
 }
 
