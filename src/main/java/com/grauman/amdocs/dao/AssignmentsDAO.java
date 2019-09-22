@@ -26,6 +26,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return null;
     }
 
+    //add assignment for employee
     @Override
     public Assignment add(Assignment item) throws SQLException {
         try (Connection connection = db.getConnection()) {
@@ -75,6 +76,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return null;
     }
 
+    // get employee assignments history
     @Override
     public List<AssignmentRequestVM> getAssignmentsByUserID(int employeeID, int currentPage, int limit) throws SQLException {
         List<AssignmentRequestVM> assignments = new ArrayList<>();
@@ -140,6 +142,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return assignments;
     }
 
+    // get assignments requests in manager team
     @Override
     public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException {
         List<AssignmentRequestVM> assignmentsRequests = new ArrayList<>();
@@ -199,7 +202,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return assignmentsRequests;
     }
 
-
+    // get done assignments in manager team
     @Override
     public List<AssignmentRequestVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentRequestVM> doneAssignments = new ArrayList<>();
@@ -265,6 +268,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return doneAssignments;
     }
 
+    // approve/ reject assignment request
     @Override
     public String updatePendingApprovalStatus(Assignment assignment, boolean approvalResponse) throws SQLException {
         String message = "SUCCESS";
