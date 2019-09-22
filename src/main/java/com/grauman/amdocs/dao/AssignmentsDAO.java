@@ -30,7 +30,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     //add assignment for employee
     @Override
     public Assignment add(Assignment item) throws SQLException {
-        if(CheckIfAssignment(item)){
+        if (CheckIfAssignment(item)) {
             throw new InvalidDataException("Employee already assigned to this project");
         }
         try (Connection connection = db.getConnection()) {
@@ -86,7 +86,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         List<AssignmentRequestVM> assignments = new ArrayList<>();
 
         if (currentPage < 1)
-             currentPage = 1;
+            currentPage = 1;
 
         int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
         String managerToName;
@@ -125,16 +125,16 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         }
 
                         assignments.add(new AssignmentRequestVM(
-                                resultAssignment.getInt("a.id"),
-                                resultAssignment.getString("p.name"),
-                                resultAssignment.getInt("a.project_id"),
-                                employeeID,
-                                resultAssignment.getString("name"),
-                                resultAssignment.getDate("a.start_date"),
-                                resultAssignment.getDate("a.end_date"),
-                                resultAssignment.getInt("a.requested_from_manager_id"),
-                                resultAssignment.getInt("a.requested_to_manager_id"),
-                                resultAssignment.getString("a.status"),managerFromName,managerToName
+                                        resultAssignment.getInt("a.id"),
+                                        resultAssignment.getString("p.name"),
+                                        resultAssignment.getInt("a.project_id"),
+                                        employeeID,
+                                        resultAssignment.getString("name"),
+                                        resultAssignment.getDate("a.start_date"),
+                                        resultAssignment.getDate("a.end_date"),
+                                        resultAssignment.getInt("a.requested_from_manager_id"),
+                                        resultAssignment.getInt("a.requested_to_manager_id"),
+                                        resultAssignment.getString("a.status"), managerFromName, managerToName
                                 )
 
                         );
@@ -263,7 +263,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 result.getDate("a.end_date"),
                                 result.getInt("a.requested_from_manager_id"),
                                 result.getInt("a.requested_to_manager_id"),
-                                result.getString("a.status"),managerFromName,managerToName)
+                                result.getString("a.status"), managerFromName, managerToName)
                         );
                     }
                 }
@@ -294,25 +294,16 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     private boolean CheckIfAssignment(Assignment item) throws SQLException {
-        boolean check1 ,check2;
-        String checkQuery = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status='In progress'",
-                checkQuery2 = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status='Pending approval'";
+        String checkQuery = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status in ('In progress','Pending approval')";
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn
                     .prepareStatement(checkQuery)) {
                 command.setInt(1, item.getProjectID());
                 command.setInt(2, item.getEmployeeID());
                 ResultSet result = command.executeQuery();
-                check1 = result.next();
+                return result.next();
             }
-            try (PreparedStatement command = conn
-                    .prepareStatement(checkQuery2)) {
-                command.setInt(1, item.getProjectID());
-                command.setInt(2, item.getEmployeeID());
-                ResultSet result2 = command.executeQuery();
-                check2 = result2.next();
-            }
-            return check1&check2;
+
         }
     }
 }
