@@ -372,14 +372,15 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
-        List<Integer> idsUsers = new ArrayList<>();
 
         if (currentPage < 1) {
             currentPage = 1;
         }
+
         int offset = (currentPage - 1) * limit;
+
         try (Connection connection = db.getConnection()) {
-            String employeeQuery = "select COUNT(u.id),u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
+            String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id=es.user_id" +
                     " where ";
             // check each skill in the search
@@ -391,7 +392,6 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
 
                 }
             }
-
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'; ";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
