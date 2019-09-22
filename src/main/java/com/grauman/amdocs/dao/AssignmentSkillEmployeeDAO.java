@@ -372,19 +372,20 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
+        List<Integer> idsUsers = new ArrayList<>();
 
         if (currentPage < 1) {
             currentPage = 1;
         }
         int offset = (currentPage - 1) * limit;
         try (Connection connection = db.getConnection()) {
-            String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
+            String employeeQuery = "select COUNT(u.id),u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id=es.user_id" +
                     " where ";
             // check each skill in the search
             for (int i = 0; i < skillSet.size(); i++) {
                 if (i == skillSet.size() - 1) {
-                    employeeQuery += " es.skill_id = " + skillSet.get(i).getId() + " and es.level >= " + +skillSet.get(i).getLevel() + " and es.status='APPROVED' group by u.id limit ? offset ? ;";
+                    employeeQuery += " es.skill_id = " + skillSet.get(i).getId() + " and es.level >= " + +skillSet.get(i).getLevel() + " and es.status='APPROVED' group by u.id  having count(u.id) = ? limit ? offset ? ;";
                 } else {
                     employeeQuery += " es.skill_id = " + skillSet.get(i).getId() + " and es.level >= " + skillSet.get(i).getLevel() + " or";
 
@@ -397,10 +398,13 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED'; ";
 
             try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
-                command.setInt(1, limit);
-                command.setInt(2, offset);
+                command.setInt(1, skillSet.size());
+                command.setInt(2, limit);
+                command.setInt(3, offset);
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
+
+
                         try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
                             try (ResultSet technicalSkillResult = skill.executeQuery()) {
