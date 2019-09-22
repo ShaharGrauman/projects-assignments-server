@@ -12,16 +12,16 @@ import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.WorkSite;
 
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
-	public List<EmployeeData> findAllEmployees() throws SQLException;
+	public List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException;
 	
 	public EmployeeData searchEmployeeProfile(int id) throws SQLException;
-	
+	public List<EmployeeData> findAll(int page,int limit) throws SQLException;
 	public List<EmployeeData> filterByNumber(int number) throws SQLException;
-	List<EmployeeData> filterByName(String name) throws SQLException;
-	List<EmployeeData> filterByRole(String roleName)throws SQLException;
-	List<EmployeeData> filterByDepartment(String departmentName)throws SQLException;
-	List<EmployeeData> filterByWorkSite(String siteName)throws SQLException;
-	List<EmployeeData> filterByCountry(String countryName)throws SQLException;
+    List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException;
+    List<EmployeeData> filterByRole(String roleName,int page,int limit) throws SQLException;
+    List<EmployeeData> filterByDepartment(String departmentName,int page,int limit) throws SQLException ;
+    List<EmployeeData> filterByWorkSite(String siteName,int page,int limit) throws SQLException ;
+    List<EmployeeData> filterByCountry(String countryName,int page,int limit)throws SQLException;
 	
 	List<WorkSite> findAllSites() throws SQLException;
 	List<Role> findAllRoles() throws SQLException;
