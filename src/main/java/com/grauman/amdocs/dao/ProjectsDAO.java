@@ -27,6 +27,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
+    // add a new project
     @Override
     public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
         int projectID;
@@ -110,7 +111,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
-
+    // get all the projects that a manager employees is working on
     @Override
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
 
@@ -178,7 +179,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
         return projectList;
     }
-
+    // get all the projects that an employee is working on by his/her ID
     @Override
     public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -244,6 +245,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
+    // get all the projects that an employee is working on by his/her name
     @Override
     public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -309,7 +311,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
-
+    // search projects by name
     @Override
     public List<ProjectVM> searchProjectByProjectName(String projectName, Integer currentPage, Integer limit) throws SQLException {
 
