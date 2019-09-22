@@ -18,6 +18,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Autowired
     private DBManager db;
 
+    // get manager team
     @Override
     public List<AssignmentSkillEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
@@ -86,6 +87,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         return employees;
     }
 
+    // get employees who work on a project
     @Override
     public List<AssignmentSkillEmployeeVM> getEmployeesByProjectID(Integer projectID, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
@@ -149,6 +151,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         return employees;
     }
 
+    // search employees by name
     @Override
     public List<AssignmentSkillEmployeeVM> getEmployeesByEmployeeName(String employeeName, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
@@ -213,7 +216,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         return employees;
     }
 
-
+    // search employee who have skill ID as in the search
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
@@ -286,6 +289,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         return employees;
     }
 
+    // search employee who have skill name as in the search
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillName(String skillName, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
@@ -362,7 +366,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         return employees;
     }
 
-
+    // search employees who have all the skills in the search
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<SkillsLevelVM> skillSet, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
@@ -377,6 +381,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id=es.user_id" +
                     " where ";
+            // check each skill in the search
             for (int i = 0; i < skillSet.size(); i++) {
                 if (i == skillSet.size() - 1) {
                     employeeQuery += " es.skill_id = " + skillSet.get(i).getId() + " and es.level >= " + +skillSet.get(i).getLevel() + " and es.status='APPROVED' group by u.id limit ? offset ? ;";
