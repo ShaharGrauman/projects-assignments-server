@@ -19,17 +19,17 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     private DBManager db;
 
     @Override
-    public List<AssignmentSkillEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer pageNumber, Integer limit) throws SQLException {
+    public List<AssignmentSkillEmployeeVM> getEmployeesByManagerID(Integer managerID, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
-        if (pageNumber.intValue() < 1) {
-            pageNumber = 1;
+        if (currentPage.intValue() < 1) {
+            currentPage = 1;
         }
-        int offset = (pageNumber.intValue() - 1) * limit.intValue();
+        int offset = (currentPage.intValue() - 1) * limit.intValue();
 
-        try (Connection conn = db.getConnection()) {
+        try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     "from users u where manager_id = ? limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
@@ -37,31 +37,33 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? ";
 
-            try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
+            try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setInt(1, managerID.intValue());
                 command.setInt(2, limit.intValue());
                 command.setInt(3, offset);
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
 
-                            try (ResultSet tsSkill = skill.executeQuery()) {
-                                while (tsSkill.next()) {
-                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                            try (ResultSet technicalSkillResult = skill.executeQuery()) {
+                                while (technicalSkillResult.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(technicalSkillResult.getInt(1),
+                                            technicalSkillResult.getString(2), technicalSkillResult.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
                         }
-                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
 
-                            try (ResultSet psSkill = skill.executeQuery()) {
-                                while (psSkill.next()) {
-                                    SkillsLevelVM productSkill = new SkillsLevelVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                            try (ResultSet productSkillResult = skill.executeQuery()) {
+                                while (productSkillResult.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(productSkillResult.getInt(1),
+                                            productSkillResult.getString(2), productSkillResult.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -85,38 +87,40 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentSkillEmployeeVM> getEmployeesByProjectID(Integer projectid) throws SQLException {
+    public List<AssignmentSkillEmployeeVM> getEmployeesByProjectID(Integer projectID) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalskillList = new ArrayList<>();
         List<SkillsLevelVM> productskillList = new ArrayList<>();
-        try (Connection conn = db.getConnection()) {
+        try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     "from users u join assignment a on u.id = a.employee_id where a.project_id = ? " +
                     "and a.status not in ('Pending approval','Not approved')  group by u.id;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
-            String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = \" +\n" +
-                    "\"es.user_id join skills s on es.skill_id = s.id where type = \\\"PRODUCT\\\" and u.id = ? and es.status='APPROVED'";
-            try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
-                command.setInt(1, projectid);
+            String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
+                    "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED' ";
+            try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
+                command.setInt(1, projectID);
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
-                            try (ResultSet tsSkill = skill.executeQuery()) {
-                                while (tsSkill.next()) {
-                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                            try (ResultSet technicalSkillResult = skill.executeQuery()) {
+                                while (technicalSkillResult.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(technicalSkillResult.getInt(1),
+                                            technicalSkillResult.getString(2), technicalSkillResult.getInt(3));
                                     technicalskillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
                         }
-                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
-                            try (ResultSet psSkill = skill.executeQuery()) {
-                                while (psSkill.next()) {
-                                    SkillsLevelVM productSkill = new SkillsLevelVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                            try (ResultSet productSkillResult = skill.executeQuery()) {
+                                while (productSkillResult.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(productSkillResult.getInt(1),
+                                            productSkillResult.getString(2), productSkillResult.getInt(3));
                                     productskillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -138,17 +142,18 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer pageNumber, Integer limit) throws SQLException {
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillID(Integer skillID, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
-        if (pageNumber < 1) {
-            pageNumber = 1;
+        if (currentPage < 1) {
+            currentPage = 1;
         }
 
-        Integer offset = (pageNumber - 1) * limit;
-        try (Connection conn = db.getConnection()) {
+        Integer offset = (currentPage - 1) * limit;
+
+        try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where s.id = ?" +
                     " and es.status='APPROVED' group by u.id " +
@@ -158,32 +163,34 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED'; ";
 
-            try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
+            try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setInt(1, skillID);
                 command.setInt(2, limit);
                 command.setInt(3, offset);
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
 
 
-                            try (ResultSet tsSkill = skill.executeQuery()) {
-                                while (tsSkill.next()) {
-                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                            try (ResultSet technicalSkillResult = skill.executeQuery()) {
+                                while (technicalSkillResult.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(technicalSkillResult.getInt(1),
+                                            technicalSkillResult.getString(2), technicalSkillResult.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
                         }
-                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
 
-                            try (ResultSet psSkill = skill.executeQuery()) {
-                                while (psSkill.next()) {
-                                    SkillsLevelVM productSkill = new SkillsLevelVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                            try (ResultSet productSkillResult = skill.executeQuery()) {
+                                while (productSkillResult.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(productSkillResult.getInt(1),
+                                            productSkillResult.getString(2), productSkillResult.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -207,17 +214,17 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     }
 
     @Override
-    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillName(String skillName, Integer pageNumber, Integer limit) throws SQLException {
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillName(String skillName, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
-        if (pageNumber < 1) {
-            pageNumber = 1;
+        if (currentPage < 1) {
+            currentPage = 1;
         }
 
-        Integer offset = (pageNumber - 1) * limit;
-        try (Connection conn = db.getConnection()) {
+        Integer offset = (currentPage - 1) * limit;
+        try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where" +
                     " s.name like ? and es.status='APPROVED' " +
@@ -230,33 +237,35 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     " and u.id = ? and es.status='APPROVED'";
 
 
-            try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
+            try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setString(1, skillName + "%");
                 command.setInt(2, limit);
                 command.setInt(3, offset);
 
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
 
 
-                            try (ResultSet tsSkill = skill.executeQuery()) {
-                                while (tsSkill.next()) {
-                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                            try (ResultSet technicalSkillResult = skill.executeQuery()) {
+                                while (technicalSkillResult.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(technicalSkillResult.getInt(1),
+                                            technicalSkillResult.getString(2), technicalSkillResult.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
                         }
-                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
 
 
-                            try (ResultSet psSkill = skill.executeQuery()) {
-                                while (psSkill.next()) {
-                                    SkillsLevelVM productSkill = new SkillsLevelVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                            try (ResultSet productSkillResult = skill.executeQuery()) {
+                                while (productSkillResult.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(productSkillResult.getInt(1),
+                                            productSkillResult.getString(2), productSkillResult.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {
@@ -282,55 +291,57 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
 
 
     @Override
-    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<SkillsLevelVM> skillsLevelVM, Integer pageNumber, Integer limit) throws SQLException {
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillSet(List<SkillsLevelVM> skillSet, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
-        if (pageNumber < 1) {
-            pageNumber = 1;
+        if (currentPage < 1) {
+            currentPage = 1;
         }
-        int offset = (pageNumber - 1) * limit;
-        try (Connection conn = db.getConnection()) {
+        int offset = (currentPage - 1) * limit;
+        try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id=es.user_id" +
                     " where ";
-            for (int i = 0; i < skillsLevelVM.size(); i++) {
-                if (i == skillsLevelVM.size() - 1) {
-                    employeeQuery += " es.skill_id = " + skillsLevelVM.get(i).getId() + " and es.level >= " + +skillsLevelVM.get(i).getLevel() + " and es.status='APPROVED' group by u.id limit ? offset ? ;";
+            for (int i = 0; i < skillSet.size(); i++) {
+                if (i == skillSet.size() - 1) {
+                    employeeQuery += " es.skill_id = " + skillSet.get(i).getId() + " and es.level >= " + +skillSet.get(i).getLevel() + " and es.status='APPROVED' group by u.id limit ? offset ? ;";
                 } else {
-                    employeeQuery += " es.skill_id = " + skillsLevelVM.get(i).getId() + " and es.level >= " + skillsLevelVM.get(i).getLevel() + " or";
+                    employeeQuery += " es.skill_id = " + skillSet.get(i).getId() + " and es.level >= " + skillSet.get(i).getLevel() + " or";
 
                 }
             }
 
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                     " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'; ";
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'; ";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED'; ";
 
-            try (PreparedStatement command = conn.prepareStatement(employeeQuery)) {
+            try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setInt(1, limit);
                 command.setInt(2, offset);
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-                        try (PreparedStatement skill = conn.prepareStatement(technicalSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
-                            try (ResultSet tsSkill = skill.executeQuery()) {
-                                while (tsSkill.next()) {
-                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(tsSkill.getInt(1), tsSkill.getString(2), tsSkill.getInt(3));
+                            try (ResultSet technicalSkillResult = skill.executeQuery()) {
+                                while (technicalSkillResult.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(technicalSkillResult.getInt(1),
+                                            technicalSkillResult.getString(2), technicalSkillResult.getInt(3));
                                     technicalSkillList.add(technicalSkill);
                                 }
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
                         }
-                        try (PreparedStatement skill = conn.prepareStatement(productSkillQuery)) {
+                        try (PreparedStatement skill = connection.prepareStatement(productSkillQuery)) {
                             skill.setInt(1, result.getInt("u.id"));
                             //skill.setInt(2,skellSet)
-                            try (ResultSet psSkill = skill.executeQuery()) {
-                                while (psSkill.next()) {
-                                    SkillsLevelVM productSkill = new SkillsLevelVM(psSkill.getInt(1), psSkill.getString(2), psSkill.getInt(3));
+                            try (ResultSet productSkillResult = skill.executeQuery()) {
+                                while (productSkillResult.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(productSkillResult.getInt(1),
+                                            productSkillResult.getString(2), productSkillResult.getInt(3));
                                     productSkillList.add(productSkill);
                                 }
                             } catch (SQLException e) {

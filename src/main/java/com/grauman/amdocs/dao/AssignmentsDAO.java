@@ -30,14 +30,14 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     @Override
     public Assignment add(Assignment item) throws SQLException {
-        try (Connection conn = db.getConnection()) {
+        try (Connection connection = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
-            String insertQuery = "INSERT INTO assignment (project_id, employee_id, start_date, requested_from_manager_id," +
-                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?)";
+            String insertAssignmentQuery = "INSERT INTO assignment (project_id, employee_id, start_date, requested_from_manager_id," +
+                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?) ";
 
             // preparing a statement that guarantees returning the auto generated id
-            try (PreparedStatement command = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement command = connection.prepareStatement(insertAssignmentQuery, Statement.RETURN_GENERATED_KEYS)) {
                 command.setInt(1, item.getProjectID());
                 command.setInt(2, item.getEmployeeID());
                 command.setDate(3, new java.sql.Date(new java.util.Date().getTime()));
@@ -49,7 +49,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                     command.setString(6, "Pending approval");
                     item.setStatus("Pending approval");
                 } else {
-                    System.out.println(item.getRequestToManagerID() + " bbbbbbb");
                     command.setNull(5, Types.INTEGER);
                     command.setString(6, "In progress");
                     item.setStatus("In progress");
@@ -79,36 +78,36 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public List<AssignmentHistoryVM> getAssignmentsByUserID(int employeeID, int currPage, int limit) throws SQLException {
+    public List<AssignmentHistoryVM> getAssignmentsByUserID(int employeeID, int currentPage, int limit) throws SQLException {
         List<AssignmentHistoryVM> assignments = new ArrayList<>();
 
-        if (currPage < 1)
-            currPage = 1;
+        if (currentPage < 1)
+            currentPage = 1;
 
-        int offset = (currPage - 1) * limit; // index of which row to start retrieving data
+        int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
 
-        try (Connection conn = db.getConnection()) {
+        try (Connection connection = db.getConnection()) {
 
             String sqlCommand = "Select a.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
                     "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
 
-            try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
+            try (PreparedStatement command = connection.prepareStatement(sqlCommand)) {
                 command.setInt(1, employeeID);
                 command.setInt(2, limit);
                 command.setInt(3, offset);
 
-                try (ResultSet result = command.executeQuery()) {
-                    while (result.next()) {
+                try (ResultSet resultAssignment = command.executeQuery()) {
+                    while (resultAssignment.next()) {
                         assignments.add(new AssignmentHistoryVM(
-                                result.getInt("a.id"),
-                                result.getString("p.name"),
-                                result.getInt("a.project_id"),
+                                resultAssignment.getInt("a.id"),
+                                resultAssignment.getString("p.name"),
+                                resultAssignment.getInt("a.project_id"),
                                 employeeID,
-                                result.getDate("a.start_date"),
-                                result.getDate("a.end_date"),
-                                result.getInt("a.requested_from_manager_id"),
-                                result.getInt("a.requested_to_manager_id"),
-                                result.getString("a.status"))
+                                resultAssignment.getDate("a.start_date"),
+                                resultAssignment.getDate("a.end_date"),
+                                resultAssignment.getInt("a.requested_from_manager_id"),
+                                resultAssignment.getInt("a.requested_to_manager_id"),
+                                resultAssignment.getString("a.status"))
                         );
                     }
                 }
@@ -119,57 +118,58 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerid, int currPage, int limit) throws SQLException, ResultsNotFoundException {
-        List<AssignmentRequestVM> assignments = new ArrayList<>();
-        if (currPage < 1)
-            currPage = 1;
-        int offset = (currPage - 1) * limit; // index of which row to start retrieving data
-        try (Connection conn = db.getConnection()) {
-            String sqlCommand = "Select a.id,concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
+    public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException {
+        List<AssignmentRequestVM> assignmentsRequests = new ArrayList<>();
+        if (currentPage < 1)
+            currentPage = 1;
+        int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
+
+        try (Connection connection = db.getConnection()) {
+            String getAssignmentRequestQuery = "Select a.id,concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id\n" +
                     "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = 'Pending approval' limit ? offset ?";
             String managerName;
-            try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
-                command.setInt(1, managerid);
+            try (PreparedStatement command = connection.prepareStatement(getAssignmentRequestQuery)) {
+                command.setInt(1, managerID);
                 command.setInt(2, limit);
                 command.setInt(3, offset);
-                try (ResultSet result = command.executeQuery()) {
-                    while (result.next()) {
-                        String sqlmanagerName = "Select concat(u.first_name, \" \" , u.last_name) as name \n" +
+                try (ResultSet resultAssignment = command.executeQuery()) {
+                    while (resultAssignment.next()) {
+                        String managerNameQuery = "Select concat(u.first_name, \" \" , u.last_name) as name \n" +
                                 "from users u where u.id = ?";
-                        try (PreparedStatement commandManagerName = conn.prepareStatement(sqlmanagerName)) {
-                            commandManagerName.setInt(1, result.getInt(9));
+                        try (PreparedStatement commandManagerName = connection.prepareStatement(managerNameQuery)) {
+                            commandManagerName.setInt(1, resultAssignment.getInt(9));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
                                 resultManagerName.next();
                                 managerName = resultManagerName.getString(1);
                             }
                         }
-                        assignments.add(new AssignmentRequestVM(
-                                result.getInt("a.id"),
-                                result.getString("p.name"),
-                                result.getInt("a.project_id"),
-                                result.getInt("u.id"),
-                                result.getString("name"),
-                                result.getDate("a.start_date"),
-                                result.getDate("a.end_date"),
-                                result.getInt("a.requested_from_manager_id"),
-                                result.getInt("a.requested_to_manager_id"),
-                                result.getString("a.status"), managerName)
+                        assignmentsRequests.add(new AssignmentRequestVM(
+                                resultAssignment.getInt("a.id"),
+                                resultAssignment.getString("p.name"),
+                                resultAssignment.getInt("a.project_id"),
+                                resultAssignment.getInt("u.id"),
+                                resultAssignment.getString("name"),
+                                resultAssignment.getDate("a.start_date"),
+                                resultAssignment.getDate("a.end_date"),
+                                resultAssignment.getInt("a.requested_from_manager_id"),
+                                resultAssignment.getInt("a.requested_to_manager_id"),
+                                resultAssignment.getString("a.status"), managerName)
                         );
                     }
                 }
             }
         }
-        return assignments;
+        return assignmentsRequests;
     }
 
 
     @Override
-    public List<EmployeeAssignmentVM> getAssignmentsbystatus(Integer managerID, Date requestedDate, Integer pageNumber, Integer limit) throws SQLException {
+    public List<EmployeeAssignmentVM> getDoneAssignments (Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException {
         List<EmployeeAssignmentVM> doneAssignments = new ArrayList<>();
-        // Date today = Calendar.getInstance().getTime();
-        if (pageNumber < 1)
-            pageNumber = 1;
-        Integer offset = (pageNumber - 1) * limit;
+        if (currentPage < 1)
+            currentPage = 1;
+
+        Integer offset = (currentPage - 1) * limit;
         try (Connection conn = db.getConnection()) {
             String sqlCommand = " select u.id, concat(u.first_name, \" \" , u.last_name) as name, a.project_id ,a.id, p.name,\n" +
                     "             a.start_date, a.end_date, a.requested_from_manager_id, a.requested_to_manager_id, a.status\n" +
@@ -204,18 +204,17 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     @Override
-    public String updatePendingApprovalStatus(Assignment assignment, boolean response) throws SQLException {
+    public String updatePendingApprovalStatus(Assignment assignment, boolean approvalResponse) throws SQLException {
         String message = "SUCCESS";
-        try (Connection conn = db.getConnection()) {
+        try (Connection connection = db.getConnection()) {
             String updateCommand = " update assignment SET status=?  where id= ? and status= \"Pending approval\"; ";
-            try (PreparedStatement command = conn.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
-                if (response) {
+            try (PreparedStatement command = connection.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
+                if (approvalResponse) {
                     command.setString(1, "In progress");
                 } else {
                     command.setString(1, "Not approved");
                 }
                 command.setInt(2, assignment.getId());
-                // int responseMessage = command.executeUpdate();
                 if (command.executeUpdate() <= 0)
                     message = "FAILURE";
             }
