@@ -34,14 +34,14 @@ public class ProjectController {
 
 
         @GetMapping("name/{name}")
-    public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@PathVariable("name") String projectName, @RequestParam int pageNumber, @RequestParam int limit) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName, pageNumber, limit));
+    public ResponseEntity<List<ProjectVM>> getProjectsByProjectName(@PathVariable("name") String projectName, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.searchProjectByProjectName(projectName, currentPage, limit));
     }
 
 
     @PostMapping("")
-    public ResponseEntity<ProjectVM> addProject(@RequestBody ProjectVM projectVM) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.add(projectVM));
+    public ResponseEntity<ProjectVM> addProject(@RequestBody ProjectVM project) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.add(project));
 
     }
 }
