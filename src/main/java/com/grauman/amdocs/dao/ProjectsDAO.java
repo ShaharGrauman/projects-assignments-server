@@ -27,6 +27,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
+    // add a new project
     @Override
     public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
         int projectID;
@@ -110,7 +111,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
-
+    // get all the projects that a manager employees is working on
     @Override
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
 
@@ -121,7 +122,8 @@ public class ProjectsDAO implements IProjectsDAO {
 
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select distinct p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
+
+            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
 
                     "                                                      join project p on a.project_id=p.id\n" +
                     "                                                      where a.status = \"In progress\" and u.manager_id= ?;";
@@ -180,7 +182,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
         return projectList;
     }
-
+    // get all the projects that an employee is working on by his/her ID
     @Override
     public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -188,7 +190,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id,p.name, p.start_date, p.description from assignment a join project p" +
+            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description from assignment a join project p" +
                     " on a.project_id=p.id where a.status= 'In progress' and a.employee_id= ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -246,6 +248,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
+    // get all the projects that an employee is working on by his/her name
     @Override
     public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -253,7 +256,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
+            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
                     " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'In progress' and u.first_name like ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -311,7 +314,7 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
-
+    // search projects by name
     @Override
     public List<ProjectVM> searchProjectByProjectName(String projectName, Integer currentPage, Integer limit) throws SQLException {
 
@@ -320,7 +323,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
+            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
