@@ -21,27 +21,27 @@ public class AssignmentSkillEmployeeController {
     private AssignmentSkillEmployeeDAO employeeDAO;
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<AssignmentSkillEmployeeVM>> getEmployeesByManagerID(@PathVariable("id") Integer managerID, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException {
-        List<AssignmentSkillEmployeeVM> employees = employeeDAO.getEmployeesByManagerID(managerID, pageNumber,limit);
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> getEmployeesByManagerID(@PathVariable("id") Integer managerID, @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = employeeDAO.getEmployeesByManagerID(managerID, currentPage,limit);
         return ResponseEntity.ok().body(employees);
     }
 
     @GetMapping("/project/{id}")
-    public ResponseEntity<List<AssignmentSkillEmployeeVM>> getEmployeesByProjectID(@PathVariable("id") Integer projectid) throws SQLException {
-        List<AssignmentSkillEmployeeVM> employees = employeeDAO.getEmployeesByProjectID(projectid);
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> getEmployeesByProjectID(@PathVariable("id") Integer projectID) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = employeeDAO.getEmployeesByProjectID(projectID);
         return ResponseEntity.ok().body(employees);
 
     }
 
     @GetMapping("/skill/id/{id}")
-    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillID(@PathVariable("id") Integer skillID, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException {
-        List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillID(skillID, pageNumber,limit);
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillID(@PathVariable("id") Integer skillID, @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillID(skillID, currentPage,limit);
         return ResponseEntity.ok().body(employees);
 
     }
     @GetMapping("/skill/name/{name}")
-    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillName(@PathVariable("name") String skillName, @RequestParam Integer pageNumber, @RequestParam Integer limit) throws SQLException {
-        List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillName(skillName, pageNumber,limit);
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillName(@PathVariable("name") String skillName, @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillName(skillName, currentPage,limit);
         return ResponseEntity.ok().body(employees);
 
     }
