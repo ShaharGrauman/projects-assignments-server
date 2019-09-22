@@ -122,7 +122,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 resultAssignment.getInt("a.id"),
                                 resultAssignment.getString("p.name"),
                                 resultAssignment.getInt("a.project_id"),
-                                resultAssignment.getInt("u.id"),
+                                resultAssignment.getInt(employeeID),
                                 resultAssignment.getString("name"),
                                 resultAssignment.getDate("a.start_date"),
                                 resultAssignment.getDate("a.end_date"),
@@ -161,7 +161,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         String managerNameQueryTo = "Select concat(u.first_name, \" \" , u.last_name) as name \n" +
                                 "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = connection.prepareStatement(managerNameQueryTo)) {
-                            commandManagerName.setInt(1, resultAssignment.getInt(9));
+                            commandManagerName.setInt(1, resultAssignment.getInt("a.requested_from_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
                                 resultManagerName.next();
                                 managerToName = resultManagerName.getString(1);
@@ -171,7 +171,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         String managerNameQueryFrom = "Select concat(u.first_name, \" \" , u.last_name) as name \n" +
                                 "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = connection.prepareStatement(managerNameQueryFrom)) {
-                            commandManagerName.setInt(1, resultAssignment.getInt(8));
+                            commandManagerName.setInt(1, resultAssignment.getInt("a.requested_to_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
                                 resultManagerName.next();
                                 managerFromName = resultManagerName.getString(1);
