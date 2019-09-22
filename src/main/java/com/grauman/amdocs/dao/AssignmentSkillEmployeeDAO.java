@@ -97,8 +97,8 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     "and a.status not in ('Pending approval','Not approved')  group by u.id;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
-            String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = \" +\n" +
-                    "\"es.user_id join skills s on es.skill_id = s.id where type = \\\"PRODUCT\\\" and u.id = ? and es.status='APPROVED'";
+            String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
+                    "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED' ";
             try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setInt(1, projectID);
                 try (ResultSet result = command.executeQuery()) {
@@ -314,7 +314,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
             }
 
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-                     " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'; ";
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'; ";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                     " es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED'; ";
 
