@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,22 +16,26 @@ import com.grauman.amdocs.models.ResetPasswordVM;
 
 @RestController
 @RequestMapping("/resetPassword")
+@CrossOrigin
 public class ResetPasswordController {
 
 	@Autowired
 	EmployeeDataDAO employee;
 		
 	@PostMapping("")
-	public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordVM email, ResetPasswordVM employeeNumber){
+	public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordVM data){
 
 		try {
-			employee.resetPassword(email.getEmail(),employeeNumber.getEmployeeNumber());
+			employee.resetPassword(data.getEmail(),data.getEmployeeNumber());
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return ResponseEntity.ok().body("can't be sent");
 		} catch (EmployeeException e) {
 			e.printStackTrace();
+			return ResponseEntity.ok().body("can't be sent");
+
 		}
-		return ResponseEntity.ok().body(null);
+		return ResponseEntity.ok().body("sent");
 	}
 	
 }

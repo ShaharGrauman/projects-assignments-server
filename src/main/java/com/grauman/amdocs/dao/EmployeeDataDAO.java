@@ -772,7 +772,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 //done Exceptions
-//	@SuppressWarnings("null")
 	@SuppressWarnings("null")
 	public void resetPassword(String toEmail, int number) throws SQLException, EmployeeException {
 		boolean catchTimeOut = false;
@@ -822,12 +821,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					// employee and returns the employee
 
 					try {
-						employee.setEmployee((find(result.getInt("id")).getEmployee())); // find gets the id of employee
-																							// and returns the employee
+						employee =  find(result.getInt("id")); // find gets the id of employee
 						System.out.println("found employee...");
 						employee.getEmployee().setPassword(PasswordUtils.generateSecurePassword(newPassword));
-						update(employee); // update the new password of this employee in the database.
-						System.out.println("updated...");
+						// till here
+//						update(employee); // update the new password of this employee in the database.
+//						System.out.println("updated...");
 					} catch (SQLException e) {
 						e.printStackTrace();
 						System.out.println("can't continue from here.......");
@@ -841,8 +840,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				// in the text file, replace the ##USER with the username and ##PWD with
 				// newPassword.
 				if (text != " ") {
-					text.replaceFirst("##USER", firstName);
-					text.replaceFirst("##PWD", newPassword);
+					text = text.replaceAll("##USER", firstName);
+					text = text.replaceAll("##PWD", newPassword);
 				}
 
 				try {
@@ -916,11 +915,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			message.setFrom(new InternetAddress(fromEmail));
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
 			message.setSubject(subject);
-			message.setText(text);
+			message.setContent(text, "text/html; charset=utf-8");
+//			message.setText();
 
 			Transport.send(message);
 
-		} catch (MessagingException e) {
+		} catch (MessagingException e) { // stuck here
 			e.printStackTrace();
 			throw new SendFailedException("can't send email" + e.getMessage());
 		} catch (IllegalStateException e) {
