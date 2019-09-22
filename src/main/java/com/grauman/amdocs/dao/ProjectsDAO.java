@@ -37,9 +37,9 @@ public class ProjectsDAO implements IProjectsDAO {
                     "VALUES (?,?,?,?)";
             try (PreparedStatement fetchInsertQueryProject = connection.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
                 fetchInsertQueryProject.setString(1, newProject.getName());
-                fetchInsertQueryProject.setInt(2, newProject.getManagerID());
+                fetchInsertQueryProject.setNull(2,Types.INTEGER);
                 fetchInsertQueryProject.setString(3, newProject.getDescription());
-                fetchInsertQueryProject.setString(4, String.valueOf(newProject.getStartDate()));
+                fetchInsertQueryProject.setDate(4, newProject.getStartDate());
                 fetchInsertQueryProject.executeUpdate();
                 try (ResultSet generatedID = fetchInsertQueryProject.getGeneratedKeys()) {
                     if (generatedID.next()) {
