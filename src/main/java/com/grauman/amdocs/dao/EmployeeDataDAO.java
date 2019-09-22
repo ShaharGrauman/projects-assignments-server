@@ -399,7 +399,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				 command.setInt(2, limit);
 				 command.setInt(3, offset);
 					ResultSet result = command.executeQuery();
-					if(result.next()) {
+					while(result.next()) {
 						employeeRoles=getEmployeeRoles(result.getInt(1));
 						found.add(new EmployeeData(new Employee(
 								result.getInt(1),

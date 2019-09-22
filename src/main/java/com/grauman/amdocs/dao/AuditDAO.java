@@ -23,16 +23,21 @@ public class AuditDAO implements IAuditDAO{
 	 @Autowired DBManager db;
 
 	 @Override
-	    public List<AuditEmployee> findAll() throws SQLException {
+	    public List<AuditEmployee> findAll(int page,int limit) throws SQLException {
 	        List<AuditEmployee> audit=new ArrayList<>();
 	        List<Role> roles=new ArrayList<>();
-	        
+	        if(page<1)
+	        	page=1;
+	        int offset=(page-1)*limit;
 	        String sqlAllUserscommand="select A.id,A.employee_number, A.date_time,U.first_name,U.last_name,U.id as Employeeid,A.activity "+
-	                                    "from users U JOIN audit A ON U.id=A.user_id";
+	                                    "from users U JOIN audit A ON U.id=A.user_id"
+	        		+" limit ? offset ?";
 	        
 	        try(Connection conn = db.getConnection()) {
-	            try(Statement command = conn.createStatement()){
-	                ResultSet result=command.executeQuery(sqlAllUserscommand);
+	        	try (PreparedStatement command = conn.prepareStatement(sqlAllUserscommand)) {
+	                command.setInt(1, limit);
+	                command.setInt(2, offset);
+	        		ResultSet result=command.executeQuery();
 						while(result.next()) {
 							roles=getEmployeeRoles(result.getInt(6));
 	                    audit.add(
@@ -139,6 +144,11 @@ public AuditEmployee update(AuditEmployee movie) throws SQLException {
 }
 @Override
 public AuditEmployee delete(int id) throws SQLException {
+	// TODO Auto-generated method stub
+	return null;
+}
+@Override
+public List<AuditEmployee> findAll() throws SQLException {
 	// TODO Auto-generated method stub
 	return null;
 }        
