@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
+import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.LevelValidityException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.vm.ProjectVM;
@@ -27,6 +28,16 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
+    private boolean checkIfProjectExists(ProjectVM project) throws SQLException {
+        String checkQuery= "select id from project where name= ? ;";
+        try (Connection connection = db.getConnection()) {
+            try (PreparedStatement command = connection.prepareStatement(checkQuery)){
+                command.setString(1, project.getName());
+                ResultSet result = command.executeQuery();
+                return result.next();
+            }
+        }
+    }
     /**
      * @param  newProject
      * @return new added assignment
@@ -34,9 +45,12 @@ public class ProjectsDAO implements IProjectsDAO {
      */
     @Override
     public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
+
+        if(checkIfProjectExists(newProject)){
+            throw new AlreadyExistsException("Project name already exists. Project name should be unique.");
+        }
         int projectID;
         try (Connection connection = db.getConnection()) {
-
             String insertQueryProject = "INSERT INTO project (name, manager_id, description,start_date) " +
                                          "VALUES (?,?,?,?)";
             try (PreparedStatement fetchInsertQueryProject = connection.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
