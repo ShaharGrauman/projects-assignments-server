@@ -1,7 +1,7 @@
 package com.grauman.amdocs.controllers;
 
 
-import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
+import com.grauman.amdocs.dao.AssignmentsDAO;
 import com.grauman.amdocs.models.Assignment;
 import com.grauman.amdocs.models.vm.AssignmentRequestVM;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import java.util.List;
 @CrossOrigin
 public class AssignmentsController {
     @Autowired
-    private IAssignmentsDAO assignmentsDAO;
+    private AssignmentsDAO assignmentsDAO;
 
     /**
      *
