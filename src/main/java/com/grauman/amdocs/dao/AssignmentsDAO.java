@@ -49,12 +49,12 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
                 if (item.getRequestFromManagerID() != (item.getRequestToManagerID())) {
                     command.setInt(5, item.getRequestToManagerID());
-                    command.setString(6, "Pending approval");
-                    item.setStatus("Pending approval");
+                    command.setString(6, "PENDING_APPROVAL");
+                    item.setStatus("PENDING_APPROVAL");
                 } else {
                     command.setNull(5, Types.INTEGER);
-                    command.setString(6, "In progress");
-                    item.setStatus("In progress");
+                    command.setString(6, "IN_PROGRESS");
+                    item.setStatus("IN_PROGRESS");
                 }
                 command.executeUpdate();
                 try (ResultSet generatedID = command.getGeneratedKeys()) {
