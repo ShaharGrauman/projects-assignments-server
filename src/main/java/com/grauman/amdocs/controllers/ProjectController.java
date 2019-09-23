@@ -1,6 +1,6 @@
 package com.grauman.amdocs.controllers;
 
-import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
+import com.grauman.amdocs.dao.ProjectsDAO;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.vm.ProjectVM;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import java.util.List;
 @CrossOrigin
 public class ProjectController {
     @Autowired
-    private IProjectsDAO projectsDAO;
+    private ProjectsDAO projectsDAO;
 
     /**
      *

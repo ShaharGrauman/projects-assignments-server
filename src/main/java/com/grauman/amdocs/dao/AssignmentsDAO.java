@@ -27,12 +27,13 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return null;
     }
 
-    //add assignment for employee
+    /**
+     * @param  newAssignment
+     * @return new added assignment
+     * @throws SQLException
+     */
     @Override
-    public Assignment add(Assignment item) throws SQLException {
-        if (CheckIfAssignment(item)) {
-            throw new InvalidDataException("Employee already assigned to this project");
-        }
+    public Assignment add(Assignment newAssignment) throws SQLException {
         try (Connection connection = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
@@ -41,25 +42,25 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
             // preparing a statement that guarantees returning the auto generated id
             try (PreparedStatement command = connection.prepareStatement(insertAssignmentQuery, Statement.RETURN_GENERATED_KEYS)) {
-                command.setInt(1, item.getProjectID());
-                command.setInt(2, item.getEmployeeID());
+                command.setInt(1, newAssignment.getProjectID());
+                command.setInt(2, newAssignment.getEmployeeID());
                 command.setDate(3, new java.sql.Date(new java.util.Date().getTime()));
-                item.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
-                command.setInt(4, item.getRequestFromManagerID());
+                newAssignment.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
+                command.setInt(4, newAssignment.getRequestFromManagerID());
 
-                if (item.getRequestFromManagerID() != (item.getRequestToManagerID())) {
-                    command.setInt(5, item.getRequestToManagerID());
-                    command.setString(6, "Pending approval");
-                    item.setStatus("Pending approval");
+                if (newAssignment.getRequestFromManagerID() != (newAssignment.getRequestToManagerID())) {
+                    command.setInt(5, newAssignment.getRequestToManagerID());
+                    command.setString(6, "PENDING_APPROVAL");
+                    newAssignment.setStatus("PENDING_APPROVAL");
                 } else {
                     command.setNull(5, Types.INTEGER);
-                    command.setString(6, "In progress");
-                    item.setStatus("In progress");
+                    command.setString(6, "IN_PROGRESS");
+                    newAssignment.setStatus("IN_PROGRESS");
                 }
                 command.executeUpdate();
                 try (ResultSet generatedID = command.getGeneratedKeys()) {
                     if (generatedID.next())
-                        item.setId(generatedID.getInt(1));
+                        newAssignment.setId(generatedID.getInt(1));
                     else
                         throw new SQLException("Assignment insertion failed.");
                 }
@@ -67,7 +68,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
 
         }
-        return item;
+        return newAssignment;
     }
 
     @Override
@@ -80,7 +81,14 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return null;
     }
 
-    // get employee assignments history
+    /**
+     * @param  employeeID
+     * * @param  currentPage
+     * * @param  limit
+     * @return array of assignments for employee
+     * @throws SQLException
+     * @throws ResultsNotFoundException
+     */
     @Override
     public List<AssignmentVM> getAssignmentsByUserID(int employeeID, int currentPage, int limit) throws SQLException {
         List<AssignmentVM> assignments = new ArrayList<>();
@@ -146,7 +154,14 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return assignments;
     }
 
-    // get assignments requests in manager team
+    /**
+     * @param  managerID
+     * * @param  currentPage
+     * * @param  limit
+     * @return array of assignments requests for manager team
+     * @throws SQLException
+     * @throws ResultsNotFoundException
+     */
     @Override
     public List<AssignmentVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException {
         List<AssignmentVM> assignmentsRequests = new ArrayList<>();
@@ -206,7 +221,15 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return assignmentsRequests;
     }
 
-    // get done assignments in manager team
+    /**
+     * @param  managerID
+     * * @param requestedDate
+     * * @param  currentPage
+     * * @param  limit
+     * @return array of done assignments for manager team
+     * @throws SQLException
+     * @throws ResultsNotFoundException
+     */
     @Override
     public List<AssignmentVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentVM> doneAssignments = new ArrayList<>();
@@ -272,7 +295,13 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return doneAssignments;
     }
 
-    // approve/ reject assignment request
+    /**
+     * @param  assignment
+     * * @param response
+     * @return message of success/failure in approving/not approving assignment request
+     * @throws SQLException
+     * @throws ResultsNotFoundException
+     */
     @Override
     public String updatePendingApprovalStatus(Assignment assignment, boolean approvalResponse) throws SQLException {
         String message = "SUCCESS";
