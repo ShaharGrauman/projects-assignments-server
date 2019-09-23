@@ -373,6 +373,14 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
+        //set defualt level = 1  if no level
+        for (SkillsLevelVM skillsLevelVM : skillSet) {
+            if (skillsLevelVM.getLevel() == null || skillsLevelVM.getLevel() < 1) {
+                skillsLevelVM.setLevel(1);
+
+            }
+        }
+
         if (currentPage < 1) {
             currentPage = 1;
         }

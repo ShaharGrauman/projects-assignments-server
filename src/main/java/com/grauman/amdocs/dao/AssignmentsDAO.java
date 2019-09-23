@@ -4,7 +4,7 @@ import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.InvalidDataException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.vm.AssignmentRequestVM;
+import com.grauman.amdocs.models.vm.AssignmentVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,8 +82,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     // get employee assignments history
     @Override
-    public List<AssignmentRequestVM> getAssignmentsByUserID(int employeeID, int currentPage, int limit) throws SQLException {
-        List<AssignmentRequestVM> assignments = new ArrayList<>();
+    public List<AssignmentVM> getAssignmentsByUserID(int employeeID, int currentPage, int limit) throws SQLException {
+        List<AssignmentVM> assignments = new ArrayList<>();
 
         if (currentPage < 1)
             currentPage = 1;
@@ -124,7 +124,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                             }
                         }
 
-                        assignments.add(new AssignmentRequestVM(
+                        assignments.add(new AssignmentVM(
                                         resultAssignment.getInt("a.id"),
                                         resultAssignment.getString("p.name"),
                                         resultAssignment.getInt("a.project_id"),
@@ -148,8 +148,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     // get assignments requests in manager team
     @Override
-    public List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException {
-        List<AssignmentRequestVM> assignmentsRequests = new ArrayList<>();
+    public List<AssignmentVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException {
+        List<AssignmentVM> assignmentsRequests = new ArrayList<>();
         if (currentPage < 1)
             currentPage = 1;
         int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
@@ -185,7 +185,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                             }
                         }
 
-                        assignmentsRequests.add(new AssignmentRequestVM(
+                        assignmentsRequests.add(new AssignmentVM(
                                 resultAssignment.getInt("a.id"),
                                 resultAssignment.getString("p.name"),
                                 resultAssignment.getInt("a.project_id"),
@@ -208,8 +208,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
     // get done assignments in manager team
     @Override
-    public List<AssignmentRequestVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException {
-        List<AssignmentRequestVM> doneAssignments = new ArrayList<>();
+    public List<AssignmentVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException {
+        List<AssignmentVM> doneAssignments = new ArrayList<>();
         if (currentPage < 1)
             currentPage = 1;
 
@@ -253,7 +253,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         }
 
 
-                        doneAssignments.add(new AssignmentRequestVM(
+                        doneAssignments.add(new AssignmentVM(
                                 result.getInt("a.id"),
                                 result.getString("p.name"),
                                 result.getInt("a.project_id"),
