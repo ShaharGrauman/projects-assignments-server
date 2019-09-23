@@ -42,7 +42,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 	@Autowired
 	MailManager mail;
-
+	/**
+	    * @param page
+	    * @param limit
+	    * @return all locked employees
+	    * @throws SQLException
+	    */
 //Search all employees which are locked
 	@Override
 	public List<EmployeeData> findAll(int page,int limit) throws SQLException {
@@ -83,7 +88,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return users;
 	}
-
+	/**
+	    * @param page
+	    * @param limit
+	    * @return all employees
+	    * @throws SQLException
+	    */
 //search all employees	
 	public List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException {
 		int userId;
@@ -122,7 +132,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return users;
 	}
 
-	
+	/**
+	    * @param id 
+	    * @return find employee by id
+	    * @throws SQLException
+	    */
 // search the employee profile 
 	public EmployeeData searchEmployeeProfile(int id) throws SQLException {
 		Date auditDate=null;
@@ -253,6 +267,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 	// *******************************************************************************************
 // we should generate a random password and then insert it to the uses table in the data base
+	/**
+	    * @param employee 
+	    * @return new added employee
+	    * @throws SQLException
+	    */
 	@Override
 	public EmployeeData add(EmployeeData employee) throws SQLException {
 		int newEmployeeId = -1;
@@ -308,6 +327,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 //never change the employee number!!
+	/**
+	    * @param id 
+	    * @param employee
+	    * @return update employee
+	    * @throws SQLException
+	    */
 	@Override
 	public EmployeeData update(EmployeeData employee) throws SQLException {
 
@@ -358,7 +383,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
         return updatedEmployee;
 
 	}
-
+	/**
+	    * @param id 
+	    * @return deleted/deactivated employee
+	    * @throws SQLException
+	    */
 //deactivate an Employee
 	@Override
 	public EmployeeData delete(int id) throws SQLException {
@@ -631,7 +660,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //*******************************************very important!	**********************
 /**call the resetAttempts from LoginDAO */
-//unlock user
+	/**
+	    * @param id 
+	    * @return unlocked employee 
+	    * @throws SQLException
+	    */
+	//unlock user
 	public EmployeeData unlockEmployee(int id) throws SQLException {
 		String sqlUnlockEmployeeStatement = "update users set locked=false where id=?";
 		EmployeeData unLockedEmployee = null;
@@ -646,7 +680,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		loginAttemptes.resetAttempts(unLockedEmployee.getEmployee().getEmail());
 		return unLockedEmployee;
 	}
-//lock Employee after 3 attempts
+	/**
+	    * @param id 
+	    * @return locked employee 
+	    * @throws SQLException
+	    */
+	//lock Employee after 3 attempts
 	public EmployeeData lockEmployee(int id) throws SQLException {
 		String sqlLockEmployeeStatement = "update users set locked=true where id=?";
 		EmployeeData lockedEmployee = null;
@@ -678,7 +717,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return employeeRoles;
 	}
-
+	/** 
+	    * @return all sites 
+	    * @throws SQLException
+	    */
 // get all sites 
 	public List<WorkSite> findAllSites() throws SQLException {
 		List<WorkSite> sites = new ArrayList<WorkSite>();
@@ -697,7 +739,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return sites;
 	}
-
+	/** 
+	    * @return all roles 
+	    * @throws SQLException
+	    */
 // get all roles
 	public List<Role> findAllRoles() throws SQLException {
 		List<Role> roles = new ArrayList<Role>();
@@ -712,7 +757,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return roles;
 	}
-
+	/** 
+	    * @return all departments 
+	    * @throws SQLException
+	    */
 // get all departments
 	public List<Department> findAllDepartments() throws SQLException {
 		List<Department> departments = new ArrayList<Department>();
@@ -727,7 +775,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return departments;
 	}
-
+	/** 
+	    * @return all managers 
+	    * @throws SQLException
+	    */
 // get all Managers (Name+ID)
 	public List<Employee> findAllManagers() throws SQLException {
 		List<Employee> managers = new ArrayList<Employee>();
@@ -753,8 +804,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return managers;
 	}
 
-//get all countries
-
+	 /** 
+	    * @return all countries 
+	    * @throws SQLException
+	    */
+	//get all countries
 	public List<Country> findAllCountries() throws SQLException {
 		List<Country> countries = new ArrayList<>();
 		String sqlDepartmetsCommand = "select * from country";
@@ -770,6 +824,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 	// ***************************************************************************************************
+	/** 
+	    * @return number of employees 
+	    * @throws SQLException
+	    */
 	// counters for the Home Page
 	public Integer countEmployees() throws SQLException {
 		try (Connection conn = db.getConnection()) {
@@ -780,7 +838,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			}
 		}
 	}
-
+	/** 
+	    * @return number of roles 
+	    * @throws SQLException
+	    */
 	public Integer countRoles() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
@@ -790,7 +851,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			}
 		}
 	}
-
+	/** 
+	    * @return number of departments 
+	    * @throws SQLException
+	    */
 	public Integer countDepartments() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
@@ -800,7 +864,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			}
 		}
 	}
-
+	/** 
+	    * @return number of countries 
+	    * @throws SQLException
+	    */
 	public Integer countWorkSites() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
