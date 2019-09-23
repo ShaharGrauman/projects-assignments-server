@@ -16,12 +16,14 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	
 	public EmployeeData searchEmployeeProfile(int id) throws SQLException;
 	public List<EmployeeData> findAll(int page,int limit) throws SQLException;
-	public List<EmployeeData> filterByNumber(int number) throws SQLException;
+	
     List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException;
-    List<EmployeeData> filterByRole(String roleName,int page,int limit) throws SQLException;
-    List<EmployeeData> filterByDepartment(String departmentName,int page,int limit) throws SQLException ;
-    List<EmployeeData> filterByWorkSite(String siteName,int page,int limit) throws SQLException ;
-    List<EmployeeData> filterByCountry(String countryName,int page,int limit)throws SQLException;
+//	List<EmployeeData> filterByNumber(int number) throws SQLException;
+//    List<EmployeeData> filterByRole(String roleName,int page,int limit) throws SQLException;
+//    List<EmployeeData> filterByDepartment(String departmentName,int page,int limit) throws SQLException ;
+//    List<EmployeeData> filterByWorkSite(String siteName,int page,int limit) throws SQLException ;
+
+    List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,String countryName,int page,int limit)throws SQLException;
 	
 	List<WorkSite> findAllSites() throws SQLException;
 	List<Role> findAllRoles() throws SQLException;
