@@ -27,7 +27,7 @@ public class AssignmentsController {
      */
 
     @PostMapping("")
-    public ResponseEntity<Assignment> addAssignment(@RequestBody Assignment assignment) throws SQLException {
+    public ResponseEntity<Assignment> addAssignment(@RequestBody Assignment assignment) throws Exception {
         return ResponseEntity.ok().body(assignmentsDAO.add(assignment));
     }
 

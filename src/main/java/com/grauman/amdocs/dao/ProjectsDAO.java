@@ -37,9 +37,9 @@ public class ProjectsDAO implements IProjectsDAO {
                     "VALUES (?,?,?,?)";
             try (PreparedStatement fetchInsertQueryProject = connection.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
                 fetchInsertQueryProject.setString(1, newProject.getName());
-                fetchInsertQueryProject.setInt(2, newProject.getManagerID());
+                fetchInsertQueryProject.setNull(2,Types.INTEGER);
                 fetchInsertQueryProject.setString(3, newProject.getDescription());
-                fetchInsertQueryProject.setString(4, String.valueOf(newProject.getStartDate()));
+                fetchInsertQueryProject.setDate(4, newProject.getStartDate());
                 fetchInsertQueryProject.executeUpdate();
                 try (ResultSet generatedID = fetchInsertQueryProject.getGeneratedKeys()) {
                     if (generatedID.next()) {
@@ -82,10 +82,10 @@ public class ProjectsDAO implements IProjectsDAO {
 
                 fetchInsertProjectSkill.executeUpdate();
                 try (ResultSet generatedID = fetchInsertProjectSkill.getGeneratedKeys()) {
-                    if (generatedID.next()) {
+                    if (!generatedID.next()) {
                         String deleteQueryProject = "DELETE FROM project WHERE id = ?";
                         try (PreparedStatement fetchDeleteQueryProject = connection.prepareStatement(deleteQueryProject, Statement.RETURN_GENERATED_KEYS)) {
-                            fetchDeleteQueryProject.setString(1, newProject.getName());
+                            fetchDeleteQueryProject.setInt(1, newProject.getId());
                             fetchDeleteQueryProject.executeUpdate();
                         }
 
