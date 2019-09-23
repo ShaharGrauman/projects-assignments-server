@@ -35,6 +35,11 @@ public class DepartmentDAO implements IDepartmentDAO {
 	}
 
 	// validation done
+	/**
+	    * @param department
+	    * @return new added department
+	    * @throws SQLException
+	    */
 
 	@Override
 	public Department add(Department department) throws Exception {
