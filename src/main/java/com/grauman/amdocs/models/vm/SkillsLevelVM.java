@@ -10,5 +10,5 @@ import lombok.Setter;
 public class SkillsLevelVM {
     private Integer id;
     private String name;
-    private Integer level = 1 ;
+    private Integer level;
 }
