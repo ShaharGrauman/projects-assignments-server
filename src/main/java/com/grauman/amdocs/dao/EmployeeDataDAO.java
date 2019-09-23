@@ -1,5 +1,6 @@
 package com.grauman.amdocs.dao;
 
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -814,38 +815,26 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 	@Override
-	public EmployeeInSession findEmployeeByEmail(String username) throws SQLException {
+	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
+		List<Permission> permissions = new ArrayList<>();
+		String fetchPermissions = "SELECT P.id, P.name FROM employeeroles ER " +
+				"INNER JOIN rolepermissions RP on ER.role_id = RP.role_id " +
+				"INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.employee_id = ?";
 
-		String query = "SELECT * From users WHERE email = ?";
-		String fetchPermissions = "SELECT P.id, P.name FROM employeeRoles ER " +
-				"inner join rolepermissions RP on ER.role_id = RP.role_id " +
-				"inner join permissions P on P.id = RP.permission_id WHERE ER.employee_id = ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(query)) {
-				command.setString(1, username);
-				ResultSet result = command.executeQuery();
-				if(result.next()){
-					List<Role> roles = getEmployeeRoles(result.getInt(1));
-					List<Permission> permissions = new ArrayList<>();
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
+				preparedStatement.setInt(1, id);
 
-					try (ResultSet rs = command.executeQuery(fetchPermissions)){
-						while (rs.next()){
-							permissions.add(new Permission(rs.getInt(1),
-									rs.getString(2)));
-						}
+				try (ResultSet resultSet = preparedStatement.executeQuery()){
+					while (resultSet.next()){
+						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
 					}
-					EmployeeInSession employeeInSession = new EmployeeInSession(
-							result.getInt(1), result.getString(5), roles, permissions
-					);
-
-					return employeeInSession;
 				}
-				result.close();
-
 			}
+
 		}
 
-		return null;
+		return permissions;
 	}
 
 	//done Exceptions
@@ -942,6 +931,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 	private static String generatePassword(int length) {
+
 		Random random = new Random();
 		Random random2 = new Random();
 		String capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

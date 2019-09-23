@@ -3,6 +3,7 @@ package com.grauman.amdocs.controllers;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import com.grauman.amdocs.errors.custom.InvalidCredentials;
+import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.vm.EmployeeInSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,51 +33,53 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 @CrossOrigin
 public class LoginController {
 
-	@Autowired
-	private ILoginDAO loginDAO;
-	@Autowired private IEmployeeDataDAO employeeDataDAO;
+    @Autowired
+    private ILoginDAO loginDAO;
+    @Autowired
+    private IEmployeeDataDAO employeeDataDAO;
 
-	@GetMapping("")
-	public ResponseEntity<String> login(){
-		return ResponseEntity.ok().body("Login...");
-	}
-	
-	@PostMapping("")
-	public ResponseEntity<String> login(@RequestBody Login login, ServletResponse response) throws SQLException {
-		
-		EmployeeData header = loginDAO.validate(login.getUsername(),login.getPassword()); // if login successful return encoded string
+    @GetMapping("")
+    public ResponseEntity<String> login() {
+        return ResponseEntity.ok().body("Login...");
+    }
 
-		String hashedPwd = BCrypt.withDefaults().hashToString(12, login.getPassword().toCharArray());
-		
-		System.out.println(hashedPwd);
-		System.out.println(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd));
+    @PostMapping("")
+    public ResponseEntity<EmployeeInSession> login(@RequestBody Login login, ServletResponse response) throws SQLException {
 
-		if(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd).verified){
+        EmployeeData employeeData = loginDAO.validate(login.getUsername(), login.getPassword());
 
-			EmployeeInSession employeeData = employeeDataDAO.findEmployeeByEmail(login.getUsername());
+      //  String hashedPwd = BCrypt.withDefaults().hashToString(12, login.getPassword().toCharArray());
 
-		if (employeeData != null){
-			String value = Base64.getEncoder().encodeToString((login.getUsername() + ":" + login.getPassword()).getBytes());
-			HttpServletResponse resp = (HttpServletResponse)response;
+       // System.out.println(hashedPwd);
+        //System.out.println(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd));
 
-			StringBuilder values = new StringBuilder();
-			values.append("userID=" + employeeData.getId()
-					+";email="+employeeData.getEmail()
-					+";roles=[");
+        EmployeeInSession employeeInSession = new EmployeeInSession(employeeData.getEmployee().getId(),
+                employeeData.getEmployee().getEmail(), employeeData.getRoles(), null);
 
-			employeeData.getRoles().forEach(role -> values.append("role="+role+","));
+        List<Permission> permissions = employeeDataDAO.getEmployeePermissions(employeeInSession.getId());
+        employeeInSession.setPermissions(permissions);
 
-			values.append("];permessions=[");
-			employeeData.getPermissions().forEach(permission -> values.append("permission="+permission+","));
+        HttpServletResponse resp = (HttpServletResponse) response;
 
-			values.append("];");
-			resp.addCookie(new Cookie("auth", values.toString()));
 
-			return ResponseEntity.ok().header("auth", value).body("Login...");
-		}else
-			throw new InvalidCredentials("email does not exist");
-		}
-		throw new InvalidCredentials("wrong information entered");
-	}
-	
+        StringBuilder values = new StringBuilder();
+        values.append( employeeInSession.getId()
+                + ";" + employeeInSession.getEmail()
+                + ";[");
+
+        employeeInSession.getRoles().forEach(role -> values.append(role + ","));
+        values.append("];[");
+
+        employeeInSession.getPermissions().forEach(permission -> values.append(permission + ","));
+        values.append("];");
+
+        String value = Base64.getEncoder().encodeToString((values.toString()).getBytes());
+
+        resp.addCookie(new Cookie("auth", value));
+
+        return ResponseEntity.ok().header("auth", value).body(employeeInSession);
+
+
+    }
+
 }

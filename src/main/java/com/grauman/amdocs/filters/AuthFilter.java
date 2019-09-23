@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
+import com.grauman.amdocs.models.EmployeeData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,12 @@ public class AuthFilter implements Filter {
 
 		if (!req.getRequestURI().contains("api/login")) {
 
+			/*String authHeader = req.getHeader("auth");
+
+			if (authHeader == null) {
+				throw new RuntimeException("Not Authorized");
+			}*/
+
 			//Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 			HttpServletResponse resp = (HttpServletResponse)response;
 			
@@ -43,31 +50,18 @@ public class AuthFilter implements Filter {
 										.orElseThrow(() -> new RuntimeException("Not Authorized"));
 
 			String details = new String(Base64.getDecoder().decode(authCookie.getValue()));
-			
-			
-			
-//			String authHeader = req.getHeader("auth");
-//
-//			if (authHeader == null) {
-//				throw new RuntimeException("Not Authorized");
-//			}
-//			
-//			String details = new String(Base64.getDecoder().decode(authHeader.getBytes()));
-//			
-//			System.out.println("auth header: " + details);
-//			String[] credentials = details.split(":");
-//
-//			// catch SQLException and rethrow as a runtime exception
-//			// since the method does not allow to add the throws SQLException deceleration to it
-//			try {
-//
-////				String auth = dao.validate(credentials[0],credentials[1]);
-//				Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-//				HttpServletResponse resp = (HttpServletResponse)response;
-//				resp.addCookie(new Cookie("auth",auth));
-//			}catch (SQLException e){
-//				throw new RuntimeException(e);
-//			}
+			String[] credentials = details.split(";");
+
+			// catch SQLException and rethrow as a runtime exception
+			// since the method does not allow to add the throws SQLException deceleration to it
+			try {
+
+				EmployeeData auth = dao.validate(credentials[0],credentials[1]);
+				String value = Base64.getEncoder().encodeToString((credentials[0] + ";" + credentials[1]).getBytes());
+				resp.addCookie(new Cookie("auth",value));
+			}catch (SQLException e){
+				throw new RuntimeException(e);
+			}
 		}
 //
 		chain.doFilter(request, response);

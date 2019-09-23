@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import com.grauman.amdocs.errors.custom.InvalidCredentials;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
@@ -221,7 +222,9 @@ public class LoginDAO implements ILoginDAO {
                     		login=firstAttempte(username);
                     	}
                     	employeeData=getEmployeeData(username);
-                    		if (!password.equals(set.getString("password"))){
+
+						if (!BCrypt.verifyer().verify(password.toCharArray(), set.getString("password")).verified){
+                    		//if (!password.equals(set.getString("password"))){
                     			//not equals because this time was the last attempt
                     			if(failedAttemptsCounter(username)<MAX_ATTEMPTS) {
                     				//checks when did the user attempted to login,how many times he failed
