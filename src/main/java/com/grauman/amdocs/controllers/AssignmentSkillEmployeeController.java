@@ -1,7 +1,7 @@
 package com.grauman.amdocs.controllers;
 
 
-import com.grauman.amdocs.dao.AssignmentSkillEmployeeDAO;
+import com.grauman.amdocs.dao.interfaces.IAssignmentSkillEmployeeDAO;
 import com.grauman.amdocs.models.vm.AssignmentSkillEmployeeVM;
 import com.grauman.amdocs.models.vm.SkillsLevelVM;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.List;
 @CrossOrigin
 public class AssignmentSkillEmployeeController {
     @Autowired
-    private AssignmentSkillEmployeeDAO employeeDAO;
+    private IAssignmentSkillEmployeeDAO employeeDAO;
 
     /**
      *

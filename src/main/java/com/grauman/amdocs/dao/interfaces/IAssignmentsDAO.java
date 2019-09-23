@@ -2,7 +2,7 @@ package com.grauman.amdocs.dao.interfaces;
 
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.vm.AssignmentRequestVM;
+import com.grauman.amdocs.models.vm.AssignmentVM;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -17,7 +17,7 @@ public interface IAssignmentsDAO extends IDAO<Assignment> {
      * @throws SQLException
      * @throws ResultsNotFoundException
      */
-    List<AssignmentRequestVM> getAssignmentsByUserID(int id, int currentPage, int limit) throws SQLException, ResultsNotFoundException;
+    List<AssignmentVM> getAssignmentsByUserID(int id, int currentPage, int limit) throws SQLException, ResultsNotFoundException;
     /**
      * @param  managerID
      * * @param  currentPage
@@ -26,7 +26,7 @@ public interface IAssignmentsDAO extends IDAO<Assignment> {
      * @throws SQLException
      * @throws ResultsNotFoundException
      */
-    List<AssignmentRequestVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException;
+    List<AssignmentVM> getAssignmentsRequestByManagerID(int managerID, int currentPage, int limit) throws SQLException, ResultsNotFoundException;
     /**
      * @param  managerID
      * * @param requestedDate
@@ -36,7 +36,7 @@ public interface IAssignmentsDAO extends IDAO<Assignment> {
      * @throws SQLException
      * @throws ResultsNotFoundException
      */
-    List<AssignmentRequestVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException;
+    List<AssignmentVM> getDoneAssignments(Integer managerID, Date requestedDate, Integer currentPage, Integer limit) throws SQLException;
     /**
      * @param  assignmentID
      * * @param response
