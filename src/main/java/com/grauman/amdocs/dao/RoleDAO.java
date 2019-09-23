@@ -40,7 +40,7 @@ public class RoleDAO implements IRoleDAO {
 		ResultSet result2 = null;
 		ResultSet result = null;
 		
-		String sqlFindRoles = "select id,name from roles";
+		String sqlFindRoles = "select * from roles";
 		String findRolePermissions = "select P.id,P.name"
 				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_id"
 				+ " where RP.permission_id=P.id AND RP.role_id=?";
@@ -59,7 +59,7 @@ public class RoleDAO implements IRoleDAO {
 				} while (catchTimeOut);
 
 				while (result.next()) {
-					roles.add(new Role(result.getInt("id"), result.getString("name")));
+					roles.add(new Role(result.getInt("id"), result.getString("name"),result.getString(3)));
 				}
 			}
 
@@ -84,7 +84,7 @@ public class RoleDAO implements IRoleDAO {
 						rolePermissions.add(new Permission(result2.getInt(1), result2.getString(2)));
 					}
 					rolesWithPermissions
-							.add(new RolePermissions(new Role(role.getId(), role.getName()), rolePermissions));
+							.add(new RolePermissions(new Role(role.getId(), role.getName(),role.getDescription()), rolePermissions));
 				}
 			}
 		}
