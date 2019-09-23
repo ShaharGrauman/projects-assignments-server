@@ -817,9 +817,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		boolean catchTimeOut = false;
 		int retries = 0;
 		String findEmployeeByEmail = "SELECT * from users where email=? AND employee_number=?";
+		String updatePasswordInDataBase = "update users set password=? where id=?";
 		String newPassword;
 		EmployeeData employee = null;
 		ResultSet result = null;
+		int result2 =0;
 
 		if (!isValid(toEmail))
 			throw new EmployeeException("email not valid");
@@ -850,7 +852,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				 * @return A string.
 				 */
 				newPassword = generatePassword(6);
-
+				
 				/*
 				 * before sending the email, new password must be updated and saved in the
 				 * database.
@@ -863,10 +865,25 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
 						System.out.println("found employee...");
-						employee.getEmployee().setPassword(PasswordUtils.generateSecurePassword(newPassword));
-						// till here
-//						update(employee); // update the new password of this employee in the database.
-//						System.out.println("updated...");
+						employee.getEmployee().setPassword(newPassword);
+
+						retries=0;
+						try(PreparedStatement statement2= conn.prepareStatement(updatePasswordInDataBase)){
+							statement2.setString(1, newPassword);
+							statement2.setInt(2, employee.getEmployee().getId());
+							do {
+								try {
+									result2 = statement2.executeUpdate();
+									catchTimeOut = false;
+								} catch (SQLTimeoutException e) {
+									catchTimeOut = true;
+									if (retries++ > 3)
+										throw e;
+								}
+							} while (catchTimeOut);
+						
+						}
+						
 					} catch (SQLException e) {
 						e.printStackTrace();
 						System.out.println("can't continue from here.......");
