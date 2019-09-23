@@ -58,7 +58,7 @@ public class LoginDAO implements ILoginDAO {
 //get the user details + roles
     public EmployeeData getEmployeeData(String username) throws SQLException{
     	int employeeId;
-    	String employeeData="select id,employee_number,first_name,last_name from users where email=?";
+    	String employeeData="select id,employee_number,first_name,last_name, email from users where email=?";
     	EmployeeData employeeDetails=null;
     	List<Role> roles=new ArrayList<>();
     	String employeeRoles="select R.name "
@@ -82,7 +82,8 @@ public class LoginDAO implements ILoginDAO {
 																		  result.getInt("id"),
 																		  result.getInt("employee_number"),
 																		  result.getString("first_name"),
-																		  result.getString("last_name")),roles);
+																		  result.getString("last_name"),
+									result.getString("email")),roles);
 						}
 					}
 			}
@@ -223,8 +224,8 @@ public class LoginDAO implements ILoginDAO {
                     	}
                     	employeeData=getEmployeeData(username);
 
-						if (!BCrypt.verifyer().verify(password.toCharArray(), set.getString("password")).verified){
-                    		//if (!password.equals(set.getString("password"))){
+						//if (!BCrypt.verifyer().verify(password.toCharArray(), set.getString("password")).verified){
+                    		if (!password.equals(set.getString("password"))){
                     			//not equals because this time was the last attempt
                     			if(failedAttemptsCounter(username)<MAX_ATTEMPTS) {
                     				//checks when did the user attempted to login,how many times he failed

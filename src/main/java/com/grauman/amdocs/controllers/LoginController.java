@@ -61,11 +61,11 @@ public class LoginController {
 
         HttpServletResponse resp = (HttpServletResponse) response;
 
-
         StringBuilder values = new StringBuilder();
         values.append( employeeInSession.getId()
                 + ";" + employeeInSession.getEmail()
                 + ";[");
+
 
         employeeInSession.getRoles().forEach(role -> values.append(role + ","));
         values.append("];[");
@@ -77,7 +77,7 @@ public class LoginController {
 
         resp.addCookie(new Cookie("auth", value));
 
-        return ResponseEntity.ok().header("auth", value).body(employeeInSession);
+        return ResponseEntity.ok().body(employeeInSession);
 
 
     }
