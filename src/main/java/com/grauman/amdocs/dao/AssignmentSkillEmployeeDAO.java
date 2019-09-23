@@ -379,7 +379,6 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                 skillsLevelVM.setLevel(1);
 
             }
-            System.out.println(skillsLevelVM.getLevel());
         }
 
         if (currentPage < 1) {
