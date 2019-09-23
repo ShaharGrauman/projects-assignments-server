@@ -27,7 +27,11 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
-    // add a new project
+    /**
+     * @param  newProject
+     * @return new added assignment
+     * @throws SQLException
+     */
     @Override
     public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
         int projectID;
@@ -111,7 +115,12 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
-    // get all the projects that a manager employees is working on
+    /**
+     *
+     * @param managerID
+     * @return list of projects that a manager employees are working on
+     * @throws SQLException
+     */
     @Override
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
 
@@ -179,7 +188,12 @@ public class ProjectsDAO implements IProjectsDAO {
 
         return projectList;
     }
-    // get all the projects that an employee is working on by his/her ID
+    /**
+     *
+     * @param userID
+     * @return list of projects that an employee are working on by his/her ID
+     * @throws SQLException
+     */
     @Override
     public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -245,7 +259,12 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
-    // get all the projects that an employee is working on by his/her name
+    /**
+     *
+     * @param userName
+     * @return list of projects that an employee are working on by his/her name
+     * @throws SQLException
+     */
     @Override
     public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -311,8 +330,12 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
-    // search projects by name
-    @Override
+    /**
+     *
+     * @param projectName
+     * @return search projects by name
+     * @throws SQLException
+     */    @Override
     public List<ProjectVM> searchProjectByProjectName(String projectName, Integer currentPage, Integer limit) throws SQLException {
 
         List<ProjectVM> projectList = new ArrayList<>();

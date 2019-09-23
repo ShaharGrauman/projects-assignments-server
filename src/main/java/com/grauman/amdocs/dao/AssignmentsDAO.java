@@ -26,9 +26,13 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         return null;
     }
 
-    //add assignment for employee
+    /**
+     * @param  newAssignment
+     * @return new added assignment
+     * @throws SQLException
+     */
     @Override
-    public Assignment add(Assignment item) throws SQLException {
+    public Assignment add(Assignment newAssignment) throws SQLException {
         try (Connection connection = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
@@ -37,25 +41,25 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
             // preparing a statement that guarantees returning the auto generated id
             try (PreparedStatement command = connection.prepareStatement(insertAssignmentQuery, Statement.RETURN_GENERATED_KEYS)) {
-                command.setInt(1, item.getProjectID());
-                command.setInt(2, item.getEmployeeID());
+                command.setInt(1, newAssignment.getProjectID());
+                command.setInt(2, newAssignment.getEmployeeID());
                 command.setDate(3, new java.sql.Date(new java.util.Date().getTime()));
-                item.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
-                command.setInt(4, item.getRequestFromManagerID());
+                newAssignment.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
+                command.setInt(4, newAssignment.getRequestFromManagerID());
 
-                if (item.getRequestFromManagerID() != (item.getRequestToManagerID())) {
-                    command.setInt(5, item.getRequestToManagerID());
+                if (newAssignment.getRequestFromManagerID() != (newAssignment.getRequestToManagerID())) {
+                    command.setInt(5, newAssignment.getRequestToManagerID());
                     command.setString(6, "Pending approval");
-                    item.setStatus("Pending approval");
+                    newAssignment.setStatus("Pending approval");
                 } else {
                     command.setNull(5, Types.INTEGER);
                     command.setString(6, "In progress");
-                    item.setStatus("In progress");
+                    newAssignment.setStatus("In progress");
                 }
                 command.executeUpdate();
                 try (ResultSet generatedID = command.getGeneratedKeys()) {
                     if (generatedID.next())
-                        item.setId(generatedID.getInt(1));
+                        newAssignment.setId(generatedID.getInt(1));
                     else
                         throw new SQLException("Assignment insertion failed.");
                 }
@@ -63,7 +67,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
 
         }
-        return item;
+        return newAssignment;
     }
 
     @Override
