@@ -41,5 +41,11 @@ public class AuditController {
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
+
+ @GetMapping("/count")
+ public Integer numberOfRoles() throws SQLException {
+ 	Integer Counter= auditDAO.countAudit();
+ 	return Counter;
+ }
  
 }

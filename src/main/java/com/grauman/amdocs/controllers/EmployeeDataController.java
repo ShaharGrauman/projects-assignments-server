@@ -67,12 +67,7 @@ public class EmployeeDataController {
 		EmployeeData employee=employeeDataDAO.searchEmployeeProfile(id);
 		return ResponseEntity.ok().body(employee);
 	}
-//Employee by employee id
-//	@GetMapping("/id")
-//	public ResponseEntity<EmployeeData> find(@RequestParam int id) throws SQLException {
-//		EmployeeData employee=employeeDataDAO.find(id);
-//		return ResponseEntity.ok().body(employee);
-//	}
+
 	/**
 	    * @param employee 
 	    * @return new added employee
@@ -108,8 +103,6 @@ public class EmployeeDataController {
 		return ResponseEntity.ok().body(deletedEmployee);   
 	}
 	
-   // List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,String countryName,int page,int limit)throws SQLException;
-
 	@GetMapping("/filter")
 	public ResponseEntity<List<EmployeeData>> findFilteredEmployees(
 			@RequestParam(value="num",defaultValue="0") int number,
@@ -119,8 +112,7 @@ public class EmployeeDataController {
 			@RequestParam("country") String countryName,
 			@RequestParam int page,
 			@RequestParam int limit) throws SQLException {
-//		int number = 0;
-//		String roleName = "", siteName = "", departmentName = "", countryName = "";
+
 		List<EmployeeData> employeeByName=employeeDataDAO.filter(number,roleName,siteName,departmentName,countryName,page,limit);
 		return ResponseEntity.ok().body(employeeByName);
 		}
@@ -153,7 +145,6 @@ public class EmployeeDataController {
 		EmployeeData lockedEmployee = employeeDataDAO.lockEmployee(id);
 		return ResponseEntity.ok().body(lockedEmployee);    
 	}
-//################################################################################
 	/** 
 	    * @return all sites 
 	    * @throws SQLException

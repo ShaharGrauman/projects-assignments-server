@@ -115,6 +115,15 @@ public class AuditDAO implements IAuditDAO{
          }
          return audit;
    }
+   public Integer countAudit() throws SQLException {
+		try (Connection conn = db.getConnection()) {
+			try (Statement command = conn.createStatement()) {
+				ResultSet result = command.executeQuery("select count(*) from audit");
+				result.next();
+				return result.getInt("count(*)");
+			}
+		}
+	}
 @Override
 public AuditEmployee find(int id) throws SQLException {
 	// TODO Auto-generated method stub
