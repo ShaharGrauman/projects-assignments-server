@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IRoleDAO;
+import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.models.EmployeeException;
 import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
@@ -34,6 +35,7 @@ public class RoleDAO implements IRoleDAO {
 		int tries = 0;
 		ResultSet result2 = null;
 		ResultSet result = null;
+		
 		String sqlFindRoles = "select id,name from roles";
 		String findRolePermissions = "select P.id,P.name"
 				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_id"
@@ -51,9 +53,6 @@ public class RoleDAO implements IRoleDAO {
 							throw e;
 					}
 				} while (catchTimeOut);
-
-				if (!result.next())
-					throw new Exception("no roles found");
 
 				while (result.next()) {
 					roles.add(new Role(result.getInt("id"), result.getString("name")));
@@ -77,9 +76,6 @@ public class RoleDAO implements IRoleDAO {
 
 					List<Permission> rolePermissions = new ArrayList<>();
 
-					if (!result2.next())
-						throw new Exception("no role permission found");
-
 					while (result2.next()) {
 						rolePermissions.add(new Permission(result2.getInt(1), result2.getString(2)));
 					}
@@ -87,8 +83,6 @@ public class RoleDAO implements IRoleDAO {
 							.add(new RolePermissions(new Role(role.getId(), role.getName()), rolePermissions));
 				}
 			}
-		} catch (Exception e) {
-			throw e;
 		}
 		return rolesWithPermissions;
 	}
@@ -101,10 +95,12 @@ public class RoleDAO implements IRoleDAO {
 		boolean catchTimeOut = false;
 		int tries = 0;
 		ResultSet result = null, result1 = null;
-		String sqlRole = "Select * From roles where id=?";
 		List<Permission> rolePermissionsList = new ArrayList<>();
+		
+		String sqlRole = "Select * From roles where id=?";
 		String sqlRolePermissions = "select P.* "
 				+ "from permissions P JOIN rolepermissions RP ON P.id=RP.permission_id " + "where RP.role_id=?";
+		
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement statement = conn.prepareStatement(sqlRole)) {
 				statement.setInt(1, id);
@@ -122,8 +118,6 @@ public class RoleDAO implements IRoleDAO {
 
 				if (result.next()) {
 					role = new Role(result.getInt(1), result.getString(2), result.getString(3));
-				} else {
-					throw new Exception("ID not found");
 				}
 			}
 
@@ -142,16 +136,12 @@ public class RoleDAO implements IRoleDAO {
 					}
 				} while (catchTimeOut);
 
-				if (!result1.next())
-					throw new EmployeeException("no role permission found");
-
 				while (result1.next()) {
 					rolePermissionsList.add(new Permission(result1.getInt(1), result1.getString(2)));
 				}
 			}
-		} catch(Exception e) {
-			throw e;
-		}
+		} 
+
 		roleWithPermissions = new RolePermissions(role, rolePermissionsList);
 		return roleWithPermissions;
 	}
@@ -165,6 +155,7 @@ public class RoleDAO implements IRoleDAO {
 		boolean catchTimeOut = false;
 		int tries = 0;
 		ResultSet exists = null;
+		
 		List<Permission> rolePermissions = roleWithPermissions.getPermissions();
 		String checkIfRoleExists = "select * from roles where name=?";
 		String sqlAddRole = "Insert INTO roles (name,description) values(?,?)";
@@ -189,15 +180,47 @@ public class RoleDAO implements IRoleDAO {
 				tries = 0;
 
 				// if the result set is false..there is no such role in the database
-				if (!exists.next()) {
-					try (PreparedStatement statement = conn.prepareStatement(sqlAddRole,
-							Statement.RETURN_GENERATED_KEYS)) {
-						statement.setString(1, roleWithPermissions.getRole().getName());
-						statement.setString(2, roleWithPermissions.getRole().getDescription());
+				if (exists.next()) {
+					throw new AlreadyExistsException("Role already exists");
+				}
+				
+				try (PreparedStatement statement = conn.prepareStatement(sqlAddRole,
+						Statement.RETURN_GENERATED_KEYS)) {
+					statement.setString(1, roleWithPermissions.getRole().getName());
+					statement.setString(2, roleWithPermissions.getRole().getDescription());
 
+					do {
+						try {
+							statement.executeUpdate();
+							catchTimeOut = false;
+						} catch (SQLTimeoutException e) {
+							catchTimeOut = true;
+							if (tries++ > 3)
+								throw e;
+						}
+					} while (catchTimeOut);
+
+					ResultSet ids = null;
+					
+					ids = statement.getGeneratedKeys();
+					
+					while (ids.next()) {
+						roleId = ids.getInt(1);
+						newRole = find(roleId);
+					}
+				}
+
+				tries = 0;
+
+				try (PreparedStatement statement2 = conn.prepareStatement(sqlLinkRoleWithpermission)) {
+					for (int i = 0; i < rolePermissions.size(); i++) {
+						statement2.setInt(1, newRole.getRole().getId());
+						statement2.setInt(2, rolePermissions.get(i).getId());
 						do {
 							try {
-								statement.executeUpdate();
+								int num = statement2.executeUpdate();
+								if(num == 0)
+									throw new Exception("update failed");
 								catchTimeOut = false;
 							} catch (SQLTimeoutException e) {
 								catchTimeOut = true;
@@ -205,54 +228,13 @@ public class RoleDAO implements IRoleDAO {
 									throw e;
 							}
 						} while (catchTimeOut);
-
-						ResultSet ids = null;
-						try {
-							ids = statement.getGeneratedKeys();
-						} catch(SQLFeatureNotSupportedException e) {
-							throw e;
-						}
-						if (!ids.next())
-							throw new EmployeeException("no IDs found");
-
-						while (ids.next()) {
-							roleId = ids.getInt(1);
-							newRole = find(roleId);
-						}
 					}
-
-					tries = 0;
-
-					try (PreparedStatement statement2 = conn.prepareStatement(sqlLinkRoleWithpermission)) {
-						for (int i = 0; i < rolePermissions.size(); i++) {
-							statement2.setInt(1, newRole.getRole().getId());
-							statement2.setInt(2, rolePermissions.get(i).getId());
-							do {
-								try {
-									int num = statement2.executeUpdate();
-									if(num == 0)
-										throw new Exception("update failed");
-									catchTimeOut = false;
-								} catch (SQLTimeoutException e) {
-									catchTimeOut = true;
-									if (tries++ > 3)
-										throw e;
-								}
-							} while (catchTimeOut);
-						}
-					}
-					try {
-						newRole = find(newRole.getRole().getId());
-					} catch(Exception e) {
-						throw e;
-					}
-				} else {
-					throw new EmployeeException("role already exists");
 				}
+				
+				newRole = find(newRole.getRole().getId());
 			}
-		} catch (Exception e) {
-			throw e;
-		}
+		} 
+
 		return newRole;
 	}
 
