@@ -856,15 +856,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				/*
 				 * before sending the email, new password must be updated and saved in the
 				 * database.
-				 */
-				System.out.println("here...");
-				
+				 */				
 					// employee = findEmployeeById(result.getInt(1)); // find gets the id of
 					// employee and returns the employee
 
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
-						System.out.println("found employee...");
 						employee.getEmployee().setPassword(newPassword);
 
 						retries=0;
