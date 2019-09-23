@@ -3,6 +3,7 @@ package com.grauman.amdocs.controllers;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,9 +35,9 @@ public class AuditController {
     @GetMapping("/date")
     public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(
     	@RequestParam(defaultValue = "0") Integer number,
-    	@RequestParam String datefrom,
-     	@RequestParam String dateto)throws SQLException{ 
-         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number,Date.valueOf(datefrom),Date.valueOf(dateto));
+    	@RequestParam Date datefrom,
+     	@RequestParam Date dateto)throws SQLException{ 
+         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number, Optional.of(datefrom), Optional.of(dateto));
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }

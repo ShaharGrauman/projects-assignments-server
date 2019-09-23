@@ -84,10 +84,10 @@ public class EmployeeDataController {
 	@GetMapping("/filter")
 	public ResponseEntity<List<EmployeeData>> findFilteredEmployees(
 			@RequestParam(value="num",defaultValue="0") int number,
-			@RequestParam("role") String roleName,
-			@RequestParam("site") String siteName,
-			@RequestParam("dept") String departmentName,
-			@RequestParam("country") String countryName,
+			@RequestParam(value="role") String roleName,
+			@RequestParam(value="site") String siteName,
+			@RequestParam(value="dept") String departmentName,
+			@RequestParam(value="country") String countryName,
 			@RequestParam int page,
 			@RequestParam int limit) throws SQLException {
 //		int number = 0;
