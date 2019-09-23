@@ -31,7 +31,7 @@ public class AuditDAO implements IAuditDAO{
 	        int offset=(page-1)*limit;
 	        String sqlAllUserscommand="select A.id,A.employee_number, A.date_time,U.first_name,U.last_name,U.id as Employeeid,A.activity "+
 	                                    "from users U JOIN audit A ON U.id=A.user_id"
-	        		+" limit ? offset ?";
+	                                    +" limit ? offset ?";
 	        
 	        try(Connection conn = db.getConnection()) {
 	        	try (PreparedStatement command = conn.prepareStatement(sqlAllUserscommand)) {
@@ -79,17 +79,15 @@ public class AuditDAO implements IAuditDAO{
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where U.employee_number=? and date(A.date_time)>? and date(A.date_time)<?";
-         //String sql = "{call audit_search(?,?,?)}";
+        		 					+ " where " + (number != 0 ? "U.employee_number=? and " : "")  + " date(A.date_time)>? and date(A.date_time)<?";
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
             	int counter=1;
-//***********************************************************
             	if(number!=0) {
             		command.setInt(counter++,number);
-            	}
-            		command.setDate(counter++,datefrom);
-            		command.setDate(counter++, dateto);
+            	}            	
+        		command.setDate(counter++,datefrom);
+        		command.setDate(counter++, dateto);
             	
             	
                 ResultSet result = command.executeQuery();
