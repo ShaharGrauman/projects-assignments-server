@@ -286,7 +286,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
+            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,a.requested_from_manager_id from assignment a join project p" +
                                   " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -331,7 +331,7 @@ public class ProjectsDAO implements IProjectsDAO {
                         }
                         ProjectVM project = new ProjectVM(result.getInt(1), result.getString(2),
                                 result.getString(4), result.getDate(3),
-                                technicalSkillList, productSkillList, result.getInt(6));
+                                technicalSkillList, productSkillList, result.getInt(5));
                         projectList.add(project);
                         technicalSkillList = new ArrayList<>();
                         productSkillList = new ArrayList<>();

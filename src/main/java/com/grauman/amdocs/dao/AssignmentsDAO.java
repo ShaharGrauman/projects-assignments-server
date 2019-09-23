@@ -34,11 +34,14 @@ public class AssignmentsDAO implements IAssignmentsDAO {
      */
     @Override
     public Assignment add(Assignment newAssignment) throws SQLException {
+        if (CheckIfAssignment(newAssignment)) {
+            throw new InvalidDataException("Employee already assigned to this project");
+        }
         try (Connection connection = db.getConnection()) {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
             String insertAssignmentQuery = "INSERT INTO assignment (project_id, employee_id, start_date, requested_from_manager_id," +
-                                           " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?) ";
+                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?) ";
 
             // preparing a statement that guarantees returning the auto generated id
             try (PreparedStatement command = connection.prepareStatement(insertAssignmentQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -102,7 +105,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         try (Connection connection = db.getConnection()) {
 
             String sqlCommand = "Select a.id, a.project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id " +
-                                "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
+                    "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
 
             try (PreparedStatement command = connection.prepareStatement(sqlCommand)) {
                 command.setInt(1, employeeID);

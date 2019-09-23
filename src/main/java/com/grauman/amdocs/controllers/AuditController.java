@@ -30,17 +30,13 @@ public class AuditController {
 		List<AuditEmployee> audit=auditDAO.findAll(page,limit);
  		return ResponseEntity.ok().body(audit);  
 	}
-	@GetMapping("/number")
-    public ResponseEntity<List<AuditEmployee>> findBynumber(@RequestParam int number) throws SQLException{
-        List<AuditEmployee>employeeAudit=auditDAO.searchAuditByEmployeeNumber(number);
- 		return ResponseEntity.ok().body(employeeAudit);  
-
-    }
-	//***************************************
+	
     @GetMapping("/date")
-    public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(@RequestParam String datefrom,
+    public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(
+    	@RequestParam(defaultValue = "0") Integer number,
+    	@RequestParam String datefrom,
      	@RequestParam String dateto)throws SQLException{ 
-         List<AuditEmployee> auditByDateFrom=auditDAO.searchAuditByDateBetween(Date.valueOf(datefrom),Date.valueOf(dateto));
+         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number,Date.valueOf(datefrom),Date.valueOf(dateto));
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
