@@ -69,36 +69,9 @@ public class AuditDAO implements IAuditDAO{
 	  		}
 	  		return employeeRoles;
 	  	}
-//search all Employee's Audit by his Employee Number
-	public List<AuditEmployee> searchAuditByEmployeeNumber(int number) throws SQLException {
-        List<AuditEmployee> audit = new ArrayList<>();
-        List<Role> roles=new ArrayList<>();
-        
-        String sqlUsercommand="select A.id,A.employee_number, A.date_time,U.first_name,U.last_name,U.id as Employeeid,A.activity "+
-                                    "from users U JOIN audit A ON U.id=A.user_id where U.employee_number=?";
-        try(Connection conn = db.getConnection()) {
-        	try(PreparedStatement statement=conn.prepareStatement(sqlUsercommand)){
-        		statement.setInt(1, number);
-        		ResultSet result = statement.executeQuery();
-        		while(result.next()) {
-        			roles=getEmployeeRoles(result.getInt(6));
-                    audit.add(
-                            new AuditEmployee(new Audit(result.getInt(1),
-                            						   result.getInt(2),
-                            						   result.getDate(3),
-                            						   result.getInt(6),
-                            						   result.getString(7)),
-                            						   result.getString(4),
-                            						   result.getString(5),roles));
-        		}
-        	}
-        }
 
-        return audit;
-    
-    }
 // search by date from to
-   public List<AuditEmployee> searchAuditByDateBetween(Date datefrom,Date dateto) throws SQLException{
+   public List<AuditEmployee> searchAudit(int number,Date datefrom,Date dateto) throws SQLException{
       
 	   List<AuditEmployee> audit = new ArrayList<>();
        List<Role> roles=new ArrayList<>();
@@ -106,11 +79,19 @@ public class AuditDAO implements IAuditDAO{
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where date(A.date_time)>? and date(A.date_time)<?";
+        		 					+ " where U.employee_number=? and date(A.date_time)>? and date(A.date_time)<?";
+         //String sql = "{call audit_search(?,?,?)}";
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
-                command.setDate(1,datefrom);
-                command.setDate(2, dateto);
+            	int counter=1;
+//***********************************************************
+            	if(number!=0) {
+            		command.setInt(counter++,number);
+            	}
+            		command.setDate(counter++,datefrom);
+            		command.setDate(counter++, dateto);
+            	
+            	
                 ResultSet result = command.executeQuery();
                 while (result.next()) {
                 	while(result.next()) {
