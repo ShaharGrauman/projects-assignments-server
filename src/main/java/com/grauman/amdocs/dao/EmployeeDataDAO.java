@@ -25,7 +25,9 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.grauman.amdocs.models.*;
+import com.grauman.amdocs.models.vm.EmployeeInSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -811,7 +813,42 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 	}
 
-//done Exceptions
+	@Override
+	public EmployeeInSession findEmployeeByEmail(String username) throws SQLException {
+
+		String query = "SELECT * From users WHERE email = ?";
+		String fetchPermissions = "SELECT P.id, P.name FROM employeeRoles ER " +
+				"inner join rolepermissions RP on ER.role_id = RP.role_id " +
+				"inner join permissions P on P.id = RP.permission_id WHERE ER.employee_id = ?";
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement command = conn.prepareStatement(query)) {
+				command.setString(1, username);
+				ResultSet result = command.executeQuery();
+				if(result.next()){
+					List<Role> roles = getEmployeeRoles(result.getInt(1));
+					List<Permission> permissions = new ArrayList<>();
+
+					try (ResultSet rs = command.executeQuery(fetchPermissions)){
+						while (rs.next()){
+							permissions.add(new Permission(rs.getInt(1),
+									rs.getString(2)));
+						}
+					}
+					EmployeeInSession employeeInSession = new EmployeeInSession(
+							result.getInt(1), result.getString(5), roles, permissions
+					);
+
+					return employeeInSession;
+				}
+				result.close();
+
+			}
+		}
+
+		return null;
+	}
+
+	//done Exceptions
 	@SuppressWarnings("null")
 	public void resetPassword(String toEmail, int number) throws SQLException, EmployeeException {
 		boolean catchTimeOut = false;
@@ -863,7 +900,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
 						System.out.println("found employee...");
-						employee.getEmployee().setPassword(PasswordUtils.generateSecurePassword(newPassword));
+						employee.getEmployee().setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
 						// till here
 //						update(employee); // update the new password of this employee in the database.
 //						System.out.println("updated...");

@@ -10,6 +10,7 @@ import com.grauman.amdocs.models.Employee;
 import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.WorkSite;
+import com.grauman.amdocs.models.vm.EmployeeInSession;
 
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	public List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException;
@@ -49,4 +50,5 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	 Integer countDepartments() throws SQLException;
 	 Integer countWorkSites() throws SQLException;
 
+	EmployeeInSession findEmployeeByEmail(String username) throws SQLException;
 }

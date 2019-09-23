@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -36,8 +37,7 @@ public class AuthFilter implements Filter {
 			//Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 			HttpServletResponse resp = (HttpServletResponse)response;
 			
-			Cookie authCookie = Arrays.asList(req.getCookies())
-										.stream()
+			Cookie authCookie = Stream.of(req.getCookies())
 										.filter(c -> c.getName().equals("auth"))
 										.findFirst()
 										.orElseThrow(() -> new RuntimeException("Not Authorized"));

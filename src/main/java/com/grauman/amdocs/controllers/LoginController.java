@@ -8,7 +8,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
+import com.grauman.amdocs.errors.custom.InvalidCredentials;
+import com.grauman.amdocs.models.vm.EmployeeInSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -30,6 +33,7 @@ public class LoginController {
 
 	@Autowired
 	private ILoginDAO loginDAO;
+	@Autowired private IEmployeeDataDAO employeeDataDAO;
 
 	@GetMapping("")
 	public ResponseEntity<String> login(){
@@ -45,14 +49,33 @@ public class LoginController {
 		
 		System.out.println(hashedPwd);
 		System.out.println(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd));
-		
-		String value = Base64.getEncoder().encodeToString((login.getUsername() + ":" + login.getPassword()).getBytes());
-		
-		HttpServletResponse resp = (HttpServletResponse)response;
-		
-		resp.addCookie(new Cookie("auth", value));
-		
-		return ResponseEntity.ok().header("auth", value).body("Login...");
+
+		if(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd).verified){
+
+			EmployeeInSession employeeData = employeeDataDAO.findEmployeeByEmail(login.getUsername());
+
+		if (employeeData != null){
+			String value = Base64.getEncoder().encodeToString((login.getUsername() + ":" + login.getPassword()).getBytes());
+			HttpServletResponse resp = (HttpServletResponse)response;
+
+			StringBuilder values = new StringBuilder();
+			values.append("userID=" + employeeData.getId()
+					+";email="+employeeData.getEmail()
+					+";roles=[");
+
+			employeeData.getRoles().forEach(role -> values.append("role="+role+","));
+
+			values.append("];permessions=[");
+			employeeData.getPermissions().forEach(permission -> values.append("permission="+permission+","));
+
+			values.append("];");
+			resp.addCookie(new Cookie("auth", values.toString()));
+
+			return ResponseEntity.ok().header("auth", value).body("Login...");
+		}else
+			throw new InvalidCredentials("email does not exist");
+		}
+		throw new InvalidCredentials("wrong information entered");
 	}
 	
 }
