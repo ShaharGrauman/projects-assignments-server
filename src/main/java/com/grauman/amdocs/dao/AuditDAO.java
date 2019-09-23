@@ -22,8 +22,9 @@ import com.grauman.amdocs.models.Role;
 @Service
 public class AuditDAO implements IAuditDAO{
 	 @Autowired DBManager db;
-
-	 @Override
+//**********************************************************
+	 //In IDAO the find doesn't get any parameters!!
+	// @Override
 	    public List<AuditEmployee> findAll(int page,int limit) throws SQLException {
 	        List<AuditEmployee> audit=new ArrayList<>();
 	        List<Role> roles=new ArrayList<>();
@@ -72,7 +73,7 @@ public class AuditDAO implements IAuditDAO{
 	  	}
 
 // search by date from to
-	 @Override
+	
    public List<AuditEmployee> searchAudit(int number,Optional<Date> datefrom, Optional<Date> dateto) throws SQLException{
       
 	   List<AuditEmployee> audit = new ArrayList<>();
@@ -135,6 +136,7 @@ public AuditEmployee delete(int id) throws SQLException {
 	return null;
 }
 @Override
+
 public List<AuditEmployee> findAll() throws SQLException {
 	// TODO Auto-generated method stub
 	return null;

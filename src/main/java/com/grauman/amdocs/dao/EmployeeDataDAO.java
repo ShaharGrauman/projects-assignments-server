@@ -668,10 +668,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	//get all countries
 	public List<Country> findAllCountries() throws SQLException {
 		List<Country> countries = new ArrayList<>();
-		String sqlDepartmetsCommand = "select * from country";
+		String sqlCountriesCommand = "select * from country";
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
-				ResultSet result = command.executeQuery(sqlDepartmetsCommand);
+				ResultSet result = command.executeQuery(sqlCountriesCommand);
 				while (result.next()) {
 					countries.add(new Country(result.getInt(1), result.getString(2)));
 				}
