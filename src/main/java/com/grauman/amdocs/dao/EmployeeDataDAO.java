@@ -817,9 +817,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	@Override
 	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
 		List<Permission> permissions = new ArrayList<>();
-		String fetchPermissions = "SELECT P.id, P.name FROM employeeroles ER " +
+		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER " +
 				"INNER JOIN rolepermissions RP on ER.role_id = RP.role_id " +
-				"INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.employee_id = ?";
+				"INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
 
 		try (Connection conn = db.getConnection()){
 			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
