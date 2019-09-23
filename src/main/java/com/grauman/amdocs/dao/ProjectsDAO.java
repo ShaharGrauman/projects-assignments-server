@@ -27,7 +27,11 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
-    // add a new project
+    /**
+     * @param  newProject
+     * @return new added assignment
+     * @throws SQLException
+     */
     @Override
     public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
         int projectID;
@@ -111,7 +115,12 @@ public class ProjectsDAO implements IProjectsDAO {
         return null;
     }
 
-    // get all the projects that a manager employees is working on
+    /**
+     *
+     * @param managerID
+     * @return list of projects that a manager employees are working on
+     * @throws SQLException
+     */
     @Override
     public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
 
@@ -179,7 +188,12 @@ public class ProjectsDAO implements IProjectsDAO {
 
         return projectList;
     }
-    // get all the projects that an employee is working on by his/her ID
+    /**
+     *
+     * @param userID
+     * @return list of projects that an employee are working on by his/her ID
+     * @throws SQLException
+     */
     @Override
     public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -245,7 +259,12 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
-    // get all the projects that an employee is working on by his/her name
+    /**
+     *
+     * @param userName
+     * @return list of projects that an employee are working on by his/her name
+     * @throws SQLException
+     */
     @Override
     public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
@@ -253,7 +272,7 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
+            String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,a.requested_from_manager_id from assignment a join project p" +
                                   " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
@@ -298,7 +317,7 @@ public class ProjectsDAO implements IProjectsDAO {
                         }
                         ProjectVM project = new ProjectVM(result.getInt(1), result.getString(2),
                                 result.getString(4), result.getDate(3),
-                                technicalSkillList, productSkillList, result.getInt(6));
+                                technicalSkillList, productSkillList, result.getInt(5));
                         projectList.add(project);
                         technicalSkillList = new ArrayList<>();
                         productSkillList = new ArrayList<>();
@@ -311,8 +330,12 @@ public class ProjectsDAO implements IProjectsDAO {
         return projectList;
     }
 
-    // search projects by name
-    @Override
+    /**
+     *
+     * @param projectName
+     * @return search projects by name
+     * @throws SQLException
+     */    @Override
     public List<ProjectVM> searchProjectByProjectName(String projectName, Integer currentPage, Integer limit) throws SQLException {
 
         List<ProjectVM> projectList = new ArrayList<>();

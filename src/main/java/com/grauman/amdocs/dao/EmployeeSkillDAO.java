@@ -34,14 +34,37 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public List<EmployeeSkill> findAll() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		List<EmployeeSkill> employeeSkills=new ArrayList<>();
+		try(Connection conn = db.getConnection()){
+			try(PreparedStatement command=conn.prepareStatement("select * from employeeskill")) {
+				try(ResultSet resultSet=command.executeQuery()){
+					while(resultSet.next()) {
+						employeeSkills.add(new EmployeeSkill(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("manager_id")
+								, resultSet.getInt("skill_id"), resultSet.getDate("date"), resultSet.getInt("level"), resultSet.getString("comment"),
+								Status.valueOf(resultSet.getString("status"))));
+					}
+				}
+			}
+		}
+		return employeeSkills;
 	}
 
 	@Override
 	public EmployeeSkill find(int id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		EmployeeSkill employeeSkills=null;
+		try(Connection conn = db.getConnection()){
+			try(PreparedStatement command=conn.prepareStatement("select * from employeeskill where id=?")) {
+				command.setInt(1, id);
+				try(ResultSet resultSet=command.executeQuery()){
+					while(resultSet.next()) {
+						employeeSkills=new EmployeeSkill(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("manager_id")
+								, resultSet.getInt("skill_id"), resultSet.getDate("date"), resultSet.getInt("level"), resultSet.getString("comment"),
+								Status.valueOf(resultSet.getString("status")));
+					}
+				}
+			}
+		}
+		return employeeSkills;
 	}
 
 	/**
@@ -294,8 +317,15 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public EmployeeSkill delete(int id) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement command = conn
+					.prepareStatement("DELETE from employeeskill" + " WHERE id = ?")) {
+				command.setInt(1, id);
+				if (command.executeUpdate() == 0)
+					throw new InvalidDataException("Can't delete this employee skill ");
+				return null;
+			}
+		}
 	}
 
 	@Override

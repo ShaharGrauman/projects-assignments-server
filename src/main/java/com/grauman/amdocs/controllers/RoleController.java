@@ -25,12 +25,20 @@ import com.grauman.amdocs.models.RolePermissions;
 public class RoleController {
 	@Autowired
 	private RoleDAO roleDAO;
-	
+	/**
+    * @return all roles with permissions
+    * @throws SQLException
+    */
 	@GetMapping("")
 	public ResponseEntity<List<RolePermissions>> all() throws Exception{
 		List<RolePermissions> roles = roleDAO.findAll();
 		return ResponseEntity.ok().body(roles);
 	}
+	/**
+    * @param role
+    * @return new added role with permissions
+    * @throws SQLException
+    */
 //Add Role
 	@PostMapping("")
 	public ResponseEntity<RolePermissions> newRole(@RequestBody RolePermissions role) throws Exception{

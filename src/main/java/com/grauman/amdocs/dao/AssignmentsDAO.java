@@ -37,7 +37,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
             // fetch project id by name since project is a unique name which
             // guarantees retrieving the appropriate id
             String insertAssignmentQuery = "INSERT INTO assignment (project_id, employee_id, start_date, requested_from_manager_id," +
-                                           " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?) ";
+                    " requested_to_manager_id, status) VALUES(?, ?, ?, ?, ?, ?) ";
 
             // preparing a statement that guarantees returning the auto generated id
             try (PreparedStatement command = connection.prepareStatement(insertAssignmentQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -49,12 +49,12 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
                 if (item.getRequestFromManagerID() != (item.getRequestToManagerID())) {
                     command.setInt(5, item.getRequestToManagerID());
-                    command.setString(6, "PENDING_APPROVAL");
-                    item.setStatus("PENDING_APPROVAL");
+                    command.setString(6, "Pending approval");
+                    item.setStatus("Pending approval");
                 } else {
                     command.setNull(5, Types.INTEGER);
-                    command.setString(6, "IN_PROGRESS");
-                    item.setStatus("IN_PROGRESS");
+                    command.setString(6, "In progress");
+                    item.setStatus("In progress");
                 }
                 command.executeUpdate();
                 try (ResultSet generatedID = command.getGeneratedKeys()) {
@@ -94,7 +94,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         try (Connection connection = db.getConnection()) {
 
             String sqlCommand = "Select a.id, a.project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id " +
-                                "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
+                    "from assignment a join project p on a.project_id=p.id where employee_id = ? limit ? offset ?";
 
             try (PreparedStatement command = connection.prepareStatement(sqlCommand)) {
                 command.setInt(1, employeeID);
@@ -105,7 +105,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                     while (resultAssignment.next()) {
 
                         String managerNameQueryTo = "Select concat(u.first_name, \" \" , u.last_name) as name " +
-                                                    "from users u where u.id = ?";
+                                "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = connection.prepareStatement(managerNameQueryTo)) {
                             commandManagerName.setInt(1, resultAssignment.getInt("a.requested_from_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
@@ -115,7 +115,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         }
 
                         String managerNameQueryFrom = "Select concat(u.first_name, \" \" , u.last_name) as name " +
-                                                      "from users u where u.id = ?";
+                                "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = connection.prepareStatement(managerNameQueryFrom)) {
                             commandManagerName.setInt(1, resultAssignment.getInt("a.requested_to_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
@@ -156,7 +156,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
         try (Connection connection = db.getConnection()) {
             String getAssignmentRequestQuery = "Select a.id,concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id " +
-                                               "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = ''PENDING_APPROVAL' limit ? offset ?";
+                    "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = ''PENDING_APPROVAL' limit ? offset ?";
             String managerToName;
             String managerFromName;
             try (PreparedStatement command = connection.prepareStatement(getAssignmentRequestQuery)) {
@@ -176,7 +176,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         }
 
                         String managerNameQueryFrom = "Select concat(u.first_name, \" \" , u.last_name) as name " +
-                                                      "from users u where u.id = ?";
+                                "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = connection.prepareStatement(managerNameQueryFrom)) {
                             commandManagerName.setInt(1, resultAssignment.getInt("a.requested_to_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
@@ -218,11 +218,11 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         String managerFromName;
         try (Connection conn = db.getConnection()) {
             String sqlCommand = " select u.id, concat(u.first_name, \" \" , u.last_name) as name, a.project_id ,a.id, p.name, " +
-                                "a.start_date, a.end_date, a.requested_from_manager_id, a.requested_to_manager_id, a.status " +
-                                "from users u join assignment a on u.id=a.employee_id join project p on a.project_id=p.id " +
-                                "where u.manager_id = ? and a.status='DONE' and " +
-                                "(select datediff((select curdate()) , a.end_date)) <  (select datediff((select curdate()) , ? ))  " +
-                                "and (select datediff((select curdate()) , a.end_date)) > 0 limit ? offset ? ;";
+                    "a.start_date, a.end_date, a.requested_from_manager_id, a.requested_to_manager_id, a.status " +
+                    "from users u join assignment a on u.id=a.employee_id join project p on a.project_id=p.id " +
+                    "where u.manager_id = ? and a.status='DONE' and " +
+                    "(select datediff((select curdate()) , a.end_date)) <  (select datediff((select curdate()) , ? ))  " +
+                    "and (select datediff((select curdate()) , a.end_date)) > 0 limit ? offset ? ;";
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
                 command.setInt(1, managerID);
                 command.setDate(2, requestedDate);
@@ -233,7 +233,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
 
                         String managerNameQueryTo = "Select concat(u.first_name, \" \" , u.last_name) as name  " +
-                                                    "from users u where u.id = ?";
+                                "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = conn.prepareStatement(managerNameQueryTo)) {
                             commandManagerName.setInt(1, result.getInt("a.requested_from_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
@@ -243,7 +243,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         }
 
                         String managerNameQueryFrom = "Select concat(u.first_name, \" \" , u.last_name) as name " +
-                                                      "from users u where u.id = ?";
+                                "from users u where u.id = ?";
                         try (PreparedStatement commandManagerName = conn.prepareStatement(managerNameQueryFrom)) {
                             commandManagerName.setInt(1, result.getInt("a.requested_to_manager_id"));
                             try (ResultSet resultManagerName = commandManagerName.executeQuery()) {
@@ -294,7 +294,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     }
 
     private boolean CheckIfAssignment(Assignment item) throws SQLException {
-        String checkQuery = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status in ('IN_PROGRESS','PENDING_APPROVAL')";
+        String checkQuery = "Select employee_id FROM assignment a where a.project_id= ? and employee_id=? and status in ('In progress','Pending approval')";
         try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn
                     .prepareStatement(checkQuery)) {
