@@ -75,7 +75,8 @@ public class SkillsDAO implements ISkillsDAO {
                 command.setString(1, skill.getSkillname());
                 command.setString(2, skill.getType().toString());
                 command.setInt(3, skill.getSkillid());
-                command.executeUpdate();
+                if (command.executeUpdate()==0)
+					throw new InvalidDataException("Can't update this skill ");
                 return skill;
             }
         }
