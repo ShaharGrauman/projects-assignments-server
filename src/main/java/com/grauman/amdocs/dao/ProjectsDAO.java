@@ -37,13 +37,13 @@ public class ProjectsDAO implements IProjectsDAO {
         int projectID;
         try (Connection connection = db.getConnection()) {
 
-            String insertQueryProject = "INSERT INTO project (name, manager_id, description,start_date)" +
-                    "VALUES (?,?,?,?)";
+            String insertQueryProject = "INSERT INTO project (name, manager_id, description,start_date) " +
+                                         "VALUES (?,?,?,?)";
             try (PreparedStatement fetchInsertQueryProject = connection.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
                 fetchInsertQueryProject.setString(1, newProject.getName());
-                fetchInsertQueryProject.setInt(2, newProject.getManagerID());
+                fetchInsertQueryProject.setNull(2,Types.INTEGER);
                 fetchInsertQueryProject.setString(3, newProject.getDescription());
-                fetchInsertQueryProject.setString(4, String.valueOf(newProject.getStartDate()));
+                fetchInsertQueryProject.setDate(4, newProject.getStartDate());
                 fetchInsertQueryProject.executeUpdate();
                 try (ResultSet generatedID = fetchInsertQueryProject.getGeneratedKeys()) {
                     if (generatedID.next()) {
@@ -54,8 +54,8 @@ public class ProjectsDAO implements IProjectsDAO {
                 }
             }
 
-            StringBuilder insertProjectSkill = new StringBuilder("INSERT INTO projectskill (project_id, skill_id,skill_level)\n" +
-                    " VALUES (?, ?,?)");
+            StringBuilder insertProjectSkill = new StringBuilder("INSERT INTO projectskill (project_id, skill_id,skill_level)" +
+                                                                  " VALUES (?, ?,?)");
             int sizeSkillProduct = newProject.getProductSkill().size();
             int sizeSkillTechnical = newProject.getTechnicalSkill().size();
             for (int i = 0; i < (sizeSkillProduct + sizeSkillTechnical) - 1; i++) {
@@ -86,10 +86,10 @@ public class ProjectsDAO implements IProjectsDAO {
 
                 fetchInsertProjectSkill.executeUpdate();
                 try (ResultSet generatedID = fetchInsertProjectSkill.getGeneratedKeys()) {
-                    if (generatedID.next()) {
+                    if (!generatedID.next()) {
                         String deleteQueryProject = "DELETE FROM project WHERE id = ?";
                         try (PreparedStatement fetchDeleteQueryProject = connection.prepareStatement(deleteQueryProject, Statement.RETURN_GENERATED_KEYS)) {
-                            fetchDeleteQueryProject.setString(1, newProject.getName());
+                            fetchDeleteQueryProject.setInt(1, newProject.getId());
                             fetchDeleteQueryProject.executeUpdate();
                         }
 
@@ -130,9 +130,9 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id\n" +
-                    "                                                      join project p on a.project_id=p.id\n" +
-                    "                                                      where a.status = \"In progress\" and u.manager_id= ?;";
+            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id " +
+                                  "join project p on a.project_id=p.id " +
+                                  "where a.status = \"IN_PROGRESS\" and u.manager_id= ?;";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
@@ -202,7 +202,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description from assignment a join project p" +
-                    " on a.project_id=p.id where a.status= 'In progress' and a.employee_id= ? ";
+                                  " on a.project_id=p.id where a.status= 'IN_PROGRESS' and a.employee_id= ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
@@ -273,7 +273,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,u.first_name,a.requested_from_manager_id from assignment a join project p" +
-                    " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'In progress' and u.first_name like ? ";
+                                  " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 

@@ -26,8 +26,8 @@ public class AuditController {
 	private AuditDAO auditDAO;
 	
 	@GetMapping("")
-	public ResponseEntity<List<AuditEmployee>> all() throws SQLException{
-		List<AuditEmployee> audit=auditDAO.findAll();
+	public ResponseEntity<List<AuditEmployee>> all(@RequestParam int page,@RequestParam int limit) throws SQLException{
+		List<AuditEmployee> audit=auditDAO.findAll(page,limit);
  		return ResponseEntity.ok().body(audit);  
 	}
 	@GetMapping("/number")
