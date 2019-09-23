@@ -171,7 +171,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
         try (Connection connection = db.getConnection()) {
             String getAssignmentRequestQuery = "Select a.id,concat(u.first_name, \" \" , u.last_name) as name ,u.id, project_id, p.name, a.start_date, a.end_date, a.status, a.requested_from_manager_id,a.requested_to_manager_id " +
-                                               "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = ''PENDING_APPROVAL' limit ? offset ?";
+                                               "from users u join assignment a on u.id = a.employee_id join project p on a.project_id=p.id where a.requested_to_manager_id = ? and a.status = 'PENDING_APPROVAL' limit ? offset ?";
             String managerToName;
             String managerFromName;
             try (PreparedStatement command = connection.prepareStatement(getAssignmentRequestQuery)) {
