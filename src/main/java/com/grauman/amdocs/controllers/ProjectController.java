@@ -68,7 +68,7 @@ public class ProjectController {
      * @throws SQLException
      */
     @PostMapping("")
-    public ResponseEntity<ProjectVM> addProject(@RequestBody ProjectVM project) throws SQLException {
+    public ResponseEntity<ProjectVM> addProject(@RequestBody ProjectVM project) throws Exception {
         return ResponseEntity.ok().body(projectsDAO.add(project));
 
     }
