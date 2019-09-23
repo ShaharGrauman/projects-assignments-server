@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -71,7 +72,8 @@ public class AuditDAO implements IAuditDAO{
 	  	}
 
 // search by date from to
-   public List<AuditEmployee> searchAudit(int number,Date datefrom,Date dateto) throws SQLException{
+	 @Override
+   public List<AuditEmployee> searchAudit(int number,Optional<Date> datefrom, Optional<Date> dateto) throws SQLException{
       
 	   List<AuditEmployee> audit = new ArrayList<>();
        List<Role> roles=new ArrayList<>();
@@ -79,16 +81,22 @@ public class AuditDAO implements IAuditDAO{
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where " + (number != 0 ? "U.employee_number=? and " : "")  + " date(A.date_time)>? and date(A.date_time)<?";
+        		 					+ " where " + (number != 0 ? "U.employee_number=? and " : "") 
+        		 					+(datefrom.isPresent()? "date(A.date_time)>? and ":"")
+        		 					+(dateto.isPresent()? "date(A.date_time)<?":"");
+         
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
             	int counter=1;
             	if(number!=0) {
             		command.setInt(counter++,number);
+            	}        
+            	if(datefrom.isPresent()) {
+            		command.setDate(counter++,datefrom.get());
+            	}
+            	if(dateto.isPresent()) {
+            		command.setDate(counter++, dateto.get());            		
             	}            	
-        		command.setDate(counter++,datefrom);
-        		command.setDate(counter++, dateto);
-            	
             	
                 ResultSet result = command.executeQuery();
                 while (result.next()) {

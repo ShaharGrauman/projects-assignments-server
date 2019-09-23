@@ -457,7 +457,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
-		 // String sql = "{call advanced_search(?,?,?,?,?)}";
 		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
 	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
 	  				+ " From users U "
@@ -466,12 +465,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
 	  				+ " JOIN country C ON WS.country_id=C.id"
 	  				+ " where ("
-	  				+ (number != -1 ? " U.employee_number=? and " : "")
-	  				+ (roleName !=null ? " R.name=? and " : "")
-	  				+ (siteName !=null ? " WS.city=? and " : "")
-	  				+ (departmentName !=null ? " U.department=? and " : "")
-	  				+ (countryName !=null ? " U.country=? " : "")
-	  				+ ")"
+	  				+ (number !=0 ? " U.employee_number=? and " : "")
+	  				+ (!roleName.isEmpty() ? " R.name=? and " : "")
+	  				+ (!siteName.isEmpty() ? " WS.city=? and " : "")
+	  				+ (!departmentName.isEmpty() ? " U.department=? and " : "")
+	  				+ (!countryName.isEmpty() ? " U.country=? " : "")
+	  				+ " ) "
 	  				+ " Group by U.id"
 	  				+" limit ? offset ?";
 		  System.out.println(sqlFindCommand);
@@ -480,17 +479,18 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			    	int counter = 1;
 			      if(number!=0)
 			    	  command.setInt(counter++,number);
-			      if(roleName!=null)
+			      if(!roleName.isEmpty())
 			    	  command.setString(counter++,roleName);
-			      if(siteName!=null)
+			      if(!siteName.isEmpty())
 			    	  command.setString(counter++,siteName);
-			      if(departmentName!=null)
+			      if(!departmentName.isEmpty())
 			    	  command.setString(counter++,departmentName);
-			      if(countryName!=null)
+			      if(!countryName.isEmpty())
 			    	  command.setString(counter++,countryName);
 			       
 			       command.setInt(counter++, limit);
 			       command.setInt(counter++, offset);
+			       System.out.println(command);
 			       ResultSet result = command.executeQuery();
 			        
 			      while(result.next()) {
