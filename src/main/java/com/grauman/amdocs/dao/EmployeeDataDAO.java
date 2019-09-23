@@ -405,44 +405,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //**********************************************************************
 //advanced search
-	//By number
-	public List<EmployeeData> filterByNumber(int number) throws SQLException{
-		List <EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles=new ArrayList<>();
-			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
-					                + "W.name as workSiteName,W.city,U.country, U.department,U.locked,U.deactivated "
-					                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
-					                + " JOIN userrole UR ON UR.user_id=U.id"
-					                + " JOIN roles R ON R.id=UR.role_id"
-					                + " where U.employee_number=?"
-					                + " Group by U.id";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-			 command.setInt(1,number);
-				ResultSet result = command.executeQuery();
-			
-				while(result.next()) {
-					employeeRoles=getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} 
-		 catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-
 //By Name
 	public List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException {
 			
@@ -487,152 +449,48 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return found;
 	}
 
-//By Role
-	public List<EmployeeData> filterByRole(String roleName,int page,int limit) throws SQLException{
-		List <EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles=new ArrayList<>();
-		if(page<1)
-			  page=1;
-		int offset=(page-1)*limit;
-			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
-				                + "W.name as workSiteName,W.city,U.country, U.department,U.locked,U.deactivated "
-				                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
-				                + " JOIN userrole UR ON UR.user_id=U.id"
-				                + " JOIN roles R ON R.id=UR.role_id"
-				                + " where R.name=?"
-				                + " Group by U.id"
-				                + " limit ? offset ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-			 command.setString(1,roleName);
-			 command.setInt(2, limit);
-			 command.setInt(3, offset);
-				ResultSet result = command.executeQuery();
-			
-				while(result.next()) {
-					employeeRoles=getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} 
-		 catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-	
-//By Department
-	public List<EmployeeData> filterByDepartment(String departmentName,int page,int limit) throws SQLException {
-		List<EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles = new ArrayList<>();
-		if(page<1)
-			  page=1;
-		int offset=(page-1)*limit;
-		String sqlFindCommand = "select U.id,U.employee_number,U.first_name,U.last_name,"
-							+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated " 
-							+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-							+ " JOIN country C ON WS.country_id=C.id"
-							+ " where U.department=?"
-							+ " Group by U.id"
-							+ " limit ? offset ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-				command.setString(1, departmentName);
-				command.setInt(2, limit);
-				command.setInt(3, offset);
-				ResultSet result = command.executeQuery();
-
-				while (result.next()) {
-					employeeRoles = getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-
-//By WorkSite
-	public List<EmployeeData> filterByWorkSite(String siteName,int page,int limit) throws SQLException {
-		List<EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles = new ArrayList<>();
-		if(page<1)
-			  page=1;
-		int offset=(page-1)*limit;
-		String sqlFindCommand = "select U.id,U.employee_number,U.first_name,U.last_name,"
-								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated "
-								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-								+ " JOIN country C ON WS.country_id=C.id"
-								+ " where WS.city=?"
-								+ " Group by U.id"
-								+" limit ? offset ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-				command.setString(1, siteName);
-				command.setInt(2, limit);
-				command.setInt(3, offset);
-				ResultSet result = command.executeQuery();
-
-				while (result.next()) {
-					employeeRoles = getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-
-//search for all the employees which are working in the selected country
-	public List<EmployeeData> filterByCountry(String countryName,int page,int limit)throws SQLException{
+//filter
+	public List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,
+			String countryName,int page,int limit)throws SQLException{
 		  List <EmployeeData> found = new ArrayList<>();
 		  List<Role> employeeRoles=new ArrayList<>();
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
-	      String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
-	    		  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
-	    		  				+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-	    		  				+ " JOIN country C ON WS.country_id=C.id"
-	    		  				+ " where U.country=?"
-	    		  				+ " Group by U.id";
+		 // String sql = "{call advanced_search(?,?,?,?,?)}";
+		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
+	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
+	  				+ " From users U "
+	  				+ " JOIN userrole UR ON UR.user_id=U.id"
+	  				+ " JOIN roles R ON R.id=UR.role_id"
+	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
+	  				+ " JOIN country C ON WS.country_id=C.id"
+	  				+ " where ("
+	  				+ (number != -1 ? " U.employee_number=? and " : "")
+	  				+ (roleName !=null ? " R.name=? and " : "")
+	  				+ (siteName !=null ? " WS.city=? and " : "")
+	  				+ (departmentName !=null ? " U.department=? and " : "")
+	  				+ (countryName !=null ? " U.country=? " : "")
+	  				+ ")"
+	  				+ " Group by U.id"
+	  				+" limit ? offset ?";
+		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-			       command.setString(1,countryName);
-			       command.setInt(2, limit);
-			       command.setInt(3, offset);
+			    	int counter = 1;
+			      if(number!=0)
+			    	  command.setInt(counter++,number);
+			      if(roleName!=null)
+			    	  command.setString(counter++,roleName);
+			      if(siteName!=null)
+			    	  command.setString(counter++,siteName);
+			      if(departmentName!=null)
+			    	  command.setString(counter++,departmentName);
+			      if(countryName!=null)
+			    	  command.setString(counter++,countryName);
+			       
+			       command.setInt(counter++, limit);
+			       command.setInt(counter++, offset);
 			       ResultSet result = command.executeQuery();
 			        
 			      while(result.next()) {
@@ -658,7 +516,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 
 
-//*******************************************very important!	**********************
 /**call the resetAttempts from LoginDAO */
 	/**
 	    * @param id 

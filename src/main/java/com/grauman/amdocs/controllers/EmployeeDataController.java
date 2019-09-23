@@ -107,9 +107,21 @@ public class EmployeeDataController {
 		EmployeeData deletedEmployee = employeeDataDAO.delete(id);
 		return ResponseEntity.ok().body(deletedEmployee);   
 	}
-	@GetMapping("/number")
-	public ResponseEntity<List<EmployeeData>> findByNumber(@RequestParam Integer number) throws SQLException {
-		List<EmployeeData> employeeByName=employeeDataDAO.filterByNumber(number);
+	
+   // List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,String countryName,int page,int limit)throws SQLException;
+
+	@GetMapping("/filter")
+	public ResponseEntity<List<EmployeeData>> findFilteredEmployees(
+			@RequestParam(value="num",defaultValue="0") int number,
+			@RequestParam("role") String roleName,
+			@RequestParam("site") String siteName,
+			@RequestParam("dept") String departmentName,
+			@RequestParam("country") String countryName,
+			@RequestParam int page,
+			@RequestParam int limit) throws SQLException {
+//		int number = 0;
+//		String roleName = "", siteName = "", departmentName = "", countryName = "";
+		List<EmployeeData> employeeByName=employeeDataDAO.filter(number,roleName,siteName,departmentName,countryName,page,limit);
 		return ResponseEntity.ok().body(employeeByName);
 		}
 	@GetMapping("/name")
@@ -117,32 +129,13 @@ public class EmployeeDataController {
 		List<EmployeeData> employeeByName=employeeDataDAO.filterByName(name,page,limit);
 		return ResponseEntity.ok().body(employeeByName);
 		}
-	
-	@GetMapping("/role")
-	public ResponseEntity<List<EmployeeData>> findByRole(@RequestParam String role,@RequestParam int page,@RequestParam int limit) throws SQLException {
-		List<EmployeeData> employeeByRole=employeeDataDAO.filterByRole(role,page,limit);
-		return ResponseEntity.ok().body(employeeByRole);
-	}
-	@GetMapping("/{department}")
-	public ResponseEntity<List<EmployeeData>> findByDepartment(@PathVariable String department,@RequestParam int page,@RequestParam int limit) throws SQLException {
-		List<EmployeeData> employeeByDepartment=employeeDataDAO.filterByDepartment(department,page,limit);
-		return ResponseEntity.ok().body(employeeByDepartment);
-	}
-	@GetMapping("/worksite")
-	public ResponseEntity<List<EmployeeData>> findByWorkSite(@RequestParam String worksite,@RequestParam int page,@RequestParam int limit) throws SQLException {
-		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByWorkSite(worksite,page,limit);
-		return ResponseEntity.ok().body(employeeByWorSite);
-	}
-	@GetMapping("/country")
-	public ResponseEntity<List<EmployeeData>> findByCountry(@RequestParam String country,@RequestParam int page,@RequestParam int limit) throws SQLException {
-		List<EmployeeData> employeeByWorSite=employeeDataDAO.filterByCountry(country,page,limit);
-		return ResponseEntity.ok().body(employeeByWorSite);
-	}
+
 	/**
 	    * @param id 
 	    * @return unlocked employee 
 	    * @throws SQLException
 	    */
+
 //Unlock Employee
 	@PutMapping("/unlock/id")
 	public ResponseEntity<EmployeeData>  unlockEmployee(@RequestParam Integer id) throws SQLException {
