@@ -25,6 +25,10 @@ import com.grauman.amdocs.models.RolePermissions;
 public class RoleDAO implements IRoleDAO {
 	@Autowired
 	private DBManager db;
+	/**
+	    * @return all roles with permissions
+	    * @throws SQLException
+	    */
 
 	// validation done
 	@Override
@@ -86,6 +90,11 @@ public class RoleDAO implements IRoleDAO {
 		}
 		return rolesWithPermissions;
 	}
+	/**
+	    * @param role
+	    * @return role with permissions by id
+	    * @throws SQLException
+	    */
 
 	//validation done
 	@Override
@@ -146,7 +155,11 @@ public class RoleDAO implements IRoleDAO {
 		return roleWithPermissions;
 	}
 
-	
+	/**
+	    * @param role
+	    * @return new added role with permissions
+	    * @throws SQLException
+	    */
 	
 	@Override
 	public RolePermissions add(RolePermissions roleWithPermissions) throws Exception {

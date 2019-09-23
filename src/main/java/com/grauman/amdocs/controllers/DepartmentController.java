@@ -21,6 +21,11 @@ import com.grauman.amdocs.models.Department;
 public class DepartmentController {
 	@Autowired
 	private DepartmentDAO departmentDAO;
+	/**
+	    * @param department
+	    * @return new added department
+	    * @throws SQLException
+	    */
 //Add department
   	@PostMapping("")
 	public ResponseEntity<Department> newDepartment(@RequestBody Department department) throws Exception{
