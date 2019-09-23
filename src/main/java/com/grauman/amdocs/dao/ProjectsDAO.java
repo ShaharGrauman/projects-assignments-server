@@ -1,7 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
-import com.grauman.amdocs.errors.custom.InvalidDataException;
+import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.LevelValidityException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.vm.ProjectVM;
@@ -47,7 +47,7 @@ public class ProjectsDAO implements IProjectsDAO {
     public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
 
         if(checkIfProjectExists(newProject)){
-            throw new InvalidDataException("Project name already exists. Project name should be unique.");
+            throw new AlreadyExistsException("Project name already exists. Project name should be unique.");
         }
         int projectID;
         try (Connection connection = db.getConnection()) {

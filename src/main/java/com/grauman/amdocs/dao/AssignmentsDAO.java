@@ -1,7 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
-import com.grauman.amdocs.errors.custom.InvalidDataException;
+import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
 import com.grauman.amdocs.models.vm.AssignmentVM;
@@ -35,7 +35,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     @Override
     public Assignment add(Assignment newAssignment) throws SQLException {
         if (CheckIfAssignment(newAssignment)) {
-            throw new InvalidDataException("Employee already assigned to this project");
+            throw new AlreadyExistsException("Employee already assigned to this project");
         }
         try (Connection connection = db.getConnection()) {
             // fetch project id by name since project is a unique name which
