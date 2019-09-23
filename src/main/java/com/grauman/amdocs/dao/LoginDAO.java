@@ -224,8 +224,8 @@ public class LoginDAO implements ILoginDAO {
                     	}
                     	employeeData=getEmployeeData(username);
 
-						//if (!BCrypt.verifyer().verify(password.toCharArray(), set.getString("password")).verified){
-                    		if (!password.equals(set.getString("password"))){
+						if (!BCrypt.verifyer().verify(password.toCharArray(), set.getString("password")).verified){
+                    		//if (!password.equals(set.getString("password"))){
                     			//not equals because this time was the last attempt
                     			if(failedAttemptsCounter(username)<MAX_ATTEMPTS) {
                     				//checks when did the user attempted to login,how many times he failed
