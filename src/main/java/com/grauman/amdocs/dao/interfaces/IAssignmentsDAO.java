@@ -45,5 +45,5 @@ public interface IAssignmentsDAO extends IDAO<Assignment> {
      * @throws ResultsNotFoundException
      */
     String updatePendingApprovalStatus(Assignment assignmentID, boolean response) throws SQLException;
-
+    Integer countDoneAssignments() throws SQLException;
 }

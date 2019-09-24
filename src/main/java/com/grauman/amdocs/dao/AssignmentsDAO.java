@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 public class AssignmentsDAO implements IAssignmentsDAO {
+    String sqlCommand;
     @Autowired
     DBManager db;
 
@@ -249,11 +250,19 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                                 "where u.manager_id = ? and a.status='DONE' and " +
                                 "(select datediff((select curdate()) , a.end_date)) <  (select datediff((select curdate()) , ? ))  " +
                                 "and (select datediff((select curdate()) , a.end_date)) > 0 limit ? offset ? ;";
+
+            this.sqlCommand=" select count(*) "+
+                    "from users u join assignment a on u.id=a.employee_id join project p on a.project_id=p.id " +
+                    "where u.manager_id = " + managerID +" and a.status='DONE' and " +
+                    "(select datediff((select curdate()) , a.end_date)) <  (select datediff((select curdate()) ,'" + requestedDate + "'))  " +
+                    "and (select datediff((select curdate()) , a.end_date)) > 0 limit "+ limit +" offset " + offset ;
+            System.out.println(this.sqlCommand);
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
                 command.setInt(1, managerID);
                 command.setDate(2, requestedDate);
                 command.setInt(3, limit);
                 command.setInt(4, offset);
+                System.out.println(command);
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
 
@@ -323,6 +332,17 @@ public class AssignmentsDAO implements IAssignmentsDAO {
         }
 
         return message;
+    }
+
+    @Override
+    public Integer countDoneAssignments() throws SQLException {
+        try (Connection conn = db.getConnection()) {
+            try (Statement command = conn.createStatement()) {
+                ResultSet result = command.executeQuery(this.sqlCommand);
+                result.next();
+                return result.getInt("count(*)");
+            }
+        }
     }
 
     private boolean CheckIfAssignment(Assignment item) throws SQLException {
