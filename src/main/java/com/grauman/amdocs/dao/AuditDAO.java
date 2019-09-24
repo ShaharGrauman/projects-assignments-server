@@ -74,17 +74,21 @@ public class AuditDAO implements IAuditDAO{
 
 // search by date from to
 	
-   public List<AuditEmployee> searchAudit(int number,Optional<Date> datefrom, Optional<Date> dateto) throws SQLException{
+   public List<AuditEmployee> searchAudit(int number,Optional<Date> datefrom, Optional<Date> dateto,int page,int limit) throws SQLException{
       
 	   List<AuditEmployee> audit = new ArrayList<>();
        List<Role> roles=new ArrayList<>();
+       if(page<1)
+    	   page=1;
+       int offset=(page-1)*limit;
 
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where " + (number != 0 ? "U.employee_number=? and " : "") 
+        		 					+ " where " + (number != 0 ? "A.employee_number=? and " : "") 
         		 					+(datefrom.isPresent()? "date(A.date_time)>? and ":"")
-        		 					+(dateto.isPresent()? "date(A.date_time)<?":"");
+        		 					+(dateto.isPresent()? "date(A.date_time)<?":"")
+        		 					+" limit ? offset ?";
          
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
@@ -97,7 +101,9 @@ public class AuditDAO implements IAuditDAO{
             	}
             	if(dateto.isPresent()) {
             		command.setDate(counter++, dateto.get());            		
-            	}            	
+            	}
+            	command.setInt(counter++,limit);
+            	command.setInt(counter++,offset);
             	
                 ResultSet result = command.executeQuery();
                 while (result.next()) {
