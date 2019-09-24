@@ -65,4 +65,14 @@ public interface IAssignmentSkillEmployeeDAO extends IDAO<AssignmentSkillEmploye
      * @throws SQLException
      */
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillName(String skillName, Integer currentPage, Integer limit) throws SQLException;
-}
+    /**
+     *
+     * @param skillVM
+     * @param currentPage
+     * @param limit
+     * @return employees who have a skill name with level bigger or equal to the level in the search
+     * @throws SQLException
+     */
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillNameLevel(SkillsLevelVM skillVM, Integer currentPage, Integer limit) throws SQLException ;
+
+    }

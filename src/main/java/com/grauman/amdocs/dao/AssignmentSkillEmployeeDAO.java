@@ -493,6 +493,84 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     }
 
     @Override
+    public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillNameLevel(SkillsLevelVM skillVM, Integer currentPage, Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
+        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
+        List<SkillsLevelVM> productSkillList = new ArrayList<>();
+
+        if (currentPage < 1) {
+            currentPage = 1;
+        }
+
+        Integer offset = (currentPage - 1) * limit;
+        try (Connection connection = db.getConnection()) {
+            String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
+                    " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where" +
+                    " s.name like ? and and es.level >= ? es.status='APPROVED' and u.deactivated=0 " +
+                    " group by u.id " +
+                    "limit ? offset ?;";
+            String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
+                    " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
+            String productSkillQuery = "SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
+                    "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" " +
+                    " and u.id = ? and es.status='APPROVED'";
+
+
+            try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
+                command.setString(1, skillVM.getName() + "%");
+                command.setInt(2, skillVM.getLevel());
+                command.setInt(3, limit);
+                command.setInt(4, offset);
+
+                try (ResultSet result = command.executeQuery()) {
+                    while (result.next()) {
+                        try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {
+                            skill.setInt(1, result.getInt("u.id"));
+
+
+                            try (ResultSet technicalSkillResult = skill.executeQuery()) {
+                                while (technicalSkillResult.next()) {
+                                    SkillsLevelVM technicalSkill = new SkillsLevelVM(technicalSkillResult.getInt(1),
+                                            technicalSkillResult.getString(2), technicalSkillResult.getInt(3));
+                                    technicalSkillList.add(technicalSkill);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println(e);
+                            }
+                        }
+                        try (PreparedStatement skill = connection.prepareStatement(productSkillQuery)) {
+                            skill.setInt(1, result.getInt("u.id"));
+
+
+                            try (ResultSet productSkillResult = skill.executeQuery()) {
+                                while (productSkillResult.next()) {
+                                    SkillsLevelVM productSkill = new SkillsLevelVM(productSkillResult.getInt(1),
+                                            productSkillResult.getString(2), productSkillResult.getInt(3));
+                                    productSkillList.add(productSkill);
+                                }
+                            } catch (SQLException e) {
+                                System.out.println(e);
+                            }
+                        }
+                        AssignmentSkillEmployeeVM employee = new AssignmentSkillEmployeeVM(result.getInt("u.id"),
+                                result.getInt("u.manager_id"),
+                                result.getString("name"),
+                                technicalSkillList, productSkillList);
+                        employees.add(employee);
+                        technicalSkillList = new ArrayList<>();
+                        productSkillList = new ArrayList<>();
+
+                    }
+                }
+            }
+
+        }
+
+        return employees;
+    }
+
+
+    @Override
     public List<AssignmentSkillEmployeeVM> findAll() throws SQLException {
         return null;
     }
