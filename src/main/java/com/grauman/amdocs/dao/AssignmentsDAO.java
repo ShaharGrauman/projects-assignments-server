@@ -335,7 +335,6 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                 ResultSet result = command.executeQuery();
                 return result.next();
             }
-
         }
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IRoleDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
+import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.EmployeeException;
 import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
@@ -42,7 +43,7 @@ public class RoleDAO implements IRoleDAO {
 		
 		String sqlFindRoles = "select * from roles";
 		String findRolePermissions = "select P.id,P.name"
-				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.role_id"
+				+ " from permissions P JOIN rolepermissions RP ON p.id=RP.permission_id"
 				+ " where RP.permission_id=P.id AND RP.role_id=?";
 
 		try (Connection conn = db.getConnection()) {
@@ -249,6 +250,19 @@ public class RoleDAO implements IRoleDAO {
 		} 
 
 		return newRole;
+	}
+	public List<Permission> getAllPermissions() throws SQLException{
+		List<Permission> Permissions = new ArrayList<>();
+		String sqlPermissionsCommand = "select * from permissions";
+		try (Connection conn = db.getConnection()) {
+			try (Statement command = conn.createStatement()) {
+				ResultSet result = command.executeQuery(sqlPermissionsCommand);
+				while (result.next()) {
+					Permissions.add(new Permission(result.getInt(1), result.getString(2)));
+				}
+			}
+		}
+		return Permissions;
 	}
 
 	@Override

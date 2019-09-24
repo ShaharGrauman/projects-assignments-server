@@ -37,6 +37,7 @@ public class WorkSiteDAO implements IWorkSiteDAO{
         WorkSite newWorkSite=null;
 		String checkIfWorkSiteExists="select * from worksite where country_id=? AND city=?";
         String FindCountryId="Select id FROM country WHERE name=?";
+        
         try(Connection conn = db.getConnection()){
 			try (PreparedStatement command = conn.prepareStatement(FindCountryId)){
 			     command.setString(1, workSite.getCountry().getName());
