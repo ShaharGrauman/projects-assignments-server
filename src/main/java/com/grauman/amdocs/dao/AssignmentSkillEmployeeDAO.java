@@ -506,7 +506,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where" +
-                    " s.name like ? and and es.level >= ? es.status='APPROVED' and u.deactivated=0 " +
+                    " s.name like ?  and es.level >= ? and es.status='APPROVED' and u.deactivated=0 " +
                     " group by u.id " +
                     "limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
