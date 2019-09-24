@@ -16,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.grauman.amdocs.dao.RoleDAO;
 import com.grauman.amdocs.models.Department;
+import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.RolePermissions;
 
@@ -32,6 +33,15 @@ public class RoleController {
 	@GetMapping("")
 	public ResponseEntity<List<RolePermissions>> all() throws Exception{
 		List<RolePermissions> roles = roleDAO.findAll();
+		return ResponseEntity.ok().body(roles);
+	}
+	/**
+	    * @return all permissions
+	    * @throws SQLException
+	    */
+	@GetMapping("/permissions")
+	public ResponseEntity<List<Permission>> allPermissions() throws Exception{
+		List<Permission> roles = roleDAO.getAllPermissions();
 		return ResponseEntity.ok().body(roles);
 	}
 	/**
