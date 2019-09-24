@@ -86,7 +86,7 @@ public class AuditDAO implements IAuditDAO{
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
         		 					+ " where " + (number != 0 ? "A.employee_number=? and " : "")
-        		 					+(!activity.isBlank() ? " A.activity=? and ": "")
+        		 					+(!activity.isEmpty() ? " A.activity=? and ": "")
         		 					+(datefrom.isPresent() ? " date(A.date_time)>? and ": "")
         		 					+(dateto.isPresent() ? " date(A.date_time)<? ": "")
         		 					+" limit ? offset ?";
@@ -98,7 +98,7 @@ public class AuditDAO implements IAuditDAO{
             	if(number!=0) {
             		command.setInt(counter++,number);
             	}
-            	if(!activity.isBlank()) {
+            	if(!activity.isEmpty()) {
             		command.setString(counter++,activity);
             	}
             	if(datefrom.isPresent()) {
