@@ -987,10 +987,30 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return null;
 	}
+  
+	@Override
+	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
+		List<Permission> permissions = new ArrayList<>();
 
-@Override
-public List<EmployeeData> findAll() throws SQLException {
-	// TODO Auto-generated method stub
-	return null;
-}
+		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER INNER JOIN rolepermissions RP on ER.role_id = RP.role_id INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
+
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
+				preparedStatement.setInt(1, id);
+
+				try (ResultSet resultSet = preparedStatement.executeQuery()){
+					while (resultSet.next()){
+						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
+					}
+				}
+			}
+		}
+		return permissions;
+	}
+  
+  @Override
+  public List<EmployeeData> findAll() throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

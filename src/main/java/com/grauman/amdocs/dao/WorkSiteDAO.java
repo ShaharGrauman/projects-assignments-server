@@ -30,7 +30,11 @@ public class WorkSiteDAO implements IWorkSiteDAO{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	/**
+     * @param worksite
+     * @return new added work site
+     * @throws SQLException
+     */
 	@Override
     public WorkSite add(WorkSite workSite) throws SQLException{
         int workSiteId;

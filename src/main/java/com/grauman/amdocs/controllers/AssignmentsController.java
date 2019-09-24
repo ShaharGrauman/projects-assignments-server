@@ -85,7 +85,7 @@ public class AssignmentsController {
      * @throws SQLException
      */
 
-    @GetMapping("/status/{id}")
+    @GetMapping("/done/{id}")
     public ResponseEntity<List<AssignmentVM>> getDoneAssignments(@PathVariable("id") Integer managerID,
                                                                  @RequestParam String requestedDate,
                                                                  @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {

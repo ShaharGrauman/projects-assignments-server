@@ -20,7 +20,11 @@ public class WorkSiteController {
     
     @Autowired
     private WorkSiteDAO worksiteDAO;
-    
+    /**
+     * @param worksite
+     * @return new added work site
+     * @throws SQLException
+     */
     //Add work site
      @PostMapping("")
      public ResponseEntity<WorkSite> newWorkSite(@RequestBody WorkSite worksite) throws SQLException{
