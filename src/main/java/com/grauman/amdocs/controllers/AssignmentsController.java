@@ -3,7 +3,7 @@ package com.grauman.amdocs.controllers;
 
 import com.grauman.amdocs.dao.AssignmentsDAO;
 import com.grauman.amdocs.models.Assignment;
-import com.grauman.amdocs.models.vm.AssignmentRequestVM;
+import com.grauman.amdocs.models.vm.AssignmentVM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +27,7 @@ public class AssignmentsController {
      */
 
     @PostMapping("")
-    public ResponseEntity<Assignment> addAssignment(@RequestBody Assignment assignment) throws SQLException {
+    public ResponseEntity<Assignment> addAssignment(@RequestBody Assignment assignment) throws Exception {
         return ResponseEntity.ok().body(assignmentsDAO.add(assignment));
     }
 
@@ -41,8 +41,8 @@ public class AssignmentsController {
      */
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<AssignmentRequestVM>> getAssignmentsHistoryForEmployee(@PathVariable("id") int employeeID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
-        List<AssignmentRequestVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeID, currentPage, limit);
+    public ResponseEntity<List<AssignmentVM>> getAssignmentsHistoryForEmployee(@PathVariable("id") int employeeID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
+        List<AssignmentVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeID, currentPage, limit);
         return ResponseEntity.ok().body(assignments);
     }
 
@@ -56,8 +56,8 @@ public class AssignmentsController {
      */
 
     @GetMapping("/request/{id}")
-    public ResponseEntity<List<AssignmentRequestVM>> getAssignmentsRequestByManagerID(@PathVariable("id") int managerID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
-        List<AssignmentRequestVM> assignmentsRequest = assignmentsDAO.getAssignmentsRequestByManagerID(managerID, currentPage, limit);
+    public ResponseEntity<List<AssignmentVM>> getAssignmentsRequestByManagerID(@PathVariable("id") int managerID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
+        List<AssignmentVM> assignmentsRequest = assignmentsDAO.getAssignmentsRequestByManagerID(managerID, currentPage, limit);
         return ResponseEntity.ok().body(assignmentsRequest);
     }
 
@@ -85,11 +85,11 @@ public class AssignmentsController {
      * @throws SQLException
      */
 
-    @GetMapping("/status/{id}")
-    public ResponseEntity<List<AssignmentRequestVM>> getDoneAssignments(@PathVariable("id") Integer managerID,
-                                                                           @RequestParam String requestedDate,
-                                                                           @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
-        List<AssignmentRequestVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), currentPage, limit);
+    @GetMapping("/done/{id}")
+    public ResponseEntity<List<AssignmentVM>> getDoneAssignments(@PathVariable("id") Integer managerID,
+                                                                 @RequestParam String requestedDate,
+                                                                 @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
+        List<AssignmentVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), currentPage, limit);
         return ResponseEntity.ok().body(doneAssignments);
     }
 

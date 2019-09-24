@@ -4,45 +4,39 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.SendFailedException;
+
 import com.grauman.amdocs.models.*;
 
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
-	public List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException;
 	
-	public EmployeeData searchEmployeeProfile(int id) throws SQLException;
-	public List<EmployeeData> findAll(int page,int limit) throws SQLException;
-	public List<EmployeeData> filterByNumber(int number) throws SQLException;
-    List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException;
-    List<EmployeeData> filterByRole(String roleName,int page,int limit) throws SQLException;
-    List<EmployeeData> filterByDepartment(String departmentName,int page,int limit) throws SQLException ;
-    List<EmployeeData> filterByWorkSite(String siteName,int page,int limit) throws SQLException ;
-    List<EmployeeData> filterByCountry(String countryName,int page,int limit)throws SQLException;
+	List<EmployeeData> findAll(int page,int limit) throws SQLException;
+	List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException;
+	EmployeeData searchEmployeeProfile(int id) throws SQLException;
+    List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException;;
+    List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,String countryName,int page,int limit)throws SQLException;
+    EmployeeData unlockEmployee(int id) throws SQLException;
+    EmployeeData lockEmployee(int id) throws SQLException ;
+    List<Role> getEmployeeRoles(int id)throws SQLException;
+    List<WorkSite> findAllSites() throws SQLException;
+    List<Role> findAllRoles() throws SQLException;
+    List<Department> findAllDepartments() throws SQLException;
+    List<Employee> findAllManagers() throws SQLException;
+    List<Country> findAllCountries() throws SQLException;
+    Integer countEmployees() throws SQLException;
+    Integer countRoles() throws SQLException;
+    Integer countDepartments() throws SQLException;
+    Integer countWorkSites() throws SQLException;
+    void resetPassword(String toEmail, int number) throws SQLException, EmployeeException;
+    void sendGeneralEmail(String toEmail, String firstName, String subject, String text) throws SendFailedException;
+
 	
-	List<WorkSite> findAllSites() throws SQLException;
-	List<Role> findAllRoles() throws SQLException;
-	List<Department> findAllDepartments() throws SQLException;
-	List<Employee> findAllManagers() throws SQLException;
-	List<Country> findAllCountries() throws SQLException;
 	
-	public Map<EmployeeData, List<EmployeeData>> findEmployeesHierarchy() throws SQLException;
-	public EmployeeData lockEmployee(int id) throws SQLException ;
-	public EmployeeData unlockEmployee(int id) throws SQLException;
+	Map<EmployeeData, List<EmployeeData>> findEmployeesHierarchy() throws SQLException;
 
 
-//	 List<EmployeeData> getEmployeesByManagerID (int managerID,int pageNumber,int limit) throws SQLException;
-//	 List<EmployeeData> getEmployeesByProjectID(int projectid) throws SQLException;
-//	 List<EmployeeData> searchEmployeesBySkillID(int skillID, int pageNumber, int limit) throws SQLException;
-//	 List<EmployeeData> searchEmployeesBySkillSet(List<Integer> skillSet, int pageNumber, int limit) throws SQLException;
-
 	 
 	 
-	 List<Role> getEmployeeRoles(int id)throws SQLException;
-	 
-	 
-	 Integer countEmployees() throws SQLException;
-	 Integer countRoles() throws SQLException;
-	 Integer countDepartments() throws SQLException;
-	 Integer countWorkSites() throws SQLException;
 
     List<Permission> getEmployeePermissions(Integer id) throws SQLException;
 }

@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +30,9 @@ import com.grauman.amdocs.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.grauman.amdocs.controllers.EmployeeDataController;
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
+import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.mail.MailManager;
 
 @Service
@@ -40,7 +44,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 	@Autowired
 	MailManager mail;
-
+	/**
+	    * @param page
+	    * @param limit
+	    * @return all locked employees
+	    * @throws SQLException
+	    */
 //Search all employees which are locked
 	@Override
 	public List<EmployeeData> findAll(int page,int limit) throws SQLException {
@@ -53,7 +62,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								+ "WS.name as worksite,WS.city,C.name as country,U.locked,U.deactivated "
 								+ "From users U JOIN worksite WS ON U.work_site_id=WS.id "
 								+ "JOIN country C ON WS.country_id=C.id "
-								+ "where U.locked=true"
+								+ "where U.locked=true order by U.employee_number"
 								+" limit ? offset ?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlAllUserscommand)) {
@@ -81,7 +90,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return users;
 	}
-
+	/**
+	    * @param page
+	    * @param limit
+	    * @return all employees
+	    * @throws SQLException
+	    */
 //search all employees	
 	public List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException {
 		int userId;
@@ -92,7 +106,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,U.manager_id,"
 								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated "
 								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-								+ " JOIN country C ON WS.country_id=C.id"
+								+ " JOIN country C ON WS.country_id=C.id order by U.employee_number"
 								+" limit ? offset ?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlAllUserscommand)) {
@@ -120,7 +134,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return users;
 	}
 
-	
+	/**
+	    * @param id 
+	    * @return find employee by id
+	    * @throws SQLException
+	    */
 // search the employee profile 
 	public EmployeeData searchEmployeeProfile(int id) throws SQLException {
 		Date auditDate=null;
@@ -136,7 +154,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								+ " From users U1 JOIN users U2 ON U1.manager_id=U2.id "
 								+ "JOIN worksite WS ON U1.work_site_id=WS.id "
 								+ "JOIN country C ON WS.country_id=C.id"
-								+ " Where U1.work_site_id=WS.id AND U1.id=?";
+								+ " Where U1.work_site_id=WS.id AND U1.id=? AND U1.deactivated=false ";
 						
 		String sqlEmployeeRoles = "Select R.*" 
 								+ " From roles R JOIN userrole UR ON R.id=UR.role_id "
@@ -251,62 +269,82 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 	// *******************************************************************************************
 // we should generate a random password and then insert it to the uses table in the data base
+	/**
+	    * @param employee 
+	    * @return new added employee
+	    * @throws SQLException
+	    */
 	@Override
 	public EmployeeData add(EmployeeData employee) throws SQLException {
 		int newEmployeeId = -1;
 		EmployeeData newEmployee = null;
+		ResultSet exists = null;
 
 		List<Role> roles = employee.getRoles();
+		String checkIfEmployeeExists = "select * from users where employee_number=?";
 		String sqlAddEmployeeStatement = "Insert INTO users (employee_number,first_name,last_name,email,manager_id,"
 				+ "department,work_site_id,country,phone,login_status,locked,deactivated,password,image)"
 				+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement statement = conn.prepareStatement(sqlAddEmployeeStatement,
-					Statement.RETURN_GENERATED_KEYS)) {
-
-				statement.setInt(1, employee.getEmployee().getNumber());
-				statement.setString(2, employee.getEmployee().getFirstName());
-				statement.setString(3, employee.getEmployee().getLastName());
-				statement.setString(4, employee.getEmployee().getEmail());
-				statement.setInt(5, employee.getEmployee().getManagerId());
-				statement.setString(6, employee.getEmployee().getDepartment());
-				statement.setInt(7, employee.getEmployee().getWorksite().getId());
-				statement.setString(8, employee.getEmployee().getWorksite().getCountry().getName());
-				statement.setString(9, employee.getEmployee().getPhone());
-				statement.setBoolean(10, employee.getEmployee().getLoginStatus());
-				statement.setBoolean(11, employee.getEmployee().getLocked());
-				statement.setBoolean(12, employee.getEmployee().getDeactivated());
-				// change it to the generated password! and hash it
-				//statement.setString(13, generatePassword(6)));
-				statement.setString(13, BCrypt.withDefaults().hashToString(12, generatePassword(6).toCharArray()));
-				statement.setString(14, employee.getEmployee().getImage());
-
-				int rowCountUpdated = statement.executeUpdate();
-
-				ResultSet ids = statement.getGeneratedKeys();
-
-				while (ids.next()) {
-					newEmployeeId = ids.getInt(1);
-					// find employee by ID
-					newEmployee = find(newEmployeeId);
+			try (PreparedStatement state = conn.prepareStatement(checkIfEmployeeExists)) {
+				state.setInt(1,employee.getEmployee().getNumber());
+				exists = state.executeQuery();
+				if (exists.next()) {
+					throw new AlreadyExistsException("Employee Number already exists");
 				}
-			}
-            
-            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
-            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
-                for(int i=0;i<roles.size();i++) {
-                    statement1.setInt(1, newEmployeeId);
-                    statement1.setInt(2, roles.get(i).getId());
-                    
-                    int rowCountUpdated=statement1.executeUpdate();
-                }
-            }
-        }
-
-		return find(newEmployeeId);
+				try (PreparedStatement statement = conn.prepareStatement(sqlAddEmployeeStatement,
+						Statement.RETURN_GENERATED_KEYS)) {
+	
+					statement.setInt(1, employee.getEmployee().getNumber());
+					statement.setString(2, employee.getEmployee().getFirstName());
+					statement.setString(3, employee.getEmployee().getLastName());
+					statement.setString(4, employee.getEmployee().getEmail());
+					statement.setInt(5, employee.getEmployee().getManagerId());
+					statement.setString(6, employee.getEmployee().getDepartment());
+					statement.setInt(7, employee.getEmployee().getWorksite().getId());
+					statement.setString(8, employee.getEmployee().getWorksite().getCountry().getName());
+					statement.setString(9, employee.getEmployee().getPhone());
+					statement.setBoolean(10, employee.getEmployee().getLoginStatus());
+					statement.setBoolean(11, employee.getEmployee().getLocked());
+					statement.setBoolean(12, employee.getEmployee().getDeactivated());
+					// change it to the generated password!
+					statement.setString(13, BCrypt.withDefaults().hashToString(12, generatePassword(6).toCharArray()));
+					statement.setString(14, employee.getEmployee().getImage());
+	
+					int rowCountUpdated = statement.executeUpdate();
+	
+					ResultSet ids = statement.getGeneratedKeys();
+	
+					while (ids.next()) {
+						newEmployeeId = ids.getInt(1);
+						// find employee by ID
+						newEmployee = find(newEmployeeId);
+					}
+				}
+	            
+	            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
+	            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
+	                for(int i=0;i<roles.size();i++) {
+	                    statement1.setInt(1, newEmployeeId);
+	                    statement1.setInt(2, roles.get(i).getId());
+	                    
+	                    int rowCountUpdated=statement1.executeUpdate();
+	                }
+	            }
+	            newEmployee=find(newEmployeeId);
+	        }
+		
+		}
+		return newEmployee;
 	}
 
 //never change the employee number!!
+	/**
+	    *
+	    * @param employee
+	    * @return update employee
+	    * @throws SQLException
+	    */
 	@Override
 	public EmployeeData update(EmployeeData employee) throws SQLException {
 
@@ -357,7 +395,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
         return updatedEmployee;
 
 	}
-
+	/**
+	    * @param id 
+	    * @return deleted/deactivated employee
+	    * @throws SQLException
+	    */
 //deactivate an Employee
 	@Override
 	public EmployeeData delete(int id) throws SQLException {
@@ -375,44 +417,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //**********************************************************************
 //advanced search
-	//By number
-	public List<EmployeeData> filterByNumber(int number) throws SQLException{
-		List <EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles=new ArrayList<>();
-			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
-					                + "W.name as workSiteName,W.city,U.country, U.department,U.locked,U.deactivated "
-					                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
-					                + " JOIN userrole UR ON UR.user_id=U.id"
-					                + " JOIN roles R ON R.id=UR.role_id"
-					                + " where U.employee_number=?"
-					                + " Group by U.id";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-			 command.setInt(1,number);
-				ResultSet result = command.executeQuery();
-			
-				while(result.next()) {
-					employeeRoles=getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} 
-		 catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-
 //By Name
 	public List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException {
 			
@@ -457,152 +461,49 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return found;
 	}
 
-//By Role
-	public List<EmployeeData> filterByRole(String roleName,int page,int limit) throws SQLException{
-		List <EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles=new ArrayList<>();
-		if(page<1)
-			  page=1;
-		int offset=(page-1)*limit;
-			String sqlFindCommand ="SELECT U.id, U.employee_number,U.first_name,U.last_name,"
-				                + "W.name as workSiteName,W.city,U.country, U.department,U.locked,U.deactivated "
-				                + " FROM users U JOIN worksite W ON U.work_site_id=W.id"
-				                + " JOIN userrole UR ON UR.user_id=U.id"
-				                + " JOIN roles R ON R.id=UR.role_id"
-				                + " where R.name=?"
-				                + " Group by U.id"
-				                + " limit ? offset ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-			 command.setString(1,roleName);
-			 command.setInt(2, limit);
-			 command.setInt(3, offset);
-				ResultSet result = command.executeQuery();
-			
-				while(result.next()) {
-					employeeRoles=getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} 
-		 catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-	
-//By Department
-	public List<EmployeeData> filterByDepartment(String departmentName,int page,int limit) throws SQLException {
-		List<EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles = new ArrayList<>();
-		if(page<1)
-			  page=1;
-		int offset=(page-1)*limit;
-		String sqlFindCommand = "select U.id,U.employee_number,U.first_name,U.last_name,"
-							+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated " 
-							+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-							+ " JOIN country C ON WS.country_id=C.id"
-							+ " where U.department=?"
-							+ " Group by U.id"
-							+ " limit ? offset ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-				command.setString(1, departmentName);
-				command.setInt(2, limit);
-				command.setInt(3, offset);
-				ResultSet result = command.executeQuery();
-
-				while (result.next()) {
-					employeeRoles = getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-
-//By WorkSite
-	public List<EmployeeData> filterByWorkSite(String siteName,int page,int limit) throws SQLException {
-		List<EmployeeData> found = new ArrayList<>();
-		List<Role> employeeRoles = new ArrayList<>();
-		if(page<1)
-			  page=1;
-		int offset=(page-1)*limit;
-		String sqlFindCommand = "select U.id,U.employee_number,U.first_name,U.last_name,"
-								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated "
-								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-								+ " JOIN country C ON WS.country_id=C.id"
-								+ " where WS.city=?"
-								+ " Group by U.id"
-								+" limit ? offset ?";
-		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-				command.setString(1, siteName);
-				command.setInt(2, limit);
-				command.setInt(3, offset);
-				ResultSet result = command.executeQuery();
-
-				while (result.next()) {
-					employeeRoles = getEmployeeRoles(result.getInt(1));
-					found.add(new EmployeeData(new Employee(
-							result.getInt(1),
-							result.getInt(2),
-							result.getString(3),
-							result.getString(4),
-							null,
-							result.getString(8),
-							new WorkSite(result.getString(5),result.getString(6)),
-							new Country(result.getString(7)),
-							result.getBoolean(9),
-							result.getBoolean(10)),employeeRoles));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return found;
-	}
-
-//search for all the employees which are working in the selected country
-	public List<EmployeeData> filterByCountry(String countryName,int page,int limit)throws SQLException{
+//filter
+	//show just the activated Employee 
+	public List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,
+			String countryName,int page,int limit)throws SQLException{
 		  List <EmployeeData> found = new ArrayList<>();
 		  List<Role> employeeRoles=new ArrayList<>();
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
-	      String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
-	    		  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
-	    		  				+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-	    		  				+ " JOIN country C ON WS.country_id=C.id"
-	    		  				+ " where U.country=?"
-	    		  				+ " Group by U.id";
+		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
+	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
+	  				+ " From users U "
+	  				+ " JOIN userrole UR ON UR.user_id=U.id"
+	  				+ " JOIN roles R ON R.id=UR.role_id"
+	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
+	  				+ " JOIN country C ON WS.country_id=C.id"
+	  				+ " where ("
+	  				+ (number !=0 ? " U.employee_number=? and " : "")
+	  				+ (!roleName.isEmpty() ? " R.name=? and " : "")
+	  				+ (!siteName.isEmpty() ? " WS.city=? and " : "")
+	  				+ (!departmentName.isEmpty() ? " U.department=? and " : "")
+	  				+ (!countryName.isEmpty() ? " U.country=? " : "")
+	  				+ " ) "
+	  				+ " Group by U.id order by U.employee_number"
+	  				+" limit ? offset ?";
+		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
-			       command.setString(1,countryName);
-			       command.setInt(2, limit);
-			       command.setInt(3, offset);
+			    	int counter = 1;
+			      if(number!=0)
+			    	  command.setInt(counter++,number);
+			      if(!roleName.isEmpty())
+			    	  command.setString(counter++,roleName);
+			      if(!siteName.isEmpty())
+			    	  command.setString(counter++,siteName);
+			      if(!departmentName.isEmpty())
+			    	  command.setString(counter++,departmentName);
+			      if(!countryName.isEmpty())
+			    	  command.setString(counter++,countryName);
+			       
+			       command.setInt(counter++, limit);
+			       command.setInt(counter++, offset);
+			       System.out.println(command);
 			       ResultSet result = command.executeQuery();
 			        
 			      while(result.next()) {
@@ -628,8 +529,12 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 
 
-//*******************************************very important!	**********************
 /**call the resetAttempts from LoginDAO */
+	/**
+	    * @param id 
+	    * @return unlocked employee 
+	    * @throws SQLException
+	    */
 //unlock user
 	public EmployeeData unlockEmployee(int id) throws SQLException {
 		String sqlUnlockEmployeeStatement = "update users set locked=false where id=?";
@@ -645,6 +550,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		loginAttemptes.resetAttempts(unLockedEmployee.getEmployee().getEmail());
 		return unLockedEmployee;
 	}
+	/**
+	    * @param id 
+	    * @return locked employee 
+	    * @throws SQLException
+	    */
 //lock Employee after 3 attempts
 	public EmployeeData lockEmployee(int id) throws SQLException {
 		String sqlLockEmployeeStatement = "update users set locked=true where id=?";
@@ -677,7 +587,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return employeeRoles;
 	}
-
+	/** 
+	    * @return all sites 
+	    * @throws SQLException
+	    */
 // get all sites 
 	public List<WorkSite> findAllSites() throws SQLException {
 		List<WorkSite> sites = new ArrayList<WorkSite>();
@@ -696,7 +609,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return sites;
 	}
-
+	/** 
+	    * @return all roles 
+	    * @throws SQLException
+	    */
 // get all roles
 	public List<Role> findAllRoles() throws SQLException {
 		List<Role> roles = new ArrayList<Role>();
@@ -711,7 +627,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return roles;
 	}
-
+	/** 
+	    * @return all departments 
+	    * @throws SQLException
+	    */
 // get all departments
 	public List<Department> findAllDepartments() throws SQLException {
 		List<Department> departments = new ArrayList<Department>();
@@ -726,7 +645,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return departments;
 	}
-
+	/** 
+	    * @return all managers 
+	    * @throws SQLException
+	    */
 // get all Managers (Name+ID)
 	public List<Employee> findAllManagers() throws SQLException {
 		List<Employee> managers = new ArrayList<Employee>();
@@ -752,14 +674,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return managers;
 	}
 
+	 /** 
+	    * @return all countries 
+	    * @throws SQLException
+	    */
 //get all countries
-
 	public List<Country> findAllCountries() throws SQLException {
 		List<Country> countries = new ArrayList<>();
-		String sqlDepartmetsCommand = "select * from country";
+		String sqlCountriesCommand = "select * from country";
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
-				ResultSet result = command.executeQuery(sqlDepartmetsCommand);
+				ResultSet result = command.executeQuery(sqlCountriesCommand);
 				while (result.next()) {
 					countries.add(new Country(result.getInt(1), result.getString(2)));
 				}
@@ -768,8 +693,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return countries;
 	}
 
-	// ***************************************************************************************************
-	// counters for the Home Page
+	/** 
+	    * @return number of employees 
+	    * @throws SQLException
+	    */
+// counters for the Home Page
 	public Integer countEmployees() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
@@ -779,7 +707,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			}
 		}
 	}
-
+	/** 
+	    * @return number of roles 
+	    * @throws SQLException
+	    */
 	public Integer countRoles() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
@@ -789,7 +720,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			}
 		}
 	}
-
+	/** 
+	    * @return number of departments 
+	    * @throws SQLException
+	    */
 	public Integer countDepartments() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
@@ -799,7 +733,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			}
 		}
 	}
-
+	/** 
+	    * @return number of countries 
+	    * @throws SQLException
+	    */
 	public Integer countWorkSites() throws SQLException {
 		try (Connection conn = db.getConnection()) {
 			try (Statement command = conn.createStatement()) {
@@ -810,38 +747,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 	}
 
-	@Override
-	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
-		List<Permission> permissions = new ArrayList<>();
-		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER " +
-				"INNER JOIN rolepermissions RP on ER.role_id = RP.role_id " +
-				"INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
-
-		try (Connection conn = db.getConnection()){
-			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
-				preparedStatement.setInt(1, id);
-
-				try (ResultSet resultSet = preparedStatement.executeQuery()){
-					while (resultSet.next()){
-						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
-					}
-				}
-			}
-
-		}
-
-		return permissions;
-	}
-
-	//done Exceptions
+//done Exceptions
 	@SuppressWarnings("null")
 	public void resetPassword(String toEmail, int number) throws SQLException, EmployeeException {
 		boolean catchTimeOut = false;
 		int retries = 0;
 		String findEmployeeByEmail = "SELECT * from users where email=? AND employee_number=?";
+		String updatePasswordInDataBase = "update users set password=? where id=?";
 		String newPassword;
 		EmployeeData employee = null;
 		ResultSet result = null;
+		int result2 =0;
 
 		if (!isValid(toEmail))
 			throw new EmployeeException("email not valid");
@@ -872,23 +788,35 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				 * @return A string.
 				 */
 				newPassword = generatePassword(6);
-
+				
 				/*
 				 * before sending the email, new password must be updated and saved in the
 				 * database.
-				 */
-				System.out.println("here...");
-				
+				 */				
 					// employee = findEmployeeById(result.getInt(1)); // find gets the id of
 					// employee and returns the employee
 
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
-						System.out.println("found employee...");
 						employee.getEmployee().setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
-						// till here
-//						update(employee); // update the new password of this employee in the database.
-//						System.out.println("updated...");
+
+						retries=0;
+						try(PreparedStatement statement2= conn.prepareStatement(updatePasswordInDataBase)){
+							statement2.setString(1, newPassword);
+							statement2.setInt(2, employee.getEmployee().getId());
+							do {
+								try {
+									result2 = statement2.executeUpdate();
+									catchTimeOut = false;
+								} catch (SQLTimeoutException e) {
+									catchTimeOut = true;
+									if (retries++ > 3)
+										throw e;
+								}
+							} while (catchTimeOut);
+						
+						}
+						
 					} catch (SQLException e) {
 						e.printStackTrace();
 						System.out.println("can't continue from here.......");
@@ -927,7 +855,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	}
 
 	private static String generatePassword(int length) {
-
 		Random random = new Random();
 		Random random2 = new Random();
 		String capitalLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1057,7 +984,29 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return null;
 	}
 
-@Override
+	@Override
+	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
+		List<Permission> permissions = new ArrayList<>();
+
+		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER" +
+				"INNER JOIN rolepermissions RP on ER.role_id = RP.role_id " +
+				"INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
+
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
+				preparedStatement.setInt(1, id);
+
+				try (ResultSet resultSet = preparedStatement.executeQuery()){
+					while (resultSet.next()){
+						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
+					}
+				}
+			}
+		}
+		return permissions;
+	}
+
+	@Override
 public List<EmployeeData> findAll() throws SQLException {
 	// TODO Auto-generated method stub
 	return null;

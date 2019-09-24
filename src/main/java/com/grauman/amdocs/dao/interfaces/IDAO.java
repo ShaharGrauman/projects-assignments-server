@@ -10,9 +10,9 @@ public interface IDAO<T> {
 
     T find(int id) throws SQLException, Exception;
 
-    T add(T movie) throws SQLException, Exception;
+    T add(T item) throws SQLException, Exception;
 
-    T update(T movie) throws SQLException, Exception;
+    T update(T item) throws SQLException, Exception;
 
     T delete(int id) throws SQLException, Exception;
 }
