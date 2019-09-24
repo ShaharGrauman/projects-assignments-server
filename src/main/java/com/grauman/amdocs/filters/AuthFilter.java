@@ -68,11 +68,13 @@ public class AuthFilter implements Filter {
                 String[] permissions = credentials[3].split("[{},]");
 
                 for(String str : rolesArr){
-                    roleList.add(new Role(str));
+                    String[] arr = str.split("=");
+                    roleList.add(new Role(Integer.parseInt(arr[0]), arr[1]));
                 }
                 int i = 1;
                 for(String str : permissions){
-                    permissionList.add(new Permission(i++, str));
+                    String[] arr = str.split("=");
+                    permissionList.add(new Permission(Integer.parseInt(arr[0]), arr[1]));
                 }
 
                 AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
