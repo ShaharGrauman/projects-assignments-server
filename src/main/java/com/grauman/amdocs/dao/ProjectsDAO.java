@@ -4,8 +4,10 @@ import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.LevelValidityException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
+import com.grauman.amdocs.errors.custom.ValidationsCheckException;
 import com.grauman.amdocs.models.vm.ProjectVM;
 import com.grauman.amdocs.models.vm.SkillsLevelVM;
+import com.grauman.amdocs.validations.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,33 +31,38 @@ public class ProjectsDAO implements IProjectsDAO {
     }
 
     private boolean checkIfProjectExists(ProjectVM project) throws SQLException {
-        String checkQuery= "select id from project where name= ? ;";
+        String checkQuery = "select id from project where name= ? ;";
         try (Connection connection = db.getConnection()) {
-            try (PreparedStatement command = connection.prepareStatement(checkQuery)){
+            try (PreparedStatement command = connection.prepareStatement(checkQuery)) {
                 command.setString(1, project.getName());
                 ResultSet result = command.executeQuery();
                 return result.next();
             }
         }
     }
+
     /**
-     * @param  newProject
+     * @param newProject
      * @return new added assignment
      * @throws SQLException
      */
     @Override
-    public ProjectVM add(ProjectVM newProject) throws SQLException, LevelValidityException {
+    public ProjectVM add(ProjectVM newProject) throws SQLException {
+        if (!Validations.check(newProject).isEmpty())
+            throw new ValidationsCheckException(Validations.check(newProject));
 
-        if(checkIfProjectExists(newProject)){
+
+        if (checkIfProjectExists(newProject)) {
             throw new AlreadyExistsException("Project name already exists. Project name should be unique.");
         }
+
         int projectID;
         try (Connection connection = db.getConnection()) {
             String insertQueryProject = "INSERT INTO project (name, manager_id, description,start_date) " +
-                                         "VALUES (?,?,?,?)";
+                    "VALUES (?,?,?,?)";
             try (PreparedStatement fetchInsertQueryProject = connection.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
                 fetchInsertQueryProject.setString(1, newProject.getName());
-                fetchInsertQueryProject.setNull(2,Types.INTEGER);
+                fetchInsertQueryProject.setNull(2, Types.INTEGER);
                 fetchInsertQueryProject.setString(3, newProject.getDescription());
                 fetchInsertQueryProject.setDate(4, newProject.getStartDate());
                 fetchInsertQueryProject.executeUpdate();
@@ -69,7 +76,7 @@ public class ProjectsDAO implements IProjectsDAO {
             }
 
             StringBuilder insertProjectSkill = new StringBuilder("INSERT INTO projectskill (project_id, skill_id,skill_level)" +
-                                                                  " VALUES (?, ?,?)");
+                    " VALUES (?, ?,?)");
             int sizeSkillProduct = newProject.getProductSkill().size();
             int sizeSkillTechnical = newProject.getTechnicalSkill().size();
             for (int i = 0; i < (sizeSkillProduct + sizeSkillTechnical) - 1; i++) {
@@ -80,8 +87,6 @@ public class ProjectsDAO implements IProjectsDAO {
                 int counter = 0;
                 int i;
                 for (i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
-                    if (newProject.getTechnicalSkill().get(counter).getLevel() < 1 || newProject.getTechnicalSkill().get(counter).getLevel() > 5)
-                        throw new LevelValidityException("level should be  between 1 to 5");
                     fetchInsertProjectSkill.setInt(i, projectID);
                     fetchInsertProjectSkill.setInt(i + 1, newProject.getProductSkill().get(counter).getId());
                     fetchInsertProjectSkill.setInt(i + 2, newProject.getProductSkill().get(counter).getLevel());
@@ -89,13 +94,11 @@ public class ProjectsDAO implements IProjectsDAO {
                 }
                 counter = 0;
                 for (; i <= (sizeSkillTechnical) * 3 + (sizeSkillProduct) * 3; i += 3) {
-                    if (newProject.getTechnicalSkill().get(counter).getLevel() < 1 || newProject.getTechnicalSkill().get(counter).getLevel() > 5)
-                        throw new LevelValidityException("level should be  between 1 to 5");
                     fetchInsertProjectSkill.setInt(i, projectID);
                     fetchInsertProjectSkill.setInt(i + 1, newProject.getTechnicalSkill().get(counter).getId());
                     fetchInsertProjectSkill.setInt(i + 2, newProject.getTechnicalSkill().get(counter).getLevel());
                     ++counter;
-                    System.out.println(i);
+
                 }
 
                 fetchInsertProjectSkill.executeUpdate();
@@ -130,7 +133,6 @@ public class ProjectsDAO implements IProjectsDAO {
     }
 
     /**
-     *
      * @param managerID
      * @return list of projects that a manager employees are working on
      * @throws SQLException
@@ -145,8 +147,8 @@ public class ProjectsDAO implements IProjectsDAO {
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id " +
-                                  "join project p on a.project_id=p.id " +
-                                  "where a.status = \"IN_PROGRESS\" and u.manager_id= ?;";
+                    "join project p on a.project_id=p.id " +
+                    "where a.status = \"IN_PROGRESS\" and u.manager_id= ?;";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
@@ -202,8 +204,8 @@ public class ProjectsDAO implements IProjectsDAO {
 
         return projectList;
     }
+
     /**
-     *
      * @param userID
      * @return list of projects that an employee are working on by his/her ID
      * @throws SQLException
@@ -216,7 +218,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description from assignment a join project p" +
-                                  " on a.project_id=p.id where a.status= 'IN_PROGRESS' and a.employee_id= ? ";
+                    " on a.project_id=p.id where a.status= 'IN_PROGRESS' and a.employee_id= ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
@@ -274,7 +276,6 @@ public class ProjectsDAO implements IProjectsDAO {
     }
 
     /**
-     *
      * @param userName
      * @return list of projects that an employee are working on by his/her name
      * @throws SQLException
@@ -287,7 +288,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,a.requested_from_manager_id from assignment a join project p" +
-                                  " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? ";
+                    " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
@@ -345,11 +346,11 @@ public class ProjectsDAO implements IProjectsDAO {
     }
 
     /**
-     *
      * @param projectName
      * @return search projects by name
      * @throws SQLException
-     */    @Override
+     */
+    @Override
     public List<ProjectVM> searchProjectByProjectName(String projectName, Integer currentPage, Integer limit) throws SQLException {
 
         List<ProjectVM> projectList = new ArrayList<>();
