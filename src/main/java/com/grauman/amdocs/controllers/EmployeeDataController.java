@@ -3,6 +3,7 @@ package com.grauman.amdocs.controllers;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.mail.SendFailedException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +82,13 @@ public class EmployeeDataController {
 //Add Employee
 	@PostMapping("")
 	public ResponseEntity<EmployeeData> newEmployee(@RequestBody EmployeeData employee) throws SQLException{
-		EmployeeData employeeResult = employeeDataDAO.add(employee);
+		EmployeeData employeeResult = null;
+		try {
+			employeeResult = employeeDataDAO.add(employee);
+		} catch (SendFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return ResponseEntity.ok().body(employeeResult);
 	}
 	/**
