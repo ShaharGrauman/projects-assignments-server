@@ -96,6 +96,7 @@ public class AssignmentSkillEmployeeController {
 
     }
 
+
     /**
      *
      * @param skillSet
@@ -108,5 +109,19 @@ public class AssignmentSkillEmployeeController {
     @PostMapping("")
     public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillSets(@RequestBody List<SkillsLevelVM> skillSet,Integer page,Integer limit) throws SQLException {
         return ResponseEntity.ok().body(employeeDAO.searchEmployeesBySkillSet(skillSet, page, limit));
+    }
+
+    /**
+     *
+     * @param skillNameAndLevel
+     * @param page
+     * @param limit
+     * @return employees who have a skill name with level bigger or equal to the level in the search
+     * @throws SQLException
+     */
+    @PostMapping("/skill")
+    public ResponseEntity<List<AssignmentSkillEmployeeVM>> searchEmployeesBySkillNameLevel(@RequestBody SkillsLevelVM skillNameAndLevel,@RequestParam Integer page,@RequestParam Integer limit) throws SQLException {
+        List<AssignmentSkillEmployeeVM> employees = employeeDAO.searchEmployeesBySkillNameLevel(skillNameAndLevel, page,limit);
+        return ResponseEntity.ok().body(employees);
     }
 }
