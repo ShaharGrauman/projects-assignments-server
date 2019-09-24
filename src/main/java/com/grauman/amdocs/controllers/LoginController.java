@@ -1,7 +1,6 @@
 package com.grauman.amdocs.controllers;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -11,9 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
-import com.grauman.amdocs.errors.custom.InvalidCredentials;
+import com.grauman.amdocs.filters.CookieCreator;
 import com.grauman.amdocs.models.Permission;
-import com.grauman.amdocs.models.vm.EmployeeInSession;
+import com.grauman.amdocs.models.vm.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.models.EmployeeData;
 import com.grauman.amdocs.models.Login;
-
-import at.favre.lib.crypto.bcrypt.BCrypt;
 
 @RestController
 @RequestMapping("/login")
@@ -44,7 +41,7 @@ public class LoginController {
     }
 
     @PostMapping("")
-    public ResponseEntity<EmployeeInSession> login(@RequestBody Login login, ServletResponse response) throws SQLException {
+    public ResponseEntity<String> login(@RequestBody Login login, ServletResponse response) throws SQLException {
 
         EmployeeData employeeData = loginDAO.validate(login.getUsername(), login.getPassword());
 
@@ -53,31 +50,18 @@ public class LoginController {
        // System.out.println(hashedPwd);
         //System.out.println(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd));
 
-        EmployeeInSession employeeInSession = new EmployeeInSession(employeeData.getEmployee().getId(),
-                employeeData.getEmployee().getEmail(), employeeData.getRoles(), null);
-
-        List<Permission> permissions = employeeDataDAO.getEmployeePermissions(employeeInSession.getId());
-        employeeInSession.setPermissions(permissions);
+        List<Permission> permissions = employeeDataDAO.getEmployeePermissions(employeeData.getEmployee().getId());
 
         HttpServletResponse resp = (HttpServletResponse) response;
 
-        StringBuilder values = new StringBuilder();
-        values.append( employeeInSession.getId()
-                + ";" + employeeInSession.getEmail()
-                + ";[");
+        Cookie cookie = CookieCreator
+                .createUserCookie(employeeData.getEmployee().getId(), employeeData.getEmployee().getEmail(), employeeData.getRoles(), permissions);
 
+        //String value = Base64.getEncoder().encodeToString((values.toString()).getBytes());
 
-        employeeInSession.getRoles().forEach(role -> values.append(role + ","));
-        values.append("];[");
+        resp.addCookie(cookie);
 
-        employeeInSession.getPermissions().forEach(permission -> values.append(permission + ","));
-        values.append("];");
-
-        String value = Base64.getEncoder().encodeToString((values.toString()).getBytes());
-
-        resp.addCookie(new Cookie("auth", value));
-
-        return ResponseEntity.ok().body(employeeInSession);
+        return ResponseEntity.ok().body("login...");
 
 
     }

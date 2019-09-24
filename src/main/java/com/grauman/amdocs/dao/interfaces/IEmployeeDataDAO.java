@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.grauman.amdocs.models.*;
-import com.grauman.amdocs.models.vm.EmployeeInSession;
 
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	public List<EmployeeData> findAllEmployees(int page,int limit) throws SQLException;

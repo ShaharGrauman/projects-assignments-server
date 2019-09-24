@@ -2,9 +2,8 @@ package com.grauman.amdocs.filters;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.Filter;
@@ -17,9 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.grauman.amdocs.dao.EmployeeDataDAO;
+import com.grauman.amdocs.dao.interfaces.AuthenticationDAO;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import com.grauman.amdocs.errors.custom.InvalidCredentials;
 import com.grauman.amdocs.models.EmployeeData;
+import com.grauman.amdocs.models.Permission;
+import com.grauman.amdocs.models.Role;
+import com.grauman.amdocs.models.vm.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +30,7 @@ import org.springframework.stereotype.Component;
 public class AuthFilter implements Filter {
 
     @Autowired
-    private EmployeeDataDAO dao;
+    private AuthenticationDAO authenticationDAO;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -45,30 +48,51 @@ public class AuthFilter implements Filter {
 
             //Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
             HttpServletResponse resp = (HttpServletResponse) response;
+            if (req.getCookies() != null) {
+                Cookie authCookie = Stream.of(req.getCookies())
+                        .filter(c -> c.getName().equals("auth"))
+                        .findFirst()
+                        .orElseThrow(() -> new InvalidCredentials("Not Authorized"));
 
-            Cookie authCookie = Stream.of(req.getCookies())
-                    .filter(c -> c.getName().equals("auth"))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Not Authorized"));
+                String details = new String(Base64.getDecoder().decode(authCookie.getValue()));
+                String[] credentials = details.split(":");
 
-            String details = new String(Base64.getDecoder().decode(authCookie.getValue()));
-            String[] credentials = details.split(";");
+                // catch SQLException and rethrow as a runtime exception
+                // since the method does not allow to add the throws SQLException deceleration to it
 
-            // catch SQLException and rethrow as a runtime exception
-            // since the method does not allow to add the throws SQLException deceleration to it
-            try {
+                List<Role> roleList =  new ArrayList<>();
+                List<Permission> permissionList = new ArrayList<>();
 
-                EmployeeData auth = dao.find(Integer.parseInt(credentials[0]));
-                if (auth != null) {
 
-                    String value = Base64.getEncoder().encodeToString((credentials[0] + ";" + credentials[1]).getBytes());
-                    resp.addCookie(new Cookie("auth", value));
+                String[] rolesArr = credentials[2].split("[{},]");
+                String[] permissions = credentials[3].split("[{},]");
 
-                }else
-                    throw new InvalidCredentials("Not Authorized");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+                for(String str : rolesArr){
+                    roleList.add(new Role(str));
+                }
+                int i = 1;
+                for(String str : permissions){
+                    permissionList.add(new Permission(i++, str));
+                }
+
+                AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
+                        .email(credentials[1])
+                        .id(Integer.parseInt(credentials[0]))
+                        .permissions(permissionList)
+                        .roles(roleList).build();
+
+               authenticationDAO.setAuthenticatedUser(authenticatedUser);
+
+                resp.addCookie(CookieCreator
+                        .createUserCookie(authenticatedUser.getId()
+                                ,authenticatedUser.getEmail()
+                                ,authenticatedUser.getRoles()
+                                ,authenticatedUser.getPermissions()));
+
+
+
+            }else
+                throw new InvalidCredentials("Not Authorized");
         }
 //
         chain.doFilter(request, response);

@@ -1,6 +1,5 @@
 package com.grauman.amdocs.dao;
 
-import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -8,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Statement;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,11 +25,9 @@ import javax.mail.internet.MimeMessage;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.grauman.amdocs.models.*;
-import com.grauman.amdocs.models.vm.EmployeeInSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.grauman.amdocs.controllers.EmployeeDataController;
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.mail.MailManager;
 
@@ -281,8 +276,9 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				statement.setBoolean(10, employee.getEmployee().getLoginStatus());
 				statement.setBoolean(11, employee.getEmployee().getLocked());
 				statement.setBoolean(12, employee.getEmployee().getDeactivated());
-				// change it to the generated password!
-				statement.setString(13, EmployeeDataDAO.generatePassword(6));
+				// change it to the generated password! and hash it
+				//statement.setString(13, generatePassword(6)));
+				statement.setString(13, BCrypt.withDefaults().hashToString(12, generatePassword(6).toCharArray()));
 				statement.setString(14, employee.getEmployee().getImage());
 
 				int rowCountUpdated = statement.executeUpdate();
