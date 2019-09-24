@@ -61,7 +61,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								+ "WS.name as worksite,WS.city,C.name as country,U.locked,U.deactivated "
 								+ "From users U JOIN worksite WS ON U.work_site_id=WS.id "
 								+ "JOIN country C ON WS.country_id=C.id "
-								+ "where U.locked=true"
+								+ "where U.locked=true order by U.employee_number"
 								+" limit ? offset ?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlAllUserscommand)) {
@@ -105,7 +105,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		String sqlAllUserscommand="select  U.id,U.employee_number,U.first_name,U.last_name,U.manager_id,"
 								+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated "
 								+ " From users U JOIN worksite WS ON U.work_site_id=WS.id"
-								+ " JOIN country C ON WS.country_id=C.id"
+								+ " JOIN country C ON WS.country_id=C.id order by U.employee_number"
 								+" limit ? offset ?";
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(sqlAllUserscommand)) {
@@ -153,7 +153,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 								+ " From users U1 JOIN users U2 ON U1.manager_id=U2.id "
 								+ "JOIN worksite WS ON U1.work_site_id=WS.id "
 								+ "JOIN country C ON WS.country_id=C.id"
-								+ " Where U1.work_site_id=WS.id AND U1.id=?";
+								+ " Where U1.work_site_id=WS.id AND U1.id=? AND U1.deactivated=false ";
 						
 		String sqlEmployeeRoles = "Select R.*" 
 								+ " From roles R JOIN userrole UR ON R.id=UR.role_id "
