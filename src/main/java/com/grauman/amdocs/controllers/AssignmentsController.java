@@ -34,30 +34,30 @@ public class AssignmentsController {
     /**
      *
      * @param employeeID
-     * @param currentPage
+     * @param page
      * @param limit
      * @return assignments history for employee
      * @throws SQLException
      */
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<AssignmentVM>> getAssignmentsHistoryForEmployee(@PathVariable("id") int employeeID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
-        List<AssignmentVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeID, currentPage, limit);
+    public ResponseEntity<List<AssignmentVM>> getAssignmentsHistoryForEmployee(@PathVariable("id") int employeeID, @RequestParam int page, @RequestParam int limit) throws SQLException {
+        List<AssignmentVM> assignments = assignmentsDAO.getAssignmentsByUserID(employeeID, page, limit);
         return ResponseEntity.ok().body(assignments);
     }
 
     /**
      *
      * @param managerID
-     * @param currentPage
+     * @param page
      * @param limit
      * @return assignments requests for manager team
      * @throws SQLException
      */
 
     @GetMapping("/request/{id}")
-    public ResponseEntity<List<AssignmentVM>> getAssignmentsRequestByManagerID(@PathVariable("id") int managerID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
-        List<AssignmentVM> assignmentsRequest = assignmentsDAO.getAssignmentsRequestByManagerID(managerID, currentPage, limit);
+    public ResponseEntity<List<AssignmentVM>> getAssignmentsRequestByManagerID(@PathVariable("id") int managerID, @RequestParam int page, @RequestParam int limit) throws SQLException {
+        List<AssignmentVM> assignmentsRequest = assignmentsDAO.getAssignmentsRequestByManagerID(managerID, page, limit);
         return ResponseEntity.ok().body(assignmentsRequest);
     }
 
@@ -79,7 +79,7 @@ public class AssignmentsController {
      *
      * @param managerID
      * @param requestedDate
-     * @param currentPage
+     ** @param page
      * @param limit
      * @return team done assignments for manager
      * @throws SQLException
@@ -88,8 +88,8 @@ public class AssignmentsController {
     @GetMapping("/done/{id}")
     public ResponseEntity<List<AssignmentVM>> getDoneAssignments(@PathVariable("id") Integer managerID,
                                                                  @RequestParam String requestedDate,
-                                                                 @RequestParam Integer currentPage, @RequestParam Integer limit) throws SQLException {
-        List<AssignmentVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), currentPage, limit);
+                                                                 @RequestParam Integer page, @RequestParam Integer limit) throws SQLException {
+        List<AssignmentVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), page, limit);
         return ResponseEntity.ok().body(doneAssignments);
     }
     @GetMapping("/count")

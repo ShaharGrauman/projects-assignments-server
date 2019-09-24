@@ -277,11 +277,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	    * @throws SQLException
 	    */
 	@Override
-	public EmployeeData add(EmployeeData employee) throws SQLException {
+	public EmployeeData add(EmployeeData employee) throws SQLException,SendFailedException {
 		int newEmployeeId = -1;
 		EmployeeData newEmployee = null;
-		ResultSet exists = null;
 
+		String password = null;
+
+		ResultSet exists = null;
 		List<Role> roles = employee.getRoles();
 		String checkIfEmployeeExists = "select * from users where employee_number=?";
 		String sqlAddEmployeeStatement = "Insert INTO users (employee_number,first_name,last_name,email,manager_id,"
@@ -310,7 +312,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					statement.setBoolean(11, employee.getEmployee().getLocked());
 					statement.setBoolean(12, employee.getEmployee().getDeactivated());
 					// change it to the generated password!
-					statement.setString(13, BCrypt.withDefaults().hashToString(12, generatePassword(6).toCharArray()));
+					password = generatePassword(6);
+					statement.setString(13, BCrypt.withDefaults().hashToString(12, password.toCharArray()));
 					statement.setString(14, employee.getEmployee().getImage());
 	
 					int rowCountUpdated = statement.executeUpdate();
@@ -323,21 +326,39 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 						newEmployee = find(newEmployeeId);
 					}
 				}
-	            
-	            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
-	            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
-	                for(int i=0;i<roles.size();i++) {
-	                    statement1.setInt(1, newEmployeeId);
-	                    statement1.setInt(2, roles.get(i).getId());
-	                    
-	                    int rowCountUpdated=statement1.executeUpdate();
-	                }
-	            }
-	            newEmployee=find(newEmployeeId);
-	        }
+			}
+            
+            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
+            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
+                for(int i=0;i<roles.size();i++) {
+                    statement1.setInt(1, newEmployeeId);
+                    statement1.setInt(2, roles.get(i).getId());
+                    
+                    int rowCountUpdated=statement1.executeUpdate();
+                }
+            }
+        }
 		
+		String firstName = employee.getEmployee().getFirstName();
+		String text = mail.getText2() == null ? " " : mail.getText2();
+		if(text != " ") {
+			text = text.replaceAll("##USER", firstName);
+			text = text.replaceAll("##PWD", password);
 		}
-		return newEmployee;
+		
+		
+		try {
+			sendGeneralEmail(
+					newEmployee.getEmployee().getEmail(),
+					firstName,
+					mail.getSubject2(),
+					text
+					);
+		} catch(SendFailedException e) {
+			throw e;
+		}
+		
+		return find(newEmployeeId);
 	}
 
 //never change the employee number!!
