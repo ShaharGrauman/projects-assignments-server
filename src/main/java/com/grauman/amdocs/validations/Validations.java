@@ -21,7 +21,7 @@ public class Validations {
             projectError.put(String.valueOf(project.getStartDate()), "Incorret Date");
 
         if (project.getName() == null || project.getName().equals(""))
-            projectError.put("Project name", "Field that should be not empty");
+            projectError.put("name", "Field that should be not empty");
 
         if (project.getDescription() == null || project.getDescription().equals(""))
             projectError.put("Description", "Field that should be not empty");
