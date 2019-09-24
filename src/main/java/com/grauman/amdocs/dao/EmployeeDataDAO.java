@@ -335,7 +335,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		try {
 			sendGeneralEmail(
 					newEmployee.getEmployee().getEmail(),
-					newEmployee.getEmployee().getFirstName(),
+					firstName,
 					mail.getSubject2(),text
 					);
 			
