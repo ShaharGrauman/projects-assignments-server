@@ -46,7 +46,7 @@ public class ProjectController {
      * @throws SQLException
      */
     @GetMapping("user/name/{name}")
-    public ResponseEntity<List<ProjectVM>> getProjectsByUserID(@PathVariable("name") String userName) throws SQLException, ResultsNotFoundException {
+    public ResponseEntity<List<ProjectVM>> getProjectsByUserName(@PathVariable("name") String userName) throws SQLException, ResultsNotFoundException {
         return ResponseEntity.ok().body(projectsDAO.getProjectsByUserName(userName));
     }
 
