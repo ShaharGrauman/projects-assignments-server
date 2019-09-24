@@ -46,6 +46,8 @@ public final class CookieCreator {
 
 
 
-        return new Cookie("auth", encoded);
+        Cookie cookie = new Cookie("auth", encoded);
+        cookie.setPath("/");
+        return cookie;
     }
 }
