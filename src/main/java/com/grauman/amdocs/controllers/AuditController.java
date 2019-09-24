@@ -32,12 +32,14 @@ public class AuditController {
  		return ResponseEntity.ok().body(audit);  
 	}
 	
-    @GetMapping("/date")
+    @GetMapping("/search")
     public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(
     	@RequestParam(defaultValue = "0") Integer number,
     	@RequestParam Date datefrom,
-     	@RequestParam Date dateto)throws SQLException{ 
-         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number, Optional.of(datefrom), Optional.of(dateto));
+     	@RequestParam Date dateto,
+     	@RequestParam int page,
+     	@RequestParam int limit)throws SQLException{ 
+         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number, Optional.of(datefrom), Optional.of(dateto),page,limit);
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
