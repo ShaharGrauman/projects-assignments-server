@@ -469,6 +469,15 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
+		  
+		  List<String> conditions = new ArrayList<>();
+		  
+		  if(number !=0) conditions.add(" U.employee_number=? ");
+		  if(!roleName.isBlank()) conditions.add(" R.name=? ");
+		  if(!siteName.isBlank()) conditions.add(" WS.city=? ");
+		  if(!departmentName.isBlank()) conditions.add(" U.department=? ");
+		  if(!countryName.isBlank()) conditions.add(" U.country=? ");
+		  
 		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
 	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
 	  				+ " From users U "
@@ -476,28 +485,24 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ " JOIN roles R ON R.id=UR.role_id"
 	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
 	  				+ " JOIN country C ON WS.country_id=C.id"
-	  				+ " where ("
-	  				+ (number !=0 ? " U.employee_number=? and " : "")
-	  				+ (!roleName.isEmpty() ? " R.name=? and " : "")
-	  				+ (!siteName.isEmpty() ? " WS.city=? and " : "")
-	  				+ (!departmentName.isEmpty() ? " U.department=? and " : "")
-	  				+ (!countryName.isEmpty() ? " U.country=? " : "")
-	  				+ " ) "
+	  				+ " where "
+	  				+ String.join(" and ", conditions)
 	  				+ " Group by U.id order by U.employee_number"
 	  				+" limit ? offset ?";
+		  
 		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 			    	int counter = 1;
 			      if(number!=0)
 			    	  command.setInt(counter++,number);
-			      if(!roleName.isEmpty())
+			      if(!roleName.isBlank())
 			    	  command.setString(counter++,roleName);
-			      if(!siteName.isEmpty())
+			      if(!siteName.isBlank())
 			    	  command.setString(counter++,siteName);
-			      if(!departmentName.isEmpty())
+			      if(!departmentName.isBlank())
 			    	  command.setString(counter++,departmentName);
-			      if(!countryName.isEmpty())
+			      if(!countryName.isBlank())
 			    	  command.setString(counter++,countryName);
 			       
 			       command.setInt(counter++, limit);
@@ -982,10 +987,30 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return null;
 	}
+  
+	@Override
+	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
+		List<Permission> permissions = new ArrayList<>();
 
-@Override
-public List<EmployeeData> findAll() throws SQLException {
-	// TODO Auto-generated method stub
-	return null;
-}
+		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER INNER JOIN rolepermissions RP on ER.role_id = RP.role_id INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
+
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
+				preparedStatement.setInt(1, id);
+
+				try (ResultSet resultSet = preparedStatement.executeQuery()){
+					while (resultSet.next()){
+						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
+					}
+				}
+			}
+		}
+		return permissions;
+	}
+  
+  @Override
+  public List<EmployeeData> findAll() throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

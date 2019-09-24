@@ -6,13 +6,7 @@ import java.util.Map;
 
 import javax.mail.SendFailedException;
 
-import com.grauman.amdocs.models.Country;
-import com.grauman.amdocs.models.Department;
-import com.grauman.amdocs.models.Employee;
-import com.grauman.amdocs.models.EmployeeData;
-import com.grauman.amdocs.models.EmployeeException;
-import com.grauman.amdocs.models.Role;
-import com.grauman.amdocs.models.WorkSite;
+import com.grauman.amdocs.models.*;
 
 public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	
@@ -44,4 +38,5 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
 	 
 	 
 
+    List<Permission> getEmployeePermissions(Integer id) throws SQLException;
 }
