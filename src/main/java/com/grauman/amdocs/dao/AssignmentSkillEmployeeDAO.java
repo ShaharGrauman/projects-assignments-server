@@ -39,7 +39,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
 
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
-                                   "from users u where manager_id = ? limit ? offset ?;";
+                                   "from users u where manager_id = ? and u.deactivated=0 limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                                          "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
@@ -115,7 +115,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
 
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
-                                   "from users u join assignment a on u.id = a.employee_id where a.project_id = ? " +
+                                   "from users u join assignment a on u.id = a.employee_id where a.project_id = ? and u.deactivated=0 " +
                                    "and a.status not in ('PENDING_APPROVAL','NOT_APPROVED')  group by u.id limit ? offset ?; ";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                                           "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
@@ -187,7 +187,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                                     "from users u join assignment a on u.id = a.employee_id where u.first_name like ? or u.last_name like ?" +
-                                      "and a.status not in ('PENDING_APPROVAL','NOT_APPROVED')  group by u.id limit ? offset ?;";
+                                      " and u.deactivated=0 and a.status not in ('PENDING_APPROVAL','NOT_APPROVED')  group by u.id limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                                         "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
@@ -260,7 +260,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                                      " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where s.id = ?" +
-                                    " and es.status='APPROVED' group by u.id " +
+                                    " and u.deactivated=0 and es.status='APPROVED' group by u.id " +
                                    "limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                                          " es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED'";
@@ -339,7 +339,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                                   " from users u join employeeskill es on u.id = es.user_id join skills s on es.skill_id = s.id where" +
-                                  " s.name like ? and es.status='APPROVED' " +
+                                  " s.name like ? and es.status='APPROVED' and u.deactivated=0 " +
                                   " group by u.id " +
                                   "limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
@@ -432,7 +432,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     " from users u join employeeskill es on u.id=es.user_id" +
-                    " where ";
+                    " where u.deactivated=0 and ";
             // check each skill in the search
             for (int i = 0; i < skillSet.size(); i++) {
                 if (i == skillSet.size() - 1) {
