@@ -483,7 +483,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ (!departmentName.isEmpty() ? " U.department=? and " : "")
 	  				+ (!countryName.isEmpty() ? " U.country=? " : "")
 	  				+ " ) "
-	  				+ " Group by U.id"
+	  				+ " Group by U.id order by U.employee_number"
 	  				+" limit ? offset ?";
 		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
