@@ -109,4 +109,12 @@ public class Employee {
 		this.password=password;
 	}
 
+	public Employee(Integer id, Integer number, String firstName, String lastName, String email){
+		this.id=id;
+		this.number=number;
+		this.firstName=firstName;
+		this.lastName=lastName;
+		this.email=email;
+	}
+
 }

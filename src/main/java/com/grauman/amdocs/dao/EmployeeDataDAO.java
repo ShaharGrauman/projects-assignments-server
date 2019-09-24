@@ -25,6 +25,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.grauman.amdocs.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -307,7 +308,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					statement.setBoolean(11, employee.getEmployee().getLocked());
 					statement.setBoolean(12, employee.getEmployee().getDeactivated());
 					// change it to the generated password!
-					statement.setString(13, EmployeeDataDAO.generatePassword(6));
+					statement.setString(13, BCrypt.withDefaults().hashToString(12, generatePassword(6).toCharArray()));
 					statement.setString(14, employee.getEmployee().getImage());
 	
 					int rowCountUpdated = statement.executeUpdate();
@@ -339,7 +340,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //never change the employee number!!
 	/**
-	    * @param id 
+	    *
 	    * @param employee
 	    * @return update employee
 	    * @throws SQLException
@@ -797,7 +798,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
-						employee.getEmployee().setPassword(newPassword);
+						employee.getEmployee().setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
 
 						retries=0;
 						try(PreparedStatement statement2= conn.prepareStatement(updatePasswordInDataBase)){
@@ -983,7 +984,27 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		return null;
 	}
 
-@Override
+	@Override
+	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
+		List<Permission> permissions = new ArrayList<>();
+
+		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER INNER JOIN rolepermissions RP on ER.role_id = RP.role_id INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
+
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
+				preparedStatement.setInt(1, id);
+
+				try (ResultSet resultSet = preparedStatement.executeQuery()){
+					while (resultSet.next()){
+						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
+					}
+				}
+			}
+		}
+		return permissions;
+	}
+
+	@Override
 public List<EmployeeData> findAll() throws SQLException {
 	// TODO Auto-generated method stub
 	return null;
