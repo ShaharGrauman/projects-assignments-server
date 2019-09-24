@@ -1,6 +1,7 @@
 package com.grauman.amdocs.filters;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,33 +56,31 @@ public class AuthFilter implements Filter {
                         .orElseThrow(() -> new InvalidCredentials("Not Authorized"));
 
                 String details = new String(Base64.getDecoder().decode(authCookie.getValue()));
-                String[] credentials = details.split(":");
-
-                // catch SQLException and rethrow as a runtime exception
-                // since the method does not allow to add the throws SQLException deceleration to it
+                String[] credentials = details.split(";");
 
                 List<Role> roleList =  new ArrayList<>();
                 List<Permission> permissionList = new ArrayList<>();
 
 
                 String[] rolesArr = credentials[2].split("[{},]");
-                String[] permissions = credentials[3].split("[{},]");
+                Stream.of(rolesArr).filter(str -> !str.equals("")).collect(Collectors.toList()).forEach(per ->{
+                    String[] arr = per.split(":");
+                    roleList.add(new Role(null, arr[1]));
+                });
 
-                for(String str : rolesArr){
-                    String[] arr = str.split("=");
-                    roleList.add(new Role(Integer.parseInt(arr[0]), arr[1]));
-                }
-                int i = 1;
-                for(String str : permissions){
-                    String[] arr = str.split("=");
+
+                String[] permissions = credentials[3].split("[{},]");
+                Stream.of(permissions).filter(str -> !str.equals("")).collect(Collectors.toList()).forEach(per ->{
+                    String[] arr = per.split(":");
                     permissionList.add(new Permission(Integer.parseInt(arr[0]), arr[1]));
-                }
+                });
 
                 AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
                         .email(credentials[1])
                         .id(Integer.parseInt(credentials[0]))
                         .permissions(permissionList)
                         .roles(roleList).build();
+
 
                authenticationDAO.setAuthenticatedUser(authenticatedUser);
 
