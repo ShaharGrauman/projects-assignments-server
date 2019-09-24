@@ -25,7 +25,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.grauman.amdocs.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -308,7 +307,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					statement.setBoolean(11, employee.getEmployee().getLocked());
 					statement.setBoolean(12, employee.getEmployee().getDeactivated());
 					// change it to the generated password!
-					statement.setString(13, BCrypt.withDefaults().hashToString(12, generatePassword(6).toCharArray()));
+					statement.setString(13, EmployeeDataDAO.generatePassword(6));
 					statement.setString(14, employee.getEmployee().getImage());
 	
 					int rowCountUpdated = statement.executeUpdate();
@@ -340,7 +339,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //never change the employee number!!
 	/**
-	    *
+	    * @param id 
 	    * @param employee
 	    * @return update employee
 	    * @throws SQLException
@@ -470,6 +469,15 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
+		  
+		  List<String> conditions = new ArrayList<>();
+		  
+		  if(number !=0) conditions.add(" U.employee_number=? ");
+		  if(!roleName.isBlank()) conditions.add(" R.name=? ");
+		  if(!siteName.isBlank()) conditions.add(" WS.city=? ");
+		  if(!departmentName.isBlank()) conditions.add(" U.department=? ");
+		  if(!countryName.isBlank()) conditions.add(" U.country=? ");
+		  
 		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
 	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
 	  				+ " From users U "
@@ -477,28 +485,24 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ " JOIN roles R ON R.id=UR.role_id"
 	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
 	  				+ " JOIN country C ON WS.country_id=C.id"
-	  				+ " where ("
-	  				+ (number !=0 ? " U.employee_number=? and " : "")
-	  				+ (!roleName.isEmpty() ? " R.name=? and " : "")
-	  				+ (!siteName.isEmpty() ? " WS.city=? and " : "")
-	  				+ (!departmentName.isEmpty() ? " U.department=? and " : "")
-	  				+ (!countryName.isEmpty() ? " U.country=? " : "")
-	  				+ " ) "
+	  				+ " where "
+	  				+ String.join(" and ", conditions)
 	  				+ " Group by U.id order by U.employee_number"
 	  				+" limit ? offset ?";
+		  
 		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 			    	int counter = 1;
 			      if(number!=0)
 			    	  command.setInt(counter++,number);
-			      if(!roleName.isEmpty())
+			      if(!roleName.isBlank())
 			    	  command.setString(counter++,roleName);
-			      if(!siteName.isEmpty())
+			      if(!siteName.isBlank())
 			    	  command.setString(counter++,siteName);
-			      if(!departmentName.isEmpty())
+			      if(!departmentName.isBlank())
 			    	  command.setString(counter++,departmentName);
-			      if(!countryName.isEmpty())
+			      if(!countryName.isBlank())
 			    	  command.setString(counter++,countryName);
 			       
 			       command.setInt(counter++, limit);
@@ -798,7 +802,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
-						employee.getEmployee().setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
+						employee.getEmployee().setPassword(newPassword);
 
 						retries=0;
 						try(PreparedStatement statement2= conn.prepareStatement(updatePasswordInDataBase)){
@@ -983,7 +987,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return null;
 	}
-
+  
 	@Override
 	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
 		List<Permission> permissions = new ArrayList<>();
@@ -1003,10 +1007,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return permissions;
 	}
-
-	@Override
-public List<EmployeeData> findAll() throws SQLException {
-	// TODO Auto-generated method stub
-	return null;
-}
+  
+  @Override
+  public List<EmployeeData> findAll() throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

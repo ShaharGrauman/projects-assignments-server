@@ -2,6 +2,7 @@ package com.grauman.amdocs.controllers;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,11 +36,12 @@ public class AuditController {
     @GetMapping("/search")
     public ResponseEntity<List<AuditEmployee>> searchAuditByDateBetween(
     	@RequestParam(defaultValue = "0") Integer number,
+    	@RequestParam String activity,
     	@RequestParam Date datefrom,
      	@RequestParam Date dateto,
      	@RequestParam int page,
      	@RequestParam int limit)throws SQLException{ 
-         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number, Optional.of(datefrom), Optional.of(dateto),page,limit);
+         List<AuditEmployee> auditByDateFrom=auditDAO.searchAudit(number,activity, Optional.of(datefrom), Optional.of(dateto),page,limit);
   		return ResponseEntity.ok().body(auditByDateFrom);  
 
     }
