@@ -136,23 +136,29 @@ public class ProjectsDAO implements IProjectsDAO {
      * @throws SQLException
      */
     @Override
-    public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException {
+    public List<ProjectVM> getProjectsByManagerID(Integer managerID, Integer currentPage, Integer limit) throws SQLException, ResultsNotFoundException {
 
 
         List<ProjectVM> projectList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
+        if (currentPage < 1)
+            currentPage = 1;
+        int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
+
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description from users u join assignment a on u.id=a.employee_id " +
                                   "join project p on a.project_id=p.id " +
-                                  "where a.status = \"IN_PROGRESS\" and u.manager_id= ?;";
+                                  "where a.status = \"IN_PROGRESS\" and u.manager_id= ? limit ? offset ? ;";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
                 projectStatement.setInt(1, managerID);
+                projectStatement.setInt(2, limit);
+                projectStatement.setInt(3, offset);
 
                 try (ResultSet projectResult = projectStatement.executeQuery()) {
 
@@ -209,20 +215,26 @@ public class ProjectsDAO implements IProjectsDAO {
      * @throws SQLException
      */
     @Override
-    public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException {
+    public List<ProjectVM> getProjectsByUserID(Integer userID, Integer currentPage, Integer limit) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
+        if (currentPage < 1)
+            currentPage = 1;
+        int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
+
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description from assignment a join project p" +
-                                  " on a.project_id=p.id where a.status= 'IN_PROGRESS' and a.employee_id= ? ";
+                                  " on a.project_id=p.id where a.status= 'IN_PROGRESS' and a.employee_id= ? limit ? offset ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
                 projectStatement.setInt(1, userID);
+                projectStatement.setInt(2, limit);
+                projectStatement.setInt(3, offset);
 
                 try (ResultSet result = projectStatement.executeQuery()) {
 
@@ -280,20 +292,25 @@ public class ProjectsDAO implements IProjectsDAO {
      * @throws SQLException
      */
     @Override
-    public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException {
+    public List<ProjectVM> getProjectsByUserName(String userName, Integer currentPage, Integer limit) throws SQLException, ResultsNotFoundException {
         List<ProjectVM> projectList = new ArrayList<>();
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
+        if (currentPage < 1)
+            currentPage = 1;
+        int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,a.requested_from_manager_id from assignment a join project p" +
-                                  " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? ";
+                                  " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? limit ? offset ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
                 projectStatement.setString(1, userName + "%");
+                projectStatement.setInt(2, limit);
+                projectStatement.setInt(3, offset);
 
                 try (ResultSet result = projectStatement.executeQuery()) {
 
@@ -356,14 +373,20 @@ public class ProjectsDAO implements IProjectsDAO {
         List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
         List<SkillsLevelVM> productSkillList = new ArrayList<>();
 
+        if (currentPage < 1)
+            currentPage = 1;
+        int offset = (currentPage - 1) * limit; // index of which row to start retrieving data
+
         try (Connection connection = db.getConnection()) {
-            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ?";
+            String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ? limit ? offset ? ";
             String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
             String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
                 projectStatement.setString(1, projectName + '%');
+                projectStatement.setInt(2, limit);
+                projectStatement.setInt(3, offset);
 
                 try (ResultSet result = projectStatement.executeQuery()) {
 
