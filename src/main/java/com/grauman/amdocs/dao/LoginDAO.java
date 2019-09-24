@@ -239,10 +239,10 @@ public class LoginDAO implements ILoginDAO {
 
                         				throw new InvalidCredentials("You are locked out. Please contact the administrator.");
                     				}
-                    				throw new InvalidCredentials("Wrong password");
                     			}
-                    		}
-                    	
+                    			
+                    			throw new InvalidCredentials("Wrong password");
+                    		}                    	
                     }
                 }
             }
