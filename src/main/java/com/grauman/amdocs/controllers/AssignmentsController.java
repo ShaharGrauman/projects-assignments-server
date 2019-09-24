@@ -92,5 +92,9 @@ public class AssignmentsController {
         List<AssignmentVM> doneAssignments = assignmentsDAO.getDoneAssignments(managerID, Date.valueOf(requestedDate), currentPage, limit);
         return ResponseEntity.ok().body(doneAssignments);
     }
+    @GetMapping("/count")
+    public ResponseEntity<Integer> countAssignments() throws SQLException {
+        return ResponseEntity.ok().body(assignmentsDAO.countDoneAssignments());
+    }
 
 }
