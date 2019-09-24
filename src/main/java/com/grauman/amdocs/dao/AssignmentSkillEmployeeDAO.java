@@ -179,24 +179,22 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         List<SkillsLevelVM> technicalskillList = new ArrayList<>();
         List<SkillsLevelVM> productskillList = new ArrayList<>();
 
-        if (currentPage.intValue() < 1) {
+        if (currentPage < 1) {
             currentPage = 1;
         }
-        int offset = (currentPage.intValue() - 1) * limit.intValue();
+        int offset = (currentPage - 1) * limit;
 
         try (Connection connection = db.getConnection()) {
-            String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
-                                    "from users u join assignment a on u.id = a.employee_id where u.first_name like ? or u.last_name like ?" +
-                                      " and u.deactivated=0 and a.status not in ('PENDING_APPROVAL','NOT_APPROVED')  group by u.id limit ? offset ?;";
+            String employeeQuery ="select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
+                    "from users u where  u.deactivated != 1  and u.first_name like ? limit ? offset ?;";
             String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                                         "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" and u.id = ? and es.status='APPROVED' ";
             String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
                                          "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\" and u.id = ? and es.status='APPROVED' ";
             try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setString(1, employeeName + "%");
-                command.setString(2, employeeName + "%");
-                command.setInt(3, limit.intValue());
-                command.setInt(4, offset);
+                command.setInt(2, limit);
+                command.setInt(3, offset);
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
                         try (PreparedStatement skill = connection.prepareStatement(technicalSkillQuery)) {

@@ -26,6 +26,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.grauman.amdocs.models.*;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -287,33 +290,41 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				+ "department,work_site_id,country,phone,login_status,locked,deactivated,password,image)"
 				+ " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement statement = conn.prepareStatement(sqlAddEmployeeStatement,
-					Statement.RETURN_GENERATED_KEYS)) {
-
-				statement.setInt(1, employee.getEmployee().getNumber());
-				statement.setString(2, employee.getEmployee().getFirstName());
-				statement.setString(3, employee.getEmployee().getLastName());
-				statement.setString(4, employee.getEmployee().getEmail());
-				statement.setInt(5, employee.getEmployee().getManagerId());
-				statement.setString(6, employee.getEmployee().getDepartment());
-				statement.setInt(7, employee.getEmployee().getWorksite().getId());
-				statement.setString(8, employee.getEmployee().getWorksite().getCountry().getName());
-				statement.setString(9, employee.getEmployee().getPhone());
-				statement.setBoolean(10, employee.getEmployee().getLoginStatus());
-				statement.setBoolean(11, employee.getEmployee().getLocked());
-				statement.setBoolean(12, employee.getEmployee().getDeactivated());
-				// change it to the generated password!
-				statement.setString(13, password = EmployeeDataDAO.generatePassword(6));
-				statement.setString(14, employee.getEmployee().getImage());
-
-				int rowCountUpdated = statement.executeUpdate();
-
-				ResultSet ids = statement.getGeneratedKeys();
-
-				while (ids.next()) {
-					newEmployeeId = ids.getInt(1);
-					// find employee by ID
-					newEmployee = find(newEmployeeId);
+			try (PreparedStatement state = conn.prepareStatement(checkIfEmployeeExists)) {
+				state.setInt(1,employee.getEmployee().getNumber());
+				exists = state.executeQuery();
+				if (exists.next()) {
+					throw new AlreadyExistsException("Employee Number already exists");
+				}
+				try (PreparedStatement statement = conn.prepareStatement(sqlAddEmployeeStatement,
+						Statement.RETURN_GENERATED_KEYS)) {
+	
+					statement.setInt(1, employee.getEmployee().getNumber());
+					statement.setString(2, employee.getEmployee().getFirstName());
+					statement.setString(3, employee.getEmployee().getLastName());
+					statement.setString(4, employee.getEmployee().getEmail());
+					statement.setInt(5, employee.getEmployee().getManagerId());
+					statement.setString(6, employee.getEmployee().getDepartment());
+					statement.setInt(7, employee.getEmployee().getWorksite().getId());
+					statement.setString(8, employee.getEmployee().getWorksite().getCountry().getName());
+					statement.setString(9, employee.getEmployee().getPhone());
+					statement.setBoolean(10, employee.getEmployee().getLoginStatus());
+					statement.setBoolean(11, employee.getEmployee().getLocked());
+					statement.setBoolean(12, employee.getEmployee().getDeactivated());
+					// change it to the generated password!
+					password = generatePassword(6);
+					statement.setString(13, BCrypt.withDefaults().hashToString(12, password.toCharArray()));
+					statement.setString(14, employee.getEmployee().getImage());
+	
+					int rowCountUpdated = statement.executeUpdate();
+	
+					ResultSet ids = statement.getGeneratedKeys();
+	
+					while (ids.next()) {
+						newEmployeeId = ids.getInt(1);
+						// find employee by ID
+						newEmployee = find(newEmployeeId);
+					}
 				}
 			}
             
@@ -340,12 +351,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			sendGeneralEmail(
 					newEmployee.getEmployee().getEmail(),
 					firstName,
-					mail.getSubject2(),text
+					mail.getSubject2(),
+					text
 					);
-			
 		} catch(SendFailedException e) {
 			throw e;
 		}
+		
 		return find(newEmployeeId);
 	}
 
@@ -485,10 +497,10 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  List<String> conditions = new ArrayList<>();
 		  
 		  if(number !=0) conditions.add(" U.employee_number=? ");
-		  if(!roleName.isBlank()) conditions.add(" R.name=? ");
-		  if(!siteName.isBlank()) conditions.add(" WS.city=? ");
-		  if(!departmentName.isBlank()) conditions.add(" U.department=? ");
-		  if(!countryName.isBlank()) conditions.add(" U.country=? ");
+		  if(!roleName.isEmpty()) conditions.add(" R.name=? ");
+		  if(!siteName.isEmpty()) conditions.add(" WS.city=? ");
+		  if(!departmentName.isEmpty()) conditions.add(" U.department=? ");
+		  if(!countryName.isEmpty()) conditions.add(" U.country=? ");
 		  
 		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
 	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
@@ -508,13 +520,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			    	int counter = 1;
 			      if(number!=0)
 			    	  command.setInt(counter++,number);
-			      if(!roleName.isBlank())
+			      if(!roleName.isEmpty())
 			    	  command.setString(counter++,roleName);
-			      if(!siteName.isBlank())
+			      if(!siteName.isEmpty())
 			    	  command.setString(counter++,siteName);
-			      if(!departmentName.isBlank())
+			      if(!departmentName.isEmpty())
 			    	  command.setString(counter++,departmentName);
-			      if(!countryName.isBlank())
+			      if(!countryName.isEmpty())
 			    	  command.setString(counter++,countryName);
 			       
 			       command.setInt(counter++, limit);
@@ -814,7 +826,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
-						employee.getEmployee().setPassword(newPassword);
+						employee.getEmployee().setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
 
 						retries=0;
 						try(PreparedStatement statement2= conn.prepareStatement(updatePasswordInDataBase)){
