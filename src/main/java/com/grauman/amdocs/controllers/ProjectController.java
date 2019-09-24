@@ -24,8 +24,8 @@ public class ProjectController {
      * @throws SQLException
      */
     @GetMapping("manager/{managerID}")
-    public ResponseEntity<List<ProjectVM>> getProjectsBymanagerID(@PathVariable("managerID") int managerID) throws SQLException {
-        return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID));
+    public ResponseEntity<List<ProjectVM>> getProjectsBymanagerID(@PathVariable("managerID") int managerID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException {
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByManagerID(managerID,currentPage,limit));
     }
 
     /**
@@ -35,8 +35,8 @@ public class ProjectController {
      * @throws SQLException
      */
     @GetMapping("user/{userID}")
-    public ResponseEntity<List<ProjectVM>> getProjectsByUserID(@PathVariable("userID") Integer userID) throws SQLException, ResultsNotFoundException {
-        return ResponseEntity.ok().body(projectsDAO.getProjectsByUserID(userID));
+    public ResponseEntity<List<ProjectVM>> getProjectsByUserID(@PathVariable("userID") Integer userID, @RequestParam int currentPage, @RequestParam int limit) throws SQLException, ResultsNotFoundException {
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByUserID(userID,currentPage,limit));
     }
 
     /**
@@ -46,8 +46,8 @@ public class ProjectController {
      * @throws SQLException
      */
     @GetMapping("user/name/{name}")
-    public ResponseEntity<List<ProjectVM>> getProjectsByUserID(@PathVariable("name") String userName) throws SQLException, ResultsNotFoundException {
-        return ResponseEntity.ok().body(projectsDAO.getProjectsByUserName(userName));
+    public ResponseEntity<List<ProjectVM>> getProjectsByUserName(@PathVariable("name") String userName, @RequestParam int currentPage, @RequestParam int limit) throws SQLException, ResultsNotFoundException {
+        return ResponseEntity.ok().body(projectsDAO.getProjectsByUserName(userName,currentPage,limit));
     }
 
     /**

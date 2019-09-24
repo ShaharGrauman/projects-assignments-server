@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
 import com.grauman.amdocs.errors.custom.InvalidCredentials;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
@@ -57,7 +58,7 @@ public class LoginDAO implements ILoginDAO {
 //get the user details + roles
     public EmployeeData getEmployeeData(String username) throws SQLException{
     	int employeeId;
-    	String employeeData="select id,employee_number,first_name,last_name from users where email=?";
+    	String employeeData="select id,employee_number,first_name,last_name, email from users where email=?";
     	EmployeeData employeeDetails=null;
     	List<Role> roles=new ArrayList<>();
     	String employeeRoles="select R.name "
@@ -81,7 +82,8 @@ public class LoginDAO implements ILoginDAO {
 																		  result.getInt("id"),
 																		  result.getInt("employee_number"),
 																		  result.getString("first_name"),
-																		  result.getString("last_name")),roles);
+																		  result.getString("last_name"),
+									result.getString("email")),roles);
 						}
 					}
 			}
@@ -191,7 +193,7 @@ public class LoginDAO implements ILoginDAO {
     }
     
     @Override
-    public String validate(String username, String password) throws SQLException{
+    public EmployeeData validate(String username, String password) throws SQLException{
 
 //        Pattern pattern = Pattern.compile("[^a-zA-Z0-9]");
 //        Matcher usernameMatcher = pattern.matcher(username);
@@ -201,6 +203,8 @@ public class LoginDAO implements ILoginDAO {
     	if(username.isEmpty() || password.isEmpty())
             throw new InvalidCredentials("username and password are required");
 
+    	EmployeeData employeeData = null;
+    	
         try (Connection conn = db.getConnection()){
             try(PreparedStatement preparedStatement = conn.prepareStatement("SELECT * FROM users WHERE email = ?")){
                 preparedStatement.setString(1,username);
@@ -208,7 +212,6 @@ public class LoginDAO implements ILoginDAO {
 
                 try (ResultSet set = preparedStatement.executeQuery()){
                     if (!set.next()) {
-                        System.out.println("auth header: " + username +" " + password);
                         throw new InvalidCredentials("User name does not exist");
                     }else {
                     	
@@ -219,8 +222,10 @@ public class LoginDAO implements ILoginDAO {
                     	if(firstTime(username)) {//checks if the user ever tried to login
                     		login=firstAttempte(username);
                     	}
-                    	EmployeeData employeeData=getEmployeeData(username);
-                    		if (!password.equals(set.getString("password"))){
+                    	employeeData=getEmployeeData(username);
+
+						if (!BCrypt.verifyer().verify(password.toCharArray(), set.getString("password")).verified){
+                    		//if (!password.equals(set.getString("password"))){
                     			//not equals because this time was the last attempt
                     			if(failedAttemptsCounter(username)<MAX_ATTEMPTS) {
                     				//checks when did the user attempted to login,how many times he failed
@@ -242,7 +247,7 @@ public class LoginDAO implements ILoginDAO {
                 }
             }
         }
-        return Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+        return employeeData;
     }
     
     @Override

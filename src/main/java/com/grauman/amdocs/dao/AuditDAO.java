@@ -22,8 +22,9 @@ import com.grauman.amdocs.models.Role;
 @Service
 public class AuditDAO implements IAuditDAO{
 	 @Autowired DBManager db;
-
-	 @Override
+//**********************************************************
+	 //In IDAO the find doesn't get any parameters!!
+	// @Override
 	    public List<AuditEmployee> findAll(int page,int limit) throws SQLException {
 	        List<AuditEmployee> audit=new ArrayList<>();
 	        List<Role> roles=new ArrayList<>();
@@ -72,34 +73,45 @@ public class AuditDAO implements IAuditDAO{
 	  	}
 
 // search by date from to
-	 @Override
-   public List<AuditEmployee> searchAudit(int number,Optional<Date> datefrom, Optional<Date> dateto) throws SQLException{
+	
+   public List<AuditEmployee> searchAudit(int number,String activity,Optional<Date> datefrom, Optional<Date> dateto,int page,int limit) throws SQLException{
       
 	   List<AuditEmployee> audit = new ArrayList<>();
        List<Role> roles=new ArrayList<>();
+       if(page<1)
+    	   page=1;
+       int offset=(page-1)*limit;
 
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where " + (number != 0 ? "U.employee_number=? and " : "") 
-        		 					+(datefrom.isPresent()? "date(A.date_time)>? and ":"")
-        		 					+(dateto.isPresent()? "date(A.date_time)<?":"");
+        		 					+ " where " + (number != 0 ? "A.employee_number=? and " : "")
+        		 					+(!activity.isBlank() ? " A.activity=? and ": "")
+        		 					+(datefrom.isPresent() ? " date(A.date_time)>? and ": "")
+        		 					+(dateto.isPresent() ? " date(A.date_time)<? ": "")
+        		 					+" limit ? offset ?";
          
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
             	int counter=1;
+            	System.out.println(sqlSitesCommand);
             	if(number!=0) {
             		command.setInt(counter++,number);
-            	}        
+            	}
+            	if(!activity.isBlank()) {
+            		command.setString(counter++,activity);
+            	}
             	if(datefrom.isPresent()) {
             		command.setDate(counter++,datefrom.get());
             	}
             	if(dateto.isPresent()) {
             		command.setDate(counter++, dateto.get());            		
-            	}            	
-            	
+            	}
+            	command.setInt(counter++,limit);
+            	command.setInt(counter++,offset);
+            	System.out.println(command);
                 ResultSet result = command.executeQuery();
-                while (result.next()) {
+               
                 	while(result.next()) {
             			roles=getEmployeeRoles(result.getInt(6));
                         audit.add(
@@ -109,11 +121,20 @@ public class AuditDAO implements IAuditDAO{
                                        
                                         ));
             		}
-                }
+                
             }
          }
          return audit;
    }
+   public Integer countAudit() throws SQLException {
+		try (Connection conn = db.getConnection()) {
+			try (Statement command = conn.createStatement()) {
+				ResultSet result = command.executeQuery("select count(*) from audit");
+				result.next();
+				return result.getInt("count(*)");
+			}
+		}
+	}
 @Override
 public AuditEmployee find(int id) throws SQLException {
 	// TODO Auto-generated method stub
@@ -135,6 +156,7 @@ public AuditEmployee delete(int id) throws SQLException {
 	return null;
 }
 @Override
+
 public List<AuditEmployee> findAll() throws SQLException {
 	// TODO Auto-generated method stub
 	return null;
