@@ -304,7 +304,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 					+ "skills.id=em1.skill_id where em1.user_id=? and " + "skills.type=? and level>=(select max(level) "
 					+ "from employeeskill em2 where status != 'DECLINED' and "
 					+ "em1.user_id=em2.user_id and em1.skill_id=em2.skill_id)")) {
-				command.setInt(1, employeeId);
+				command.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
 				command.setString(2, skillType.name());
 
 				ResultSet result = command.executeQuery();
