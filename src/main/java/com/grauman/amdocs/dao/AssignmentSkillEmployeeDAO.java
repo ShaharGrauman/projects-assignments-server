@@ -305,6 +305,11 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         if (skillVM.getLevel() == null || skillVM.getLevel() < 1) {
             skillVM.setLevel(1);
         }
+        //set defualt level = 5
+        else
+        if (skillVM.getLevel() > 5) {
+            skillVM.setLevel(5);
+        }
 
 
         if (currentPage < 1) {
