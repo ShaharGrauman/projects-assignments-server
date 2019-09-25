@@ -18,5 +18,8 @@ public class AuditEmployee {
 	private String firstname;
 	private String lastname;
 	private List<Role> roles;
+	public AuditEmployee(Audit audit) {
+		this.audit=audit;
+	}
 
 }
