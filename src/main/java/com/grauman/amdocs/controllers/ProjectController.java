@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.List;
 
-@RequestMapping("/projects")
 @RestController
+@RequestMapping("/projects")
 @CrossOrigin(origins = "*" , allowCredentials = "true")
 public class ProjectController {
     @Autowired
@@ -78,6 +78,5 @@ public class ProjectController {
     @PostMapping("")
     public ResponseEntity<ProjectVM> addProject(@RequestBody ProjectVM project) throws Exception {
         return ResponseEntity.ok().body(projectsDAO.add(project));
-
     }
 }

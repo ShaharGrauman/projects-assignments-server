@@ -554,7 +554,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ " Group by U.id order by U.employee_number"
 	  				+" limit ? offset ?";
 		  
-		  System.out.println(sqlFindCommand);
+//		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
 			    	int counter = 1;

@@ -33,7 +33,9 @@ public class AuthFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
 
-        if (!req.getRequestURI().contains("api/login")) {
+        System.out.println(req.getMethod());
+        
+        if (!req.getRequestURI().contains("api/login") && !req.getMethod().equals("OPTIONS")) {
 
 			/*String authHeader = req.getHeader("auth");
 
