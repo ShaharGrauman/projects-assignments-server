@@ -35,6 +35,8 @@ import org.springframework.stereotype.Service;
 import com.grauman.amdocs.controllers.EmployeeDataController;
 import com.grauman.amdocs.dao.interfaces.IEmployeeDataDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
+import com.grauman.amdocs.errors.custom.InvalidDataException;
+import com.grauman.amdocs.errors.custom.NotContentExistException;
 import com.grauman.amdocs.mail.MailManager;
 
 @Service
@@ -186,8 +188,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 										   result2.getString(3)));
 							}
 						}
-					}
-
+					
+//move the found object inside the if scope ,else..throw NoContentException with status 204
 					found =new EmployeeData(new Employee(
 							  result.getInt("U1.id"),
 							  result.getInt("U1.employee_number"),
@@ -205,11 +207,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 							  result.getBoolean("U1.deactivated")),
 							
     						  result.getString("manager_name"),auditDate,roles);
+					}
+					else {
+						throw new NotContentExistException("The Employee is deactivated");
+					}
 				}
 			
-		}
-			} catch (Exception e) {
-			e.printStackTrace();
+			}
 		}
 		return found;
 	}
