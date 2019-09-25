@@ -16,36 +16,38 @@ public final class CookieCreator {
 
         StringBuilder values = new StringBuilder();
         values.append(id)
-                .append(":")
+                .append(";")
                 .append(email)
-                .append(":{");
+                .append(";{");
 
 
         for(int i = 0; i < roles.size(); i++){
             if (i == roles.size()-1){
                 System.out.println(roles.get(i).getName());
-                values.append(roles.get(i).getId()+"="+roles.get(i).getName());
+                values.append(roles.get(i).getId()+"r:"+roles.get(i).getName());
             }else{
-                values.append(roles.get(i).getId()+"="+roles.get(i).getName()).append(",");
+                values.append(roles.get(i).getId()+":"+roles.get(i).getName()).append(",");
             }
         }
 
 
-        values.append("}:{");
+        values.append("};{");
 
         for(int i = 0; i < permissions.size(); i++){
             if (i == permissions.size()-1){
-                values.append(permissions.get(i).getId()+"="+permissions.get(i).getName());
+                values.append(permissions.get(i).getId()+":"+permissions.get(i).getName());
             }else{
-                values.append(permissions.get(i).getId()+"="+permissions.get(i).getName()).append(",");
+                values.append(permissions.get(i).getId()+":"+permissions.get(i).getName()).append(",");
             }
         }
-        values.append("}:");
+        values.append("};");
 
         String encoded = new String(Base64.getEncoder().encode(values.toString().getBytes()));
 
 
 
-        return new Cookie("auth", encoded);
+        Cookie cookie = new Cookie("auth", encoded);
+        cookie.setPath("/");
+        return cookie;
     }
 }
