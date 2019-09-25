@@ -91,7 +91,7 @@ CREATE TABLE `employeeskill` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `skill_id` int(11) NOT NULL,
-  `manager_id` int(11) NOT NULL,
+  `manager_id` int(11) ,
   `status` enum('PENDING','APPROVED','DECLINED') NOT NULL DEFAULT 'PENDING',
   `level` int(11) NOT NULL,
   `date` datetime NOT NULL,
