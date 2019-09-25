@@ -12,9 +12,9 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
-@RestController
 @RequestMapping("/assignments")
-@CrossOrigin
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class AssignmentsController {
     @Autowired
     private AssignmentsDAO assignmentsDAO;

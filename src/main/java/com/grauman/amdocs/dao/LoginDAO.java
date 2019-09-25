@@ -60,7 +60,7 @@ public class LoginDAO implements ILoginDAO {
     	String employeeData="select id,employee_number,first_name,last_name, email from users where email=?";
     	EmployeeData employeeDetails=null;
     	List<Role> roles=new ArrayList<>();
-    	String employeeRoles="select R.name "
+    	String employeeRoles="select R.id, R.name "
 			    			+ "from users U JOIN  userrole UR ON U.id=UR.user_id"
 			    			+ " JOIN roles R ON UR.role_id=R.id"
 			    			+ " where U.id=?";
@@ -74,7 +74,7 @@ public class LoginDAO implements ILoginDAO {
 							statement1.setInt(1,employeeId);
 							ResultSet result1=statement1.executeQuery();
 							while(result1.next()) {
-								roles.add(new Role(
+								roles.add(new Role(result1.getInt("R.id"),
 												   result1.getString("R.name")));
 							}
 							employeeDetails=new EmployeeData(new Employee(

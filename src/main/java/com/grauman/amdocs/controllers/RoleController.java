@@ -20,10 +20,10 @@ import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.RolePermissions;
 
-@RestController
 @RequestMapping("/roles")
-@CrossOrigin
-public class RoleController {
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
+public class RoleController{
 	@Autowired
 	private RoleDAO roleDAO;
 	/**

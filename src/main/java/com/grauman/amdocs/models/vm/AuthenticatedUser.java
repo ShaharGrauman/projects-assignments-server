@@ -2,6 +2,7 @@ package com.grauman.amdocs.models.vm;
 
 import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
+import com.grauman.amdocs.models.RolePermissions;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,5 @@ public class AuthenticatedUser {
 
     private int id;
     private String email;
-    private List<Role> roles;
-    private List<Permission> permissions;
+    private List<RolePermissions> rolePermissions;
 }

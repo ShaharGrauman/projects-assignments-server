@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grauman.amdocs.dao.WorkSiteDAO;
 import com.grauman.amdocs.models.WorkSite;
 
-@RestController
 @RequestMapping("/worksite")
-@CrossOrigin
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class WorkSiteController {
     
     @Autowired
