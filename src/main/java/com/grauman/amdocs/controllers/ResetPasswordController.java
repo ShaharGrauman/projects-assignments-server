@@ -32,7 +32,6 @@ public class ResetPasswordController {
 		} catch (EmployeeException e) {
 			e.printStackTrace();
 			return ResponseEntity.ok().body("can't be sent");
-
 		}
 		return ResponseEntity.ok().body("sent");
 	}

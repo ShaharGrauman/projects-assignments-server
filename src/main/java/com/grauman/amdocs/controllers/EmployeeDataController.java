@@ -80,12 +80,13 @@ public class EmployeeDataController {
 	    * @param id 
 	    * @param employee
 	    * @return update employee
-	    * @throws SQLException
+	 * @throws Exception 
 	    */
 //Update Employee
 	@PutMapping("/id")
-	public ResponseEntity<EmployeeData> updateEmployeeInfo(@RequestParam int id, @RequestBody EmployeeData employee) throws SQLException {
-		EmployeeData employeeByID = employeeDataDAO.update(employee);
+	public ResponseEntity<EmployeeData> updateEmployeeInfo(@RequestParam int id, @RequestBody EmployeeData employee) throws Exception {
+		EmployeeData employeeByID=null;
+		employeeByID = employeeDataDAO.update(employee);
 		return ResponseEntity.ok().body(employeeByID); 
 	}
 	/**
