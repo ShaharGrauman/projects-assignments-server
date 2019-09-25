@@ -57,7 +57,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                     managerTo = resultManagerID.getInt(1);
                 }
             }
-
+            newAssignment.setRequestFromManagerID(authenticationDAO.getAuthenticatedUser().getId());
+            newAssignment.setRequestToManagerID(managerTo);
 
 
             // preparing a statement that guarantees returning the auto generated id
@@ -68,7 +69,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                 newAssignment.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
                 command.setInt(4, authenticationDAO.getAuthenticatedUser().getId());
 
-                if (authenticationDAO.getAuthenticatedUser().getId() !=managerTo) {
+                if (authenticationDAO.getAuthenticatedUser().getId() != managerTo) {
                     command.setInt(5, managerTo);
                     command.setString(6, "PENDING_APPROVAL");
                     newAssignment.setStatus("PENDING_APPROVAL");
