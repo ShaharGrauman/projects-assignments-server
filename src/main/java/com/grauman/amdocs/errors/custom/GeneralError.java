@@ -9,5 +9,5 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public class GeneralError {
     private HttpStatus status;
-    private String errorMessage;
+    private String message;
 }
