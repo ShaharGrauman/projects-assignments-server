@@ -874,7 +874,6 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		} catch (EmployeeException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private static boolean isValid(String email) {
