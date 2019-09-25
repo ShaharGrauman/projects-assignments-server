@@ -490,10 +490,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //filter
 	//show just the activated Employee 
-	public List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,
+	public List<EmployeeData> filter(int number,String name,String roleName,String siteName,String departmentName,
 			String countryName,int page,int limit)throws SQLException{
 		  List <EmployeeData> found = new ArrayList<>();
 		  List<Role> employeeRoles=new ArrayList<>();
+		  name=name.toLowerCase().trim();
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
@@ -501,6 +502,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  List<String> conditions = new ArrayList<>();
 		  
 		  if(number !=0) conditions.add(" U.employee_number=? ");
+		  if(!name.isEmpty()) conditions.add("concat(LOWER(U.first_name),' ',LOWER(U.last_name))");
 		  if(!roleName.isEmpty()) conditions.add(" R.name=? ");
 		  if(!siteName.isEmpty()) conditions.add(" WS.city=? ");
 		  if(!departmentName.isEmpty()) conditions.add(" U.department=? ");
@@ -524,6 +526,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			    	int counter = 1;
 			      if(number!=0)
 			    	  command.setInt(counter++,number);
+			      if(!name.isEmpty())
+			    	  command.setString(counter++, name);
 			      if(!roleName.isEmpty())
 			    	  command.setString(counter++,roleName);
 			      if(!siteName.isEmpty())

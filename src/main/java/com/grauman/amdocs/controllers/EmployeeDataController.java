@@ -103,6 +103,7 @@ public class EmployeeDataController {
 	@GetMapping("/filter")
 	public ResponseEntity<List<EmployeeData>> findFilteredEmployees(
 			@RequestParam(value="num",defaultValue="0") int number,
+			@RequestParam("name") String name,
 			@RequestParam("role") String roleName,
 			@RequestParam("site") String siteName,
 			@RequestParam("dept") String departmentName,
@@ -110,7 +111,7 @@ public class EmployeeDataController {
 			@RequestParam int page,
 			@RequestParam int limit) throws SQLException {
 
-		List<EmployeeData> employeeByName=employeeDataDAO.filter(number,roleName,siteName,departmentName,countryName,page,limit);
+		List<EmployeeData> employeeByName=employeeDataDAO.filter(number,name,roleName,siteName,departmentName,countryName,page,limit);
 		return ResponseEntity.ok().body(employeeByName);
 		}
 	@GetMapping("/name")
