@@ -19,6 +19,8 @@ import java.util.List;
 public class ProjectsDAO implements IProjectsDAO {
     @Autowired
     private DBManager db;
+    @Autowired
+    private AuthenticationDAO authenticationDAO;
 
     @Override
     public List<ProjectVM> findAll() throws SQLException {
@@ -74,50 +76,51 @@ public class ProjectsDAO implements IProjectsDAO {
                         throw new SQLException("Project insertion failed.");
                 }
             }
+            if(!(newProject.getProductSkill().isEmpty() && newProject.getProductSkill().isEmpty())) {
 
-            StringBuilder insertProjectSkill = new StringBuilder("INSERT INTO projectskill (project_id, skill_id,skill_level)" +
-                    " VALUES (?, ?,?)");
-            int sizeSkillProduct = newProject.getProductSkill().size();
-            int sizeSkillTechnical = newProject.getTechnicalSkill().size();
-            for (int i = 0; i < (sizeSkillProduct + sizeSkillTechnical) - 1; i++) {
-                insertProjectSkill.append(", (?, ?, ?)");
-            }
-
-            try (PreparedStatement fetchInsertProjectSkill = connection.prepareStatement(String.valueOf(insertProjectSkill), Statement.RETURN_GENERATED_KEYS)) {
-                int counter = 0;
-                int i;
-                for (i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
-                    fetchInsertProjectSkill.setInt(i, projectID);
-                    fetchInsertProjectSkill.setInt(i + 1, newProject.getProductSkill().get(counter).getId());
-                    fetchInsertProjectSkill.setInt(i + 2, newProject.getProductSkill().get(counter).getLevel());
-                    ++counter;
-                }
-                counter = 0;
-                for (; i <= (sizeSkillTechnical) * 3 + (sizeSkillProduct) * 3; i += 3) {
-                    fetchInsertProjectSkill.setInt(i, projectID);
-                    fetchInsertProjectSkill.setInt(i + 1, newProject.getTechnicalSkill().get(counter).getId());
-                    fetchInsertProjectSkill.setInt(i + 2, newProject.getTechnicalSkill().get(counter).getLevel());
-                    ++counter;
-
-                }
-
-                fetchInsertProjectSkill.executeUpdate();
-                try (ResultSet generatedID = fetchInsertProjectSkill.getGeneratedKeys()) {
-                    if (!generatedID.next()) {
-                        String deleteQueryProject = "DELETE FROM project WHERE id = ?";
-                        try (PreparedStatement fetchDeleteQueryProject = connection.prepareStatement(deleteQueryProject, Statement.RETURN_GENERATED_KEYS)) {
-                            fetchDeleteQueryProject.setInt(1, newProject.getId());
-                            fetchDeleteQueryProject.executeUpdate();
+                        StringBuilder insertProjectSkill = new StringBuilder("INSERT INTO projectskill (project_id, skill_id,skill_level)" +
+                                " VALUES (?, ?,?)");
+                        int sizeSkillProduct = newProject.getProductSkill().size();
+                        int sizeSkillTechnical = newProject.getTechnicalSkill().size();
+                        for (int i = 0; i < (sizeSkillProduct + sizeSkillTechnical) - 1; i++) {
+                            insertProjectSkill.append(", (?, ?, ?)");
                         }
 
-                        throw new SQLException("Skill Project insertion failed. Project Deleted");
-                    }
+                        try (PreparedStatement fetchInsertProjectSkill = connection.prepareStatement(String.valueOf(insertProjectSkill), Statement.RETURN_GENERATED_KEYS)) {
+                            int counter = 0;
+                            int i;
+                            for (i = 1; i <= (sizeSkillProduct) * 3; i += 3) {
+                                fetchInsertProjectSkill.setInt(i, projectID);
+                                fetchInsertProjectSkill.setInt(i + 1, newProject.getProductSkill().get(counter).getId());
+                                fetchInsertProjectSkill.setInt(i + 2, newProject.getProductSkill().get(counter).getLevel());
+                                ++counter;
+                            }
+                            counter = 0;
+                            for (; i <= (sizeSkillTechnical) * 3 + (sizeSkillProduct) * 3; i += 3) {
+                                fetchInsertProjectSkill.setInt(i, projectID);
+                                fetchInsertProjectSkill.setInt(i + 1, newProject.getTechnicalSkill().get(counter).getId());
+                                fetchInsertProjectSkill.setInt(i + 2, newProject.getTechnicalSkill().get(counter).getLevel());
+                                ++counter;
 
-                }
-            }
+                            }
 
+                            fetchInsertProjectSkill.executeUpdate();
+                            try (ResultSet generatedID = fetchInsertProjectSkill.getGeneratedKeys()) {
+                                if (!generatedID.next()) {
+                                    String deleteQueryProject = "DELETE FROM project WHERE id = ?";
+                                    try (PreparedStatement fetchDeleteQueryProject = connection.prepareStatement(deleteQueryProject, Statement.RETURN_GENERATED_KEYS)) {
+                                        fetchDeleteQueryProject.setInt(1, newProject.getId());
+                                        fetchDeleteQueryProject.executeUpdate();
+                                    }
 
-        }
+                                    throw new SQLException("Skill Project insertion failed. Project Deleted");
+                                }
+
+                            }
+                        }
+
+            }//if no skill on this project
+        }//close connection
 
         return newProject;
     }
@@ -153,7 +156,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
-                projectStatement.setInt(1, managerID);
+                projectStatement.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 projectStatement.setInt(2, limit);
                 projectStatement.setInt(3, offset);
 
@@ -164,7 +167,7 @@ public class ProjectsDAO implements IProjectsDAO {
                         ProjectVM project = new ProjectVM(projectResult.getInt(1), projectResult.getString(2),
                                 projectResult.getString(4), projectResult.getDate(3),
                                 getSkillbyType("TECHNICAL",connection, projectResult.getInt("p.id")),
-                                getSkillbyType("PRODUCT",connection, projectResult.getInt("p.id")), managerID);
+                                getSkillbyType("PRODUCT",connection, projectResult.getInt("p.id")), authenticationDAO.getAuthenticatedUser().getId());
                         projectList.add(project);
                     }
                 }

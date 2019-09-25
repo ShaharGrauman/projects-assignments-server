@@ -53,7 +53,7 @@ public class AuthFilter implements Filter {
                 String[] credentials = details.split(";");
                 ObjectMapper mapper = new ObjectMapper();
 
-                List<RolePermissions> rolePermissions = mapper.readValue(credentials[2], List.class);
+                List<RolePermissions> rolePermissions = mapper.readValue(credentials[3], List.class);
                /* List<Role> roleList =  new ArrayList<>();
                 List<Permission> permissionList = new ArrayList<>();
 
@@ -72,8 +72,9 @@ public class AuthFilter implements Filter {
                 });*/
 
                 AuthenticatedUser authenticatedUser = AuthenticatedUser.builder()
-                        .email(credentials[1])
+                        .email(credentials[2])
                         .id(Integer.parseInt(credentials[0]))
+                        .employeeNumber(Integer.parseInt(credentials[1]))
                         .rolePermissions(rolePermissions)
                         .build();
 
@@ -83,7 +84,8 @@ public class AuthFilter implements Filter {
                 resp.addCookie(CookieCreator
                         .createUserCookie(authenticatedUser.getId()
                                 ,authenticatedUser.getEmail()
-                                ,authenticatedUser.getRolePermissions()));
+                                ,authenticatedUser.getRolePermissions()
+                                ,authenticatedUser.getEmployeeNumber()));
 
 
 

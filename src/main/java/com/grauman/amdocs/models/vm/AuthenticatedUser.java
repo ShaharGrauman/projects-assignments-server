@@ -20,6 +20,7 @@ import java.util.List;
 public class AuthenticatedUser {
 
     private int id;
+    private int employeeNumber;
     private String email;
     private List<RolePermissions> rolePermissions;
 }
