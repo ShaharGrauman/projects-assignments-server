@@ -3,6 +3,7 @@
 package com.grauman.amdocs.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,11 +14,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IWorkSiteDAO;
+import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.WorkSite;
 @Service
 public class WorkSiteDAO implements IWorkSiteDAO{
-    @Autowired DBManager db;
+    @Autowired 
+    DBManager db;
+    
+    @Autowired
+	AuthenticationDAO authenticationDAO;
+
+	@Autowired
+	AuditDAO auditDAO;
 
 	@Override
 	public List<WorkSite> findAll() throws SQLException {
@@ -83,6 +93,13 @@ public class WorkSiteDAO implements IWorkSiteDAO{
 	               		//throw exception
 			            }
 					}
+			     auditDAO.add((new AuditEmployee().builder()
+							.audit(new Audit().builder()
+									.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+									.dateTime(new Date(System.currentTimeMillis()))
+									.userId(authenticationDAO.getAuthenticatedUser().getId())
+									.activity("Add WorkSite").build()
+							)).build());
 			}
         }
         return newWorkSite;

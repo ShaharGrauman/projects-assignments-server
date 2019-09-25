@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IDepartmentDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
+import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 import com.grauman.amdocs.models.Department;
 import com.grauman.amdocs.models.EmployeeException;
 
@@ -21,7 +24,13 @@ import com.grauman.amdocs.models.EmployeeException;
 public class DepartmentDAO implements IDepartmentDAO {
 	@Autowired
 	DBManager db;
+	
+	@Autowired
+	AuthenticationDAO authenticationDAO;
 
+	@Autowired
+	AuditDAO auditDAO;
+	
 	@Override
 	public List<Department> findAll() throws SQLException {
 		// TODO Auto-generated method stub
@@ -118,6 +127,14 @@ public class DepartmentDAO implements IDepartmentDAO {
 							result.next();
 							newD = new Department(result.getInt(1), result.getString(2));
 						}
+						
+						auditDAO.add((new AuditEmployee().builder()
+									.audit(new Audit().builder()
+											.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+											.dateTime(new Date(System.currentTimeMillis()))
+											.userId(authenticationDAO.getAuthenticatedUser().getId())
+											.activity("Add Department").build()
+									)).build());
 					}
 				}
 			}

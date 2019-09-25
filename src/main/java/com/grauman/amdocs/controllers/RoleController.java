@@ -20,8 +20,8 @@ import com.grauman.amdocs.models.Permission;
 import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.RolePermissions;
 
-@RequestMapping("/roles")
 @RestController
+@RequestMapping("/roles")
 @CrossOrigin(origins = "*" , allowCredentials = "true")
 public class RoleController{
 	@Autowired

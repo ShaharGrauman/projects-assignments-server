@@ -141,12 +141,41 @@ public AuditEmployee find(int id) throws SQLException {
 	return null;
 }
 @Override
-public AuditEmployee add(AuditEmployee a) throws SQLException {
-	// TODO Auto-generated method stub
-	return null;
+public AuditEmployee add(AuditEmployee audit) throws SQLException {
+	AuditEmployee inseretAudit=null;
+	int id;
+	String sqlAddAudit = "Insert INTO audit(employee_number,date_time,user_id,activity) values(?,?,?,?)";
+	String newAudit="select * from audit where id=?";
+	try (Connection conn = db.getConnection()) {
+		try (PreparedStatement statement = conn.prepareStatement(sqlAddAudit,
+				Statement.RETURN_GENERATED_KEYS)) {
+			statement.setInt(1,audit.getAudit().getEmployeeNumber());
+			statement.setDate(2,audit.getAudit().getDateTime());
+			statement.setInt(3,audit.getAudit().getUserId());
+			statement.setString(4,audit.getAudit().getActivity());
+			int result0=statement.executeUpdate();
+			ResultSet ids = statement.getGeneratedKeys();
+			if(ids.next()) {
+				id=ids.getInt(1);
+				
+				try(PreparedStatement statement1 = conn.prepareStatement(newAudit)){
+					statement1.setInt(1,id);
+					ResultSet result=statement1.executeQuery();
+					while(result.next()) {
+						inseretAudit=new AuditEmployee(new Audit(id,
+								result.getInt(2),
+								result.getDate(3),
+								result.getInt(4),
+								result.getString(5)));
+					}
+				}
+			}
+		}
+	}
+	return inseretAudit;
 }
 @Override
-public AuditEmployee update(AuditEmployee movie) throws SQLException {
+public AuditEmployee update(AuditEmployee audit) throws SQLException {
 	// TODO Auto-generated method stub
 	return null;
 }

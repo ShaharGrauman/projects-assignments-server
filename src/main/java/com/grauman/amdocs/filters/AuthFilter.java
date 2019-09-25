@@ -77,7 +77,8 @@ public class AuthFilter implements Filter {
                         .employeeNumber(Integer.parseInt(credentials[1]))
                         .rolePermissions(rolePermissions)
                         .build();
-
+                
+                System.out.print(authenticatedUser);
 
                authenticationDAO.setAuthenticatedUser(authenticatedUser);
 

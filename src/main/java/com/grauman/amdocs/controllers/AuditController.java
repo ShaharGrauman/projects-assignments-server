@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grauman.amdocs.dao.AuditDAO;
 import com.grauman.amdocs.models.Audit;
 import com.grauman.amdocs.models.AuditEmployee;
+import com.grauman.amdocs.models.WorkSite;
 
 @RequestMapping("/audit")
 @RestController
@@ -50,6 +53,11 @@ public class AuditController {
  public Integer numberOfRoles() throws SQLException {
  	Integer Counter= auditDAO.countAudit();
  	return Counter;
+ }
+ @PostMapping("")
+ public ResponseEntity<AuditEmployee> newAudit(@RequestBody AuditEmployee audit) throws SQLException{
+	 AuditEmployee addedAudit=auditDAO.add(audit);
+    return ResponseEntity.ok().body(addedAudit);
  }
  
 }

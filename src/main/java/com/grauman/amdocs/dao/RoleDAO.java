@@ -1,6 +1,7 @@
 package com.grauman.amdocs.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import com.grauman.amdocs.dao.interfaces.IRoleDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
+import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 import com.grauman.amdocs.models.Country;
 import com.grauman.amdocs.models.EmployeeException;
 import com.grauman.amdocs.models.Permission;
@@ -26,6 +29,11 @@ import com.grauman.amdocs.models.RolePermissions;
 public class RoleDAO implements IRoleDAO {
 	@Autowired
 	private DBManager db;
+	 @Autowired
+	 AuthenticationDAO authenticationDAO;
+
+	@Autowired
+	AuditDAO auditDAO;
 	/**
 	    * @return all roles with permissions
 	    * @throws SQLException
@@ -244,7 +252,17 @@ public class RoleDAO implements IRoleDAO {
 						} while (catchTimeOut);
 					}
 				}
-				
+				try {
+					auditDAO.add((new AuditEmployee().builder()
+							.audit(new Audit().builder()
+									.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+									.dateTime(new Date(System.currentTimeMillis()))
+									.userId(authenticationDAO.getAuthenticatedUser().getId())
+									.activity("Add Role").build()
+									)).build());					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				newRole = find(newRole.getRole().getId());
 			}
 		} 
