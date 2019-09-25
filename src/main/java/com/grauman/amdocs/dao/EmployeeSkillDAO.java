@@ -34,13 +34,14 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public List<EmployeeSkill> findAll() throws SQLException {
-		List<EmployeeSkill> employeeSkills=new ArrayList<>();
-		try(Connection conn = db.getConnection()){
-			try(PreparedStatement command=conn.prepareStatement("select * from employeeskill")) {
-				try(ResultSet resultSet=command.executeQuery()){
-					while(resultSet.next()) {
-						employeeSkills.add(new EmployeeSkill(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("manager_id")
-								, resultSet.getInt("skill_id"), resultSet.getDate("date"), resultSet.getInt("level"), resultSet.getString("comment"),
+		List<EmployeeSkill> employeeSkills = new ArrayList<>();
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement command = conn.prepareStatement("select * from employeeskill")) {
+				try (ResultSet resultSet = command.executeQuery()) {
+					while (resultSet.next()) {
+						employeeSkills.add(new EmployeeSkill(resultSet.getInt("id"), resultSet.getInt("user_id"),
+								resultSet.getInt("manager_id"), resultSet.getInt("skill_id"), resultSet.getDate("date"),
+								resultSet.getInt("level"), resultSet.getString("comment"),
 								Status.valueOf(resultSet.getString("status"))));
 					}
 				}
@@ -51,14 +52,15 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public EmployeeSkill find(int id) throws SQLException {
-		EmployeeSkill employeeSkills=null;
-		try(Connection conn = db.getConnection()){
-			try(PreparedStatement command=conn.prepareStatement("select * from employeeskill where id=?")) {
+		EmployeeSkill employeeSkills = null;
+		try (Connection conn = db.getConnection()) {
+			try (PreparedStatement command = conn.prepareStatement("select * from employeeskill where id=?")) {
 				command.setInt(1, id);
-				try(ResultSet resultSet=command.executeQuery()){
-					while(resultSet.next()) {
-						employeeSkills=new EmployeeSkill(resultSet.getInt("id"), resultSet.getInt("user_id"), resultSet.getInt("manager_id")
-								, resultSet.getInt("skill_id"), resultSet.getDate("date"), resultSet.getInt("level"), resultSet.getString("comment"),
+				try (ResultSet resultSet = command.executeQuery()) {
+					while (resultSet.next()) {
+						employeeSkills = new EmployeeSkill(resultSet.getInt("id"), resultSet.getInt("user_id"),
+								resultSet.getInt("manager_id"), resultSet.getInt("skill_id"), resultSet.getDate("date"),
+								resultSet.getInt("level"), resultSet.getString("comment"),
 								Status.valueOf(resultSet.getString("status")));
 					}
 				}
@@ -111,26 +113,30 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	@Override
 	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws Exception {
 		if (employeeSkill.getSkillId() != null && skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId())) {
-				if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(), employeeSkill.getLevel())) {
-					if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
-						if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId())) {
-							// Employee's skill added successfully
-							return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, employeeSkill.getSkillId(), null,
-									employeeSkill.getLevel(), null, null));
-						} else {
-							throw new InvalidDataException("Pending employee skill Exist with different level!!");
-						}
-					} else
-						throw new InvalidDataException("Employee Skill level must be between 1-5!!");
+			if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(),
+					employeeSkill.getLevel())) {
+				if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
+					if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId())) {
+						// Employee's skill added successfully
+						return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, employeeSkill.getSkillId(),
+								null, employeeSkill.getLevel(), null, null));
+					} else {
+						throw new InvalidDataException("Pending employee skill Exist with different level!!");
+					}
 				} else
-					// Employee Skill Exist!!
-					throw new InvalidDataException("Employee Skill Exist!!");
+					throw new InvalidDataException("Employee Skill level must be between 1-5!!");
+			} else
+				// Employee Skill Exist!!
+				throw new InvalidDataException("Employee Skill Exist!!");
 		} else {
-			if (employeeSkill.getSkillName() != null && employeeSkill.getType()!=null) {
-				//add new skill
+			if (employeeSkill.getSkillName() != null && employeeSkill.getType() != null) {
+				// add new skill
 				Skill skill = skillsDAO.add(new Skill(employeeSkill.getSkillName(), 0, employeeSkill.getType()));
-				return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skill.getSkillid(), null,
-						employeeSkill.getLevel(), null, null));
+				if (employeeSkill.getLevel() != null)
+					return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skill.getSkillid(), null,
+							employeeSkill.getLevel(), null, null));
+				else
+					return new EmployeeSkill(0, 0, 0, skill.getSkillid(), null, 0, null, null);
 			} else
 				throw new InvalidDataException("Skill not Exist (must enter skill name and type)!!");
 		}
@@ -317,8 +323,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	@Override
 	public EmployeeSkill delete(int id) throws SQLException {
 		try (Connection conn = db.getConnection()) {
-			try (PreparedStatement command = conn
-					.prepareStatement("DELETE from employeeskill" + " WHERE id = ?")) {
+			try (PreparedStatement command = conn.prepareStatement("DELETE from employeeskill" + " WHERE id = ?")) {
 				command.setInt(1, id);
 				if (command.executeUpdate() == 0)
 					throw new InvalidDataException("Can't delete this employee skill ");

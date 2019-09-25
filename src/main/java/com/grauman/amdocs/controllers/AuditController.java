@@ -20,9 +20,9 @@ import com.grauman.amdocs.dao.AuditDAO;
 import com.grauman.amdocs.models.Audit;
 import com.grauman.amdocs.models.AuditEmployee;
 
-@RestController
 @RequestMapping("/audit")
-@CrossOrigin
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class AuditController {
 	@Autowired
 	private AuditDAO auditDAO;

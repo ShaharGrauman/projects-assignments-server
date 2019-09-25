@@ -17,29 +17,35 @@ import java.sql.SQLException;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({SQLException.class, NullPointerException.class, IndexOutOfBoundsException.class})
-    protected ResponseEntity<Object> handleInternalErrors(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<GeneralError> handleInternalErrors(RuntimeException ex, WebRequest request) {
         return generateError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler({ResultsNotFoundException.class})
-    protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<GeneralError> handleNotFound(RuntimeException ex, WebRequest request) {
         return generateError(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler({InvalidDataException.class, InvalidCredentials.class})
-    protected ResponseEntity<Object> handleBadRequest(RuntimeException ex, WebRequest request) {
+    protected ResponseEntity<GeneralError> handleBadRequest(RuntimeException ex, WebRequest request) {
         return generateError(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
-    private ResponseEntity<Object> generateError(HttpStatus status, String message) {
+    private ResponseEntity<GeneralError> generateError(HttpStatus status, String message) {
         return ResponseEntity.status(status)
                 .body(new GeneralError(status, message));
     }
 
-    @ExceptionHandler({LevelValidityException.class, AlreadyExistsException.class,ValidationsCheckException.class})
-    protected ResponseEntity<Object> handleRangeErrors(RuntimeException ex, WebRequest request) {
+    @ExceptionHandler({LevelValidityException.class, NotContentExistException.class, AlreadyExistsException.class,ValidationsCheckException.class})
+    protected ResponseEntity<GeneralError> handleRangeErrors(RuntimeException ex, WebRequest request) {
         return generateError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+    //searchEmployeeProfile who is deactivated..return 204 no contant
+//    @ExceptionHandler({NotContentExistException.class})
+//    protected ResponseEntity<GeneralError> handleEmployeeNotFound(RuntimeException ex, WebRequest request) {
+//        return generateError(HttpStatus.NO_CONTENT, ex.getMessage());
+//    }
+
 
     /**
      * can handle missing or invalid arguments

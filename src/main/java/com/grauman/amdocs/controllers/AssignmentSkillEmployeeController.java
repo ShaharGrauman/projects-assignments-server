@@ -13,9 +13,9 @@ import javax.websocket.server.PathParam;
 import java.sql.SQLException;
 import java.util.List;
 
-@RestController
 @RequestMapping("/team")
-@CrossOrigin
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class AssignmentSkillEmployeeController {
     @Autowired
     private IAssignmentSkillEmployeeDAO employeeDAO;
