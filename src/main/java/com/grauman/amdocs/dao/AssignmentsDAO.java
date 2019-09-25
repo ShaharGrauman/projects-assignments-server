@@ -335,14 +335,15 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     public String updatePendingApprovalStatus(Assignment assignment, boolean approvalResponse) throws SQLException {
         String message = "SUCCESS";
         try (Connection connection = db.getConnection()) {
-            String updateCommand = " update assignment SET status=?  where id= ? and status= \"PENDING_APPROVAL\" and start_date =?; ";
+            String updateCommand = " update assignment SET status=? , start_date =?  where id= ? and status= \"PENDING_APPROVAL\" ; ";
             try (PreparedStatement command = connection.prepareStatement(updateCommand, Statement.RETURN_GENERATED_KEYS)) {
                 if (approvalResponse) {
                     command.setString(1, "IN_PROGRESS");
                 } else {
                     command.setString(1, "NOT_APPROVED");
                 }
-                command.setInt(2, assignment.getId());
+                command.setDate(2, new java.sql.Date(new java.util.Date().getTime()));
+
                 command.setInt(3, assignment.getId());
 
                 if (command.executeUpdate() <= 0)
@@ -370,7 +371,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
             try (PreparedStatement command = conn
                     .prepareStatement(checkQuery)) {
                 command.setInt(1, item.getProjectID());
-                command.setDate(2, new java.sql.Date(new java.util.Date().getTime()));
+                command.setInt(2, item.getEmployeeID());
                 ResultSet result = command.executeQuery();
                 return result.next();
             }
