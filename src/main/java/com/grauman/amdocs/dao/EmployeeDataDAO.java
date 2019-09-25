@@ -45,6 +45,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	DBManager db;
 	@Autowired
 	LoginDAO loginAttemptes;
+	@Autowired
+	AuthenticationDAO authenticationDAO;
+
+	@Autowired
+	AuditDAO auditDAO;
 
 	@Autowired
 	MailManager mail;
@@ -361,6 +366,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		} catch(SendFailedException e) {
 			throw e;
 		}
+		 auditDAO.add((new AuditEmployee().builder()
+					.audit(new Audit().builder()
+							.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+							.dateTime(new Date(System.currentTimeMillis()))
+							.userId(authenticationDAO.getAuthenticatedUser().getId())
+							.activity("Add Employee").build()
+					)).build());
 		
 		return find(newEmployeeId);
 	}
@@ -419,6 +431,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	            }
         }
         updatedEmployee = find(employee.getEmployee().getId());
+        try {
+			auditDAO.add((new AuditEmployee().builder()
+					.audit(new Audit().builder()
+							.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+							.dateTime(new Date(System.currentTimeMillis()))
+							.userId(authenticationDAO.getAuthenticatedUser().getId())
+							.activity("Update Employee").build()
+							)).build());					
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         return updatedEmployee;
 
 	}
@@ -439,6 +462,17 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 				deactevatedEmployee = find(id);
 			}
 		}
+		 try {
+				auditDAO.add((new AuditEmployee().builder()
+						.audit(new Audit().builder()
+								.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+								.dateTime(new Date(System.currentTimeMillis()))
+								.userId(authenticationDAO.getAuthenticatedUser().getId())
+								.activity("Delete Employee").build()
+								)).build());					
+			} catch (Exception e) {
+				e.printStackTrace();
+			}		
 		return deactevatedEmployee;
 	}
 
