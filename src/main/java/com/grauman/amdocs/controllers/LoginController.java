@@ -48,7 +48,6 @@ public class LoginController {
 
          HttpServletResponse resp = (HttpServletResponse) response;
 
-        System.out.println("logout");
         Cookie cookie = Stream.of(req.getCookies()).filter(cc -> cc.getName().equals("auth")
         ).findFirst().orElse(null);
 

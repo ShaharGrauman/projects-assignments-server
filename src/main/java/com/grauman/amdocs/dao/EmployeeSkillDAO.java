@@ -30,6 +30,9 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	DBManager db;
 
 	@Autowired
+	AuthenticationDAO authenticationDAO;
+	
+	@Autowired
 	private ISkillsDAO skillsDAO;
 
 	@Override
@@ -335,13 +338,13 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public List<RequestedEmployeeSkillVM> getManagerTeamPendingSkills(int managerId) throws SQLException {
-		List<RequestedEmployeeSkillVM> requestedEmployeeSkills = new ArrayList<>();
+		List<RequestedEmployeeSkillVM> requestedEmployeeSkills = new ArrayList<>();		
 		try (Connection conn = db.getConnection()) {
 			try (PreparedStatement command = conn.prepareStatement(
 					"select es.id,es.user_id,concat(u.first_name,' ',u.last_name) name,es.skill_id, s.name skillName"
 							+ ",es.date,es.level,es.comment,s.type from employeeskill es join users u on es.user_id=u.id "
 							+ "join skills s on es.skill_id=s.id where u.manager_id=? and es.status='PENDING'")) {
-				command.setInt(1, managerId);
+				command.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
 				try (ResultSet result = command.executeQuery()) {
 					while (result.next()) {
 						requestedEmployeeSkills.add(new RequestedEmployeeSkillVM(result.getString("name"),
