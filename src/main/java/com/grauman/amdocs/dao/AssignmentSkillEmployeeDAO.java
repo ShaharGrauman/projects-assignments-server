@@ -17,6 +17,8 @@ import java.util.List;
 public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Autowired
     private DBManager db;
+    @Autowired
+    private  AuthenticationDAO authenticationDAO;
 
     /**
      * @param managerID
@@ -41,7 +43,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     "from users u where manager_id = ? and u.deactivated=0 limit ? offset ?;";
 
             try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
-                command.setInt(1, managerID);
+                command.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 command.setInt(2, limit);
                 command.setInt(3, offset);
 
