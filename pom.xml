@@ -22,6 +22,11 @@
 		<artifactId>lombok</artifactId>
 		<version>1.18.4</version><!--$NO-MVN-MAN-VER$-->		
 	</dependency>
+	  <dependency>
+		  <groupId>org.codehaus.jackson</groupId>
+		  <artifactId>jackson-mapper-asl</artifactId>
+		  <version>1.9.13</version>
+	  </dependency>
 	<dependency>
   		<groupId>mysql</groupId>
   		<artifactId>mysql-connector-java</artifactId>

@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.List;
 
-@RestController
 @RequestMapping("/projects")
-@CrossOrigin
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class ProjectController {
     @Autowired
     private ProjectsDAO projectsDAO;

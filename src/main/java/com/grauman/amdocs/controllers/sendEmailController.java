@@ -16,8 +16,9 @@ import com.grauman.amdocs.models.EmailData;
 import com.grauman.amdocs.models.ResetPasswordVM;
 
 @RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 @RequestMapping("/sendEmail")
-@CrossOrigin
+
 public class sendEmailController {
 
 	@Autowired

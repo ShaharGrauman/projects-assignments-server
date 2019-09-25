@@ -25,9 +25,8 @@ import com.grauman.amdocs.models.vm.RequestedEmployeeSkillVM;
 import com.grauman.amdocs.models.vm.SkillsVM;
 
 @RestController
-@RequestMapping("/skills")
 @CrossOrigin(origins = "*" , allowCredentials = "true")
-
+@RequestMapping("/skills")
 public class SkillsController {
 	@Autowired
 	private IEmployeeSkillDAO employeeSkillDAO;

@@ -1,4 +1,4 @@
-package com.grauman.amdocs.dao.interfaces;
+package com.grauman.amdocs.dao;
 
 
 import com.grauman.amdocs.models.vm.AuthenticatedUser;

@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grauman.amdocs.dao.EmployeeDataDAO;
 import com.grauman.amdocs.models.EmployeeException;
 import com.grauman.amdocs.models.ResetPasswordVM;
-
 @RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 @RequestMapping("/resetPassword")
-@CrossOrigin
 public class ResetPasswordController {
 
 	@Autowired

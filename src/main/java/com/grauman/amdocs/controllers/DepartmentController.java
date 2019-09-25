@@ -15,9 +15,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.grauman.amdocs.dao.DepartmentDAO;
 import com.grauman.amdocs.models.Department;
 
-@RestController
 @RequestMapping("/department")
-@CrossOrigin
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class DepartmentController {
 	@Autowired
 	private DepartmentDAO departmentDAO;

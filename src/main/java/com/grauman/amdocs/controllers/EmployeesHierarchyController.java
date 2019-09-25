@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.grauman.amdocs.dao.EmployeeDataDAO;
 import com.grauman.amdocs.models.EmployeeData;
+import org.springframework.web.bind.annotation.RestController;
 
-@RestController
 @RequestMapping("/hierarchy")
+@RestController
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class EmployeesHierarchyController {
 
 	@Autowired
