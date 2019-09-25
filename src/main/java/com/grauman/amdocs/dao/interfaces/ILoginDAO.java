@@ -8,11 +8,13 @@ import java.sql.SQLException;
 
 public interface ILoginDAO extends IDAO<Login>{
 
-    String validate(String username, String password) throws SQLException;
+
+    EmployeeData validate(String username, String password) throws SQLException;
     EmployeeData getEmployeeData(String username) throws SQLException;
     Login getLogin(String username)throws SQLException;
     Integer failedAttemptsCounter(String username) throws SQLException;
     Login firstAttempte(String username) throws SQLException;
     boolean firstTime(String username)throws SQLException;
     Login resetAttempts(String username)throws SQLException;
+
 }

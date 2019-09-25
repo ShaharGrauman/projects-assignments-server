@@ -1,0 +1,33 @@
+<div style="font-family: unset;font-size: 16px;">
+        <div>
+                <div>
+                        <img src="https://www.amdocs.com/amdocsOmega/images/logos/amdocs-logo-social-thumb.jpg"
+                            style="width: 250px; height:150px; float:right;margin-right: 80px; "/>
+                    </div>
+            <div style="padding: 75px;">
+
+                <p>Dear ##USER,</p>
+
+                <strong>
+                    <p>Your password for entering the <strong>Skills & Assignments</strong> website is:</p>
+
+                    ##PWD
+                </strong>
+
+				<p> Welcome to the team! We are thrilled to have you at Amdocs. We know you’re going to be a valuable asset to our company and can’t wait to see what you accomplish.
+ 
+						Just a reminder, All you need to bring is yourself, your photo ID and your social security card. Our dress code is casual, so wear something comfy! 		 
+				</p>
+
+                <p>This is an automated email response. Please do not reply.</p>
+
+                <p style="font-style: italic;font-family: initial;">Amdocs is a leading software and services provider to communications and media companies of all
+
+                    sizes,
+                    accelerating the industry’s dynamic and continuous digital transformation.</p>
+
+            </div>
+
+        </div>
+
+    </div>

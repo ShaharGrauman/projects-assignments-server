@@ -36,10 +36,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new GeneralError(status, message));
     }
 
-    @ExceptionHandler({LevelValidityException.class, AlreadyExistsException.class})
+    @ExceptionHandler({LevelValidityException.class, AlreadyExistsException.class,ValidationsCheckException.class})
     protected ResponseEntity<Object> handleRangeErrors(RuntimeException ex, WebRequest request) {
         return generateError(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
+
     /**
      * can handle missing or invalid arguments
      * uncomment if needed

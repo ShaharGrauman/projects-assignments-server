@@ -14,7 +14,7 @@ public interface IProjectsDAO extends IDAO<ProjectVM>{
      * @return list of projects that a manager employees are working on
      * @throws SQLException
      */
-    public List<ProjectVM> getProjectsByManagerID(Integer managerID) throws SQLException, ResultsNotFoundException;
+    public List<ProjectVM> getProjectsByManagerID(Integer managerID, Integer currentPage, Integer limit) throws SQLException, ResultsNotFoundException;
 
     /**
      *
@@ -30,7 +30,7 @@ public interface IProjectsDAO extends IDAO<ProjectVM>{
      * @return list of projects that an employee are working on by his/her ID
      * @throws SQLException
      */
-    public List<ProjectVM> getProjectsByUserID(Integer userID) throws SQLException, ResultsNotFoundException;
+    public List<ProjectVM> getProjectsByUserID(Integer userID, Integer currentPage, Integer limit) throws SQLException, ResultsNotFoundException;
 
     /**
      *
@@ -38,6 +38,6 @@ public interface IProjectsDAO extends IDAO<ProjectVM>{
      * @return list of projects that an employee are working on by his/her name
      * @throws SQLException
      */
-    public List<ProjectVM> getProjectsByUserName(String userName) throws SQLException, ResultsNotFoundException;
+    public List<ProjectVM> getProjectsByUserName(String userName, Integer currentPage, Integer limit) throws SQLException, ResultsNotFoundException;
 
 }

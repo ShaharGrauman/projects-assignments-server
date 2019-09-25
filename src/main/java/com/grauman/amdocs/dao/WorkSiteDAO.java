@@ -1,5 +1,3 @@
-
-
 package com.grauman.amdocs.dao;
 
 import java.sql.Connection;
@@ -30,14 +28,17 @@ public class WorkSiteDAO implements IWorkSiteDAO{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	/**
+     * @param worksite
+     * @return new added work site
+     * @throws SQLException
+     */
 	@Override
     public WorkSite add(WorkSite workSite) throws SQLException{
         int workSiteId;
         WorkSite newWorkSite=null;
 		String checkIfWorkSiteExists="select * from worksite where country_id=? AND city=?";
         String FindCountryId="Select id FROM country WHERE name=?";
-        
         try(Connection conn = db.getConnection()){
 			try (PreparedStatement command = conn.prepareStatement(FindCountryId)){
 			     command.setString(1, workSite.getCountry().getName());

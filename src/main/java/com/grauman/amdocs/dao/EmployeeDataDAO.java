@@ -26,6 +26,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.grauman.amdocs.models.*;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -274,11 +277,13 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	    * @throws SQLException
 	    */
 	@Override
-	public EmployeeData add(EmployeeData employee) throws SQLException {
+	public EmployeeData add(EmployeeData employee) throws SQLException,SendFailedException {
 		int newEmployeeId = -1;
 		EmployeeData newEmployee = null;
-		ResultSet exists = null;
 
+		String password = null;
+
+		ResultSet exists = null;
 		List<Role> roles = employee.getRoles();
 		String checkIfEmployeeExists = "select * from users where employee_number=?";
 		String sqlAddEmployeeStatement = "Insert INTO users (employee_number,first_name,last_name,email,manager_id,"
@@ -307,7 +312,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 					statement.setBoolean(11, employee.getEmployee().getLocked());
 					statement.setBoolean(12, employee.getEmployee().getDeactivated());
 					// change it to the generated password!
-					statement.setString(13, EmployeeDataDAO.generatePassword(6));
+					password = generatePassword(6);
+					statement.setString(13, BCrypt.withDefaults().hashToString(12, password.toCharArray()));
 					statement.setString(14, employee.getEmployee().getImage());
 	
 					int rowCountUpdated = statement.executeUpdate();
@@ -320,21 +326,39 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 						newEmployee = find(newEmployeeId);
 					}
 				}
-	            
-	            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
-	            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
-	                for(int i=0;i<roles.size();i++) {
-	                    statement1.setInt(1, newEmployeeId);
-	                    statement1.setInt(2, roles.get(i).getId());
-	                    
-	                    int rowCountUpdated=statement1.executeUpdate();
-	                }
-	            }
-	            newEmployee=find(newEmployeeId);
-	        }
+			}
+            
+            String sqlAddRoleToEmployee="Insert into userrole (user_id,role_id) values(?,?)";
+            try(PreparedStatement statement1=conn.prepareStatement(sqlAddRoleToEmployee)){
+                for(int i=0;i<roles.size();i++) {
+                    statement1.setInt(1, newEmployeeId);
+                    statement1.setInt(2, roles.get(i).getId());
+                    
+                    int rowCountUpdated=statement1.executeUpdate();
+                }
+            }
+        }
 		
+		String firstName = employee.getEmployee().getFirstName();
+		String text = mail.getText2() == null ? " " : mail.getText2();
+		if(text != " ") {
+			text = text.replaceAll("##USER", firstName);
+			text = text.replaceAll("##PWD", password);
 		}
-		return newEmployee;
+		
+		
+		try {
+			sendGeneralEmail(
+					newEmployee.getEmployee().getEmail(),
+					firstName,
+					mail.getSubject2(),
+					text
+					);
+		} catch(SendFailedException e) {
+			throw e;
+		}
+		
+		return find(newEmployeeId);
 	}
 
 //never change the employee number!!
@@ -469,6 +493,15 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
+		  
+		  List<String> conditions = new ArrayList<>();
+		  
+		  if(number !=0) conditions.add(" U.employee_number=? ");
+		  if(!roleName.isEmpty()) conditions.add(" R.name=? ");
+		  if(!siteName.isEmpty()) conditions.add(" WS.city=? ");
+		  if(!departmentName.isEmpty()) conditions.add(" U.department=? ");
+		  if(!countryName.isEmpty()) conditions.add(" U.country=? ");
+		  
 		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
 	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
 	  				+ " From users U "
@@ -476,15 +509,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 	  				+ " JOIN roles R ON R.id=UR.role_id"
 	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
 	  				+ " JOIN country C ON WS.country_id=C.id"
-	  				+ " where ("
-	  				+ (number !=0 ? " U.employee_number=? and " : "")
-	  				+ (!roleName.isEmpty() ? " R.name=? and " : "")
-	  				+ (!siteName.isEmpty() ? " WS.city=? and " : "")
-	  				+ (!departmentName.isEmpty() ? " U.department=? and " : "")
-	  				+ (!countryName.isEmpty() ? " U.country=? " : "")
-	  				+ " ) "
+	  				+ " where "
+	  				+ String.join(" and ", conditions)
 	  				+ " Group by U.id order by U.employee_number"
 	  				+" limit ? offset ?";
+		  
 		  System.out.println(sqlFindCommand);
 			try (Connection conn = db.getConnection()) {
 			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
@@ -797,7 +826,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 					try {
 						employee =  find(result.getInt("id")); // find gets the id of employee
-						employee.getEmployee().setPassword(newPassword);
+						employee.getEmployee().setPassword(BCrypt.withDefaults().hashToString(12, newPassword.toCharArray()));
 
 						retries=0;
 						try(PreparedStatement statement2= conn.prepareStatement(updatePasswordInDataBase)){
@@ -982,10 +1011,30 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		}
 		return null;
 	}
+  
+	@Override
+	public List<Permission> getEmployeePermissions(Integer id) throws SQLException {
+		List<Permission> permissions = new ArrayList<>();
 
-@Override
-public List<EmployeeData> findAll() throws SQLException {
-	// TODO Auto-generated method stub
-	return null;
-}
+		String fetchPermissions = "SELECT P.id, P.name FROM userrole ER INNER JOIN rolepermissions RP on ER.role_id = RP.role_id INNER JOIN permissions P on P.id = RP.permission_id WHERE ER.user_id = ?";
+
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(fetchPermissions)){
+				preparedStatement.setInt(1, id);
+
+				try (ResultSet resultSet = preparedStatement.executeQuery()){
+					while (resultSet.next()){
+						permissions.add(new Permission(resultSet.getInt(1), resultSet.getString(2)));
+					}
+				}
+			}
+		}
+		return permissions;
+	}
+  
+  @Override
+  public List<EmployeeData> findAll() throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

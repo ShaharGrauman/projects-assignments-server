@@ -74,7 +74,7 @@ public class AuditDAO implements IAuditDAO{
 
 // search by date from to
 	
-   public List<AuditEmployee> searchAudit(int number,Optional<Date> datefrom, Optional<Date> dateto,int page,int limit) throws SQLException{
+   public List<AuditEmployee> searchAudit(int number,String activity,Optional<Date> datefrom, Optional<Date> dateto,int page,int limit) throws SQLException{
       
 	   List<AuditEmployee> audit = new ArrayList<>();
        List<Role> roles=new ArrayList<>();
@@ -85,17 +85,22 @@ public class AuditDAO implements IAuditDAO{
          String sqlSitesCommand = "Select A.id,A.employee_number,A.date_time as date"
          		                    + ",U.first_name,U.last_name,U.id as Employeeid,A.activity"
         		 					+ " from audit A join users U on U.id=A.user_id"
-        		 					+ " where " + (number != 0 ? "A.employee_number=? and " : "") 
-        		 					+(datefrom.isPresent()? "date(A.date_time)>? and ":"")
-        		 					+(dateto.isPresent()? "date(A.date_time)<?":"")
+        		 					+ " where " + (number != 0 ? "A.employee_number=? and " : "")
+        		 					+(!activity.isEmpty() ? " A.activity=? and ": "")
+        		 					+(datefrom.isPresent() ? " date(A.date_time)>? and ": "")
+        		 					+(dateto.isPresent() ? " date(A.date_time)<? ": "")
         		 					+" limit ? offset ?";
          
          try (Connection conn = db.getConnection()) {
             try (PreparedStatement command = conn.prepareStatement(sqlSitesCommand)) {
             	int counter=1;
+            	System.out.println(sqlSitesCommand);
             	if(number!=0) {
             		command.setInt(counter++,number);
-            	}        
+            	}
+            	if(!activity.isEmpty()) {
+            		command.setString(counter++,activity);
+            	}
             	if(datefrom.isPresent()) {
             		command.setDate(counter++,datefrom.get());
             	}
@@ -104,9 +109,9 @@ public class AuditDAO implements IAuditDAO{
             	}
             	command.setInt(counter++,limit);
             	command.setInt(counter++,offset);
-            	
+            	System.out.println(command);
                 ResultSet result = command.executeQuery();
-                while (result.next()) {
+               
                 	while(result.next()) {
             			roles=getEmployeeRoles(result.getInt(6));
                         audit.add(
@@ -116,7 +121,7 @@ public class AuditDAO implements IAuditDAO{
                                        
                                         ));
             		}
-                }
+                
             }
          }
          return audit;
