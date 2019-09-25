@@ -1,5 +1,6 @@
 package com.grauman.amdocs.dao;
 
+import com.grauman.amdocs.dao.interfaces.AuthenticationDAO;
 import com.grauman.amdocs.dao.interfaces.IProjectsDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.LevelValidityException;
@@ -19,6 +20,8 @@ import java.util.List;
 public class ProjectsDAO implements IProjectsDAO {
     @Autowired
     private DBManager db;
+    @Autowired
+    private AuthenticationDAO authenticationDAO;
 
     @Override
     public List<ProjectVM> findAll() throws SQLException {
@@ -159,7 +162,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
-                projectStatement.setInt(1, managerID);
+                projectStatement.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 projectStatement.setInt(2, limit);
                 projectStatement.setInt(3, offset);
 
@@ -199,7 +202,7 @@ public class ProjectsDAO implements IProjectsDAO {
                         }
                         ProjectVM project = new ProjectVM(projectResult.getInt(1), projectResult.getString(2),
                                 projectResult.getString(4), projectResult.getDate(3), technicalSkillList,
-                                productSkillList, managerID);
+                                productSkillList, authenticationDAO.getAuthenticatedUser().getId());
                         projectList.add(project);
                         technicalSkillList = new ArrayList<>();
                         productSkillList = new ArrayList<>();

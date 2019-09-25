@@ -1,5 +1,6 @@
 package com.grauman.amdocs.dao;
 
+import com.grauman.amdocs.dao.interfaces.AuthenticationDAO;
 import com.grauman.amdocs.dao.interfaces.IAssignmentSkillEmployeeDAO;
 import com.grauman.amdocs.models.vm.AssignmentSkillEmployeeVM;
 import com.grauman.amdocs.models.vm.SkillsLevelVM;
@@ -17,6 +18,8 @@ import java.util.List;
 public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Autowired
     private DBManager db;
+    @Autowired
+    private AuthenticationDAO authenticationDAO;
 
     /**
      * @param managerID
@@ -41,7 +44,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                     "from users u where manager_id = ? and u.deactivated=0 limit ? offset ?;";
 
             try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
-                command.setInt(1, managerID);
+                command.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 command.setInt(2, limit);
                 command.setInt(3, offset);
 
@@ -123,12 +126,7 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
         try (Connection connection = db.getConnection()) {
             String employeeQuery = "select u.id, concat(u.first_name, \" \" , u.last_name) as name, u.manager_id " +
                     "from users u where  u.deactivated != 1  and u.first_name like ? limit ? offset ?;";
-//            String technicalSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-//                    "es.user_id join skills s on es.skill_id = s.id where type = \"TECHNICAL\" " +
-//                    "and u.id = ? and es.status='APPROVED'and es.level>=(select max(es2.level) from employeeskill es2 where es.user_id=es2.user_id  and es.skill_id=es2.skill_id and es2.status = 'APPROVED' ) order by s.name ; ;";
-//            String productSkillQuery = " SELECT s.id, s.name,es.level FROM users u join employeeskill es on u.id = " +
-//                    "es.user_id join skills s on es.skill_id = s.id where type = \"PRODUCT\"" +
-//                    " and u.id = ? and es.status='APPROVED' and es.level>=(select max(es2.level) from employeeskill es2 where es.user_id=es2.user_id  and es.skill_id=es2.skill_id and es2.status = 'APPROVED' ) order by s.name ; ";
+
             try (PreparedStatement command = connection.prepareStatement(employeeQuery)) {
                 command.setString(1, employeeName + "%");
                 command.setInt(2, limit);

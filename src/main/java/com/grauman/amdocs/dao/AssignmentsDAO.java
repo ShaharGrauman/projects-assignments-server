@@ -1,5 +1,6 @@
 package com.grauman.amdocs.dao;
 
+import com.grauman.amdocs.dao.interfaces.AuthenticationDAO;
 import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
@@ -17,6 +18,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     String sqlCommand;
     @Autowired
     DBManager db;
+    @Autowired
+    AuthenticationDAO authenticationDAO;
 
     @Override
     public List<Assignment> findAll() throws SQLException {
@@ -50,7 +53,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                 command.setInt(2, newAssignment.getEmployeeID());
                 command.setDate(3, new java.sql.Date(new java.util.Date().getTime()));
                 newAssignment.setStartDate(new java.sql.Date(new java.util.Date().getTime()));
-                command.setInt(4, newAssignment.getRequestFromManagerID());
+                command.setInt(4, authenticationDAO.getAuthenticatedUser().getId());
 
                 if (newAssignment.getRequestFromManagerID() != (newAssignment.getRequestToManagerID())) {
                     command.setInt(5, newAssignment.getRequestToManagerID());
@@ -179,7 +182,7 @@ public class AssignmentsDAO implements IAssignmentsDAO {
             String managerToName;
             String managerFromName;
             try (PreparedStatement command = connection.prepareStatement(getAssignmentRequestQuery)) {
-                command.setInt(1, managerID);
+                command.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 command.setInt(2, limit);
                 command.setInt(3, offset);
                 try (ResultSet resultAssignment = command.executeQuery()) {
@@ -253,12 +256,12 @@ public class AssignmentsDAO implements IAssignmentsDAO {
 
             this.sqlCommand=" select count(*) "+
                     "from users u join assignment a on u.id=a.employee_id join project p on a.project_id=p.id " +
-                    "where u.manager_id = " + managerID +" and a.status='DONE' and " +
+                    "where u.manager_id = " + authenticationDAO.getAuthenticatedUser().getId() +" and a.status='DONE' and " +
                     "(select datediff((select curdate()) , a.end_date)) <  (select datediff((select curdate()) ,'" + requestedDate + "'))  " +
                     "and (select datediff((select curdate()) , a.end_date)) > 0 limit "+ limit +" offset " + offset ;
             System.out.println(this.sqlCommand);
             try (PreparedStatement command = conn.prepareStatement(sqlCommand)) {
-                command.setInt(1, managerID);
+                command.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 command.setDate(2, requestedDate);
                 command.setInt(3, limit);
                 command.setInt(4, offset);
