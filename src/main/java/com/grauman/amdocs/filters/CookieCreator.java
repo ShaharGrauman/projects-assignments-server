@@ -1,7 +1,5 @@
 package com.grauman.amdocs.filters;
 
-import com.grauman.amdocs.models.Permission;
-import com.grauman.amdocs.models.Role;
 import com.grauman.amdocs.models.RolePermissions;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -15,12 +13,14 @@ public final class CookieCreator {
 
     private CookieCreator(){};
 
-    public static Cookie createUserCookie(int id, String email, List<RolePermissions> permissions){
+    public static Cookie createUserCookie(int id, String email, List<RolePermissions> permissions, int employeeNumber){
 
          try {
 
              StringBuilder values = new StringBuilder();
              values.append(id)
+                     .append(";")
+                     .append(employeeNumber)
                      .append(";")
                      .append(email)
                      .append(";");
