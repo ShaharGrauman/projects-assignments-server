@@ -23,7 +23,6 @@ import com.grauman.amdocs.models.Role;
 public class AuditDAO implements IAuditDAO{
 	 @Autowired DBManager db;
 //**********************************************************
-	 //In IDAO the find doesn't get any parameters!!
 	// @Override
 	    public List<AuditEmployee> findAll(int page,int limit) throws SQLException {
 	        List<AuditEmployee> audit=new ArrayList<>();
