@@ -16,6 +16,8 @@ public interface IEmployeeDataDAO extends IDAO<EmployeeData>{
     List<EmployeeData> filterByName(String name,int page,int limit) throws SQLException;;
     List<EmployeeData> filter(int number,String name,String roleName,String siteName,String departmentName,
 			String countryName,int page,int limit)throws SQLException;
+    public Integer countfilter(int number,String name,String roleName,String siteName,String departmentName,
+			String countryName)throws SQLException;
     EmployeeData unlockEmployee(int id) throws SQLException;
     EmployeeData lockEmployee(int id) throws SQLException ;
     List<Role> getEmployeeRoles(int id)throws SQLException;
