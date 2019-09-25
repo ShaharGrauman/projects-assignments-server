@@ -154,8 +154,8 @@ public class ProjectsDAO implements IProjectsDAO {
                                   "join project p on a.project_id=p.id " +
                                   "where a.status = \"IN_PROGRESS\" and u.manager_id= ? limit ? offset ? ;";
 
-            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
-            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ? order by s.name";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ? order by s.name";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
@@ -231,8 +231,8 @@ public class ProjectsDAO implements IProjectsDAO {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description from assignment a join project p" +
                                   " on a.project_id=p.id where a.status= 'IN_PROGRESS' and a.employee_id= ? limit ? offset ? ";
 
-            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
-            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ? order by s.name";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ? order by s.name";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
@@ -307,8 +307,8 @@ public class ProjectsDAO implements IProjectsDAO {
             String projectQuery = "select DISTINCT p.id,p.name, p.start_date, p.description,a.requested_from_manager_id from assignment a join project p" +
                                   " on a.project_id=p.id join users u on u.id = a.employee_id where a.status= 'IN_PROGRESS' and u.first_name like ? limit ? offset ? ";
 
-            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
-            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ? order by s.name";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ? order by s.name";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
@@ -383,8 +383,8 @@ public class ProjectsDAO implements IProjectsDAO {
 
         try (Connection connection = db.getConnection()) {
             String projectQuery = "select DISTINCT p.id, p.name, p.start_date, p.description,p.manager_id from project p where p.name like ? limit ? offset ? ";
-            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ?";
-            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ?";
+            String technicalSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"TECHNICAL\" and p.id = ? order by s.name";
+            String productSkillQuery = "SELECT s.id,s.name,ps.skill_level FROM project p join projectskill ps on p.id = ps.project_id join skills s on ps.skill_id = s.id where type = \"PRODUCT\" and p.id = ? order by s.name";
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
