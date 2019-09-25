@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class GeneralError {
     private HttpStatus status;
