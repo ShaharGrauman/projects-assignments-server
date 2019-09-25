@@ -252,13 +252,17 @@ public class RoleDAO implements IRoleDAO {
 						} while (catchTimeOut);
 					}
 				}
-				 auditDAO.add((new AuditEmployee().builder()
+				try {
+					auditDAO.add((new AuditEmployee().builder()
 							.audit(new Audit().builder()
 									.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
 									.dateTime(new Date(System.currentTimeMillis()))
 									.userId(authenticationDAO.getAuthenticatedUser().getId())
 									.activity("Add Role").build()
-							)).build());
+									)).build());					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				newRole = find(newRole.getRole().getId());
 			}
 		} 

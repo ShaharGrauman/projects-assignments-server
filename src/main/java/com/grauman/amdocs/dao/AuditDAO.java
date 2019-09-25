@@ -175,7 +175,7 @@ public AuditEmployee add(AuditEmployee audit) throws SQLException {
 	return inseretAudit;
 }
 @Override
-public AuditEmployee update(AuditEmployee movie) throws SQLException {
+public AuditEmployee update(AuditEmployee audit) throws SQLException {
 	// TODO Auto-generated method stub
 	return null;
 }
