@@ -47,7 +47,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 				}
 			}
 		}
-		return employeeSkills;
+		return employeeSkills; 
 	}
 
 	@Override
@@ -70,7 +70,6 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 	}
 
 	/**
-	 * 
 	 * @param employeeId
 	 * @param skillID
 	 * @param level
