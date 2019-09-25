@@ -231,6 +231,7 @@ public class LoginDAO implements ILoginDAO {
                     				login=getLogin(username);
                     				//update the attempts,date that he inserted a wrong password
                     				last_Login=update(login);
+
                     			}
                     			else {
                     				if(failedAttemptsCounter(username)==MAX_ATTEMPTS) {
@@ -240,7 +241,8 @@ public class LoginDAO implements ILoginDAO {
                     				}
                     			}
                             throw new InvalidCredentials("Wrong password");
-                    		}
+                    		}else
+							updateLogStatus(employeeData.getEmployee().getId(), true);
                     	
                     }
                 }
@@ -248,6 +250,35 @@ public class LoginDAO implements ILoginDAO {
         }
         return employeeData;
     }
+
+    private boolean updateLogStatus(int userId, boolean login) throws SQLException {
+    	boolean success = false;
+		String query = "UPDATE users SET login_status = ? WHERE id = ?";
+		try (Connection conn = db.getConnection()){
+			try(PreparedStatement preparedStatement = conn.prepareStatement(query)){
+				preparedStatement.setBoolean(1,login);
+				preparedStatement.setInt(2, userId);
+
+				System.out.println(userId);
+				int i = -1;
+				if ((i = preparedStatement.executeUpdate()) >= 0){
+
+					System.out.println(i);
+						success = true;
+
+				}
+			}
+		}
+
+
+		return success;
+	}
+
+
+    @Override
+    public boolean logout(int employeeID) throws SQLException {
+    	return updateLogStatus(employeeID, false);
+	}
     
     @Override
     public Login find(int id) throws SQLException {

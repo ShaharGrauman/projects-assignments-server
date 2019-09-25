@@ -1,12 +1,17 @@
 package com.grauman.amdocs.controllers;
 
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.management.RuntimeErrorException;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.grauman.amdocs.dao.interfaces.ILoginDAO;
@@ -34,28 +39,49 @@ public class LoginController {
     @Autowired
     private ILoginDAO loginDAO;
 
-
     @Autowired
     private IRoleDAO roleDAO;
 
     @GetMapping("")
-    public ResponseEntity<String> login() {
-        return ResponseEntity.ok().body("Login...");
+    public ResponseEntity<String> login(ServletRequest request, ServletResponse response) throws SQLException {
+         HttpServletRequest req = (HttpServletRequest) request;
+
+         HttpServletResponse resp = (HttpServletResponse) response;
+
+        System.out.println("logout");
+        Cookie cookie = Stream.of(req.getCookies()).filter(cc -> cc.getName().equals("auth")
+        ).findFirst().orElse(null);
+
+
+        if (cookie != null) {
+            String value = new String(Base64.getDecoder().decode(cookie.getValue())).split(";")[0];
+            if (loginDAO.logout(Integer.parseInt(value))){
+                cookie.setMaxAge(0);
+            }
+
+        }
+        else
+            throw new RuntimeException("Not Authorized");
+        resp.addCookie(cookie);
+
+        return ResponseEntity.ok().body("logged out");
     }
+
+
 
     @PostMapping("")
     public ResponseEntity<String> login(@RequestBody Login login, ServletResponse response) throws SQLException {
 
         EmployeeData employeeData = loginDAO.validate(login.getUsername(), login.getPassword());
 
-      //  String hashedPwd = BCrypt.withDefaults().hashToString(12, login.getPassword().toCharArray());
+        //  String hashedPwd = BCrypt.withDefaults().hashToString(12, login.getPassword().toCharArray());
 
-       // System.out.println(hashedPwd);
+        // System.out.println(hashedPwd);
         //System.out.println(BCrypt.verifyer().verify(login.getPassword().toCharArray(), hashedPwd));
 
         List<RolePermissions> permissions =  Optional.of(employeeData.getRoles().stream().map(role -> {
             try {
-               return roleDAO.find(role.getId());
+                return roleDAO.find(role.getId());
             } catch (Exception e) {
                 return null;
             }
@@ -68,7 +94,7 @@ public class LoginController {
         //cookie.setSecure(false);
         //String value = Base64.getEncoder().encodeToString((values.toString()).getBytes());
         //cookie.setHttpOnly(true);
-        cookie.setPath("/");
+
         resp.addCookie(cookie);
 
         return ResponseEntity.ok().body("login...");
