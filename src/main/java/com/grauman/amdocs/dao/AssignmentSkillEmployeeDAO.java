@@ -300,8 +300,17 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
     @Override
     public List<AssignmentSkillEmployeeVM> searchEmployeesBySkillNameLevel(SkillsLevelVM skillVM, Integer currentPage, Integer limit) throws SQLException {
         List<AssignmentSkillEmployeeVM> employees = new ArrayList<>();
-        List<SkillsLevelVM> technicalSkillList = new ArrayList<>();
-        List<SkillsLevelVM> productSkillList = new ArrayList<>();
+
+        //set defualt level = 1
+        if (skillVM.getLevel() == null || skillVM.getLevel() < 1) {
+            skillVM.setLevel(1);
+        }
+        //set defualt level = 5
+        else
+        if (skillVM.getLevel() > 5) {
+            skillVM.setLevel(5);
+        }
+
 
         if (currentPage < 1) {
             currentPage = 1;
@@ -329,8 +338,6 @@ public class AssignmentSkillEmployeeDAO implements IAssignmentSkillEmployeeDAO {
                                 result.getString("name"),
                                 getSkillbyType("TECHNICAL", connection, result.getInt("u.id")), getSkillbyType("PRODUCT", connection, result.getInt("u.id")));
                         employees.add(employee);
-                        technicalSkillList = new ArrayList<>();
-                        productSkillList = new ArrayList<>();
 
                     }
                 }
