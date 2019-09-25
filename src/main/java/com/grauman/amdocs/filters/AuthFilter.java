@@ -27,7 +27,7 @@ import com.grauman.amdocs.models.vm.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class AuthFilter implements Filter {
 
     @Autowired
