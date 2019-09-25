@@ -19,6 +19,8 @@ import java.util.List;
 public class ProjectsDAO implements IProjectsDAO {
     @Autowired
     private DBManager db;
+    @Autowired
+    private AuthenticationDAO authenticationDAO;
 
     @Override
     public List<ProjectVM> findAll() throws SQLException {
@@ -154,7 +156,7 @@ public class ProjectsDAO implements IProjectsDAO {
 
             try (PreparedStatement projectStatement = connection.prepareStatement(projectQuery)) {
 
-                projectStatement.setInt(1, managerID);
+                projectStatement.setInt(1, authenticationDAO.getAuthenticatedUser().getId());
                 projectStatement.setInt(2, limit);
                 projectStatement.setInt(3, offset);
 
@@ -165,7 +167,7 @@ public class ProjectsDAO implements IProjectsDAO {
                         ProjectVM project = new ProjectVM(projectResult.getInt(1), projectResult.getString(2),
                                 projectResult.getString(4), projectResult.getDate(3),
                                 getSkillbyType("TECHNICAL",connection, projectResult.getInt("p.id")),
-                                getSkillbyType("PRODUCT",connection, projectResult.getInt("p.id")), managerID);
+                                getSkillbyType("PRODUCT",connection, projectResult.getInt("p.id")), authenticationDAO.getAuthenticatedUser().getId());
                         projectList.add(project);
                     }
                 }
