@@ -93,13 +93,17 @@ public class WorkSiteDAO implements IWorkSiteDAO{
 	               		//throw exception
 			            }
 					}
-			     auditDAO.add((new AuditEmployee().builder()
-							.audit(new Audit().builder()
-									.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
-									.dateTime(new Date(System.currentTimeMillis()))
-									.userId(authenticationDAO.getAuthenticatedUser().getId())
-									.activity("Add WorkSite").build()
-							)).build());
+			     try {
+						auditDAO.add((new AuditEmployee().builder()
+								.audit(new Audit().builder()
+										.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+										.dateTime(new Date(System.currentTimeMillis()))
+										.userId(authenticationDAO.getAuthenticatedUser().getId())
+										.activity("Add WorkSite").build()
+										)).build());					
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 			}
         }
         return newWorkSite;
