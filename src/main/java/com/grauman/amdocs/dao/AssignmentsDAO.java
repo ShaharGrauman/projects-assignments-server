@@ -4,6 +4,8 @@ import com.grauman.amdocs.dao.interfaces.IAssignmentsDAO;
 import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.models.Assignment;
+import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 import com.grauman.amdocs.models.vm.AssignmentVM;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class AssignmentsDAO implements IAssignmentsDAO {
     DBManager db;
     @Autowired
     AuthenticationDAO authenticationDAO;
+	@Autowired
+	AuditDAO auditDAO;
 
     @Override
     public List<Assignment> findAll() throws SQLException {
@@ -86,7 +90,17 @@ public class AssignmentsDAO implements IAssignmentsDAO {
                         throw new SQLException("Assignment insertion failed.");
                 }
             }
-
+            try {
+				auditDAO.add((new AuditEmployee().builder()
+						.audit(new Audit().builder()
+								.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+								.dateTime(new Date(System.currentTimeMillis()))
+								.userId(authenticationDAO.getAuthenticatedUser().getId())
+								.activity("Assign to project").build()
+								)).build());					
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
         }
         return newAssignment;

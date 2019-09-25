@@ -5,6 +5,8 @@ import com.grauman.amdocs.errors.custom.AlreadyExistsException;
 import com.grauman.amdocs.errors.custom.LevelValidityException;
 import com.grauman.amdocs.errors.custom.ResultsNotFoundException;
 import com.grauman.amdocs.errors.custom.ValidationsCheckException;
+import com.grauman.amdocs.models.Audit;
+import com.grauman.amdocs.models.AuditEmployee;
 import com.grauman.amdocs.models.vm.ProjectVM;
 import com.grauman.amdocs.models.vm.SkillsLevelVM;
 import com.grauman.amdocs.validations.Validations;
@@ -19,8 +21,12 @@ import java.util.List;
 public class ProjectsDAO implements IProjectsDAO {
     @Autowired
     private DBManager db;
+    
     @Autowired
     private AuthenticationDAO authenticationDAO;
+
+	@Autowired
+	AuditDAO auditDAO;
 
     @Override
     public List<ProjectVM> findAll() throws SQLException {
@@ -121,6 +127,17 @@ public class ProjectsDAO implements IProjectsDAO {
 
             }//if no skill on this project
         }//close connection
+        try {
+			auditDAO.add((new AuditEmployee().builder()
+					.audit(new Audit().builder()
+							.employeeNumber(authenticationDAO.getAuthenticatedUser().getEmployeeNumber())
+							.dateTime(new Date(System.currentTimeMillis()))
+							.userId(authenticationDAO.getAuthenticatedUser().getId())
+							.activity("Add Project").build()
+							)).build());					
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
 
         return newProject;
     }
