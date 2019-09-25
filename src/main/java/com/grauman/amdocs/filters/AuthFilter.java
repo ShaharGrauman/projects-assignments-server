@@ -32,8 +32,6 @@ public class AuthFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-
-        System.out.println(req.getMethod());
         
         if (!req.getRequestURI().contains("api/login") && !req.getMethod().equals("OPTIONS")) {
 
@@ -80,7 +78,6 @@ public class AuthFilter implements Filter {
                         .rolePermissions(rolePermissions)
                         .build();
                 
-                System.out.print(authenticatedUser);
 
                authenticationDAO.setAuthenticatedUser(authenticatedUser);
 

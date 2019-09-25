@@ -60,13 +60,12 @@ public class ProjectsDAO implements IProjectsDAO {
 
         int projectID;
         try (Connection connection = db.getConnection()) {
-            String insertQueryProject = "INSERT INTO project (name, manager_id, description,start_date) " +
-                    "VALUES (?,?,?,?)";
+            String insertQueryProject = "INSERT INTO project (name, description,start_date) " +
+                    "VALUES (?,?,?)";
             try (PreparedStatement fetchInsertQueryProject = connection.prepareStatement(insertQueryProject, Statement.RETURN_GENERATED_KEYS)) {
                 fetchInsertQueryProject.setString(1, newProject.getName());
-                fetchInsertQueryProject.setNull(2, Types.INTEGER);
-                fetchInsertQueryProject.setString(3, newProject.getDescription());
-                fetchInsertQueryProject.setDate(4, newProject.getStartDate());
+                fetchInsertQueryProject.setString(2, newProject.getDescription());
+                fetchInsertQueryProject.setDate(3, newProject.getStartDate());
                 fetchInsertQueryProject.executeUpdate();
                 try (ResultSet generatedID = fetchInsertQueryProject.getGeneratedKeys()) {
                     if (generatedID.next()) {
@@ -76,13 +75,13 @@ public class ProjectsDAO implements IProjectsDAO {
                         throw new SQLException("Project insertion failed.");
                 }
             }
-            if(!(newProject.getProductSkill().isEmpty() && newProject.getProductSkill().isEmpty())) {
+            if(!(newProject.getProductSkill().isEmpty() && newProject.getTechnicalSkill().isEmpty())) {
 
                         StringBuilder insertProjectSkill = new StringBuilder("INSERT INTO projectskill (project_id, skill_id,skill_level)" +
                                 " VALUES (?, ?,?)");
                         int sizeSkillProduct = newProject.getProductSkill().size();
                         int sizeSkillTechnical = newProject.getTechnicalSkill().size();
-                        for (int i = 0; i < (sizeSkillProduct + sizeSkillTechnical) - 1; i++) {
+                        for (int i = 0; i <(sizeSkillProduct + sizeSkillTechnical)-1; i++) {
                             insertProjectSkill.append(", (?, ?, ?)");
                         }
 
