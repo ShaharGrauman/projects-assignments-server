@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -27,7 +28,7 @@ public class DepartmentController {
 	    * @throws SQLException
 	    */
 //Add department
-  	@PostMapping("")
+  	@RequestMapping(value = "", method = { RequestMethod.POST, RequestMethod.OPTIONS } )
 	public ResponseEntity<Department> newDepartment(@RequestBody Department department) throws Exception{
  		Department newDepartment=departmentDAO.add(department);
  		
