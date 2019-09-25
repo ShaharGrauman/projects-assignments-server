@@ -42,10 +42,9 @@ public class LoginDAO implements ILoginDAO {
             try (PreparedStatement command = conn.prepareStatement(query)) {
                 try (ResultSet result = command.executeQuery()) {
                     while (result.next()) {
-
-                        Users.add(new Login(
-                                result.getString("email"),
-                                result.getString("password"))
+                        Users.add(Login.builder()
+								.username(result.getString("email"))
+								.password(result.getString("password")).build()
                         );
                     }
                 }
@@ -118,11 +117,11 @@ public class LoginDAO implements ILoginDAO {
     			statement.setString(1,username);
     			ResultSet ids = statement.executeQuery();
     			if(ids.next()) {
-    				login=new Login(ids.getInt(1),
-    								ids.getInt(2),
-    								ids.getString(3),
-    								ids.getInt(4),
-    								ids.getDate(5));
+    				login= Login.builder()
+							.id(ids.getInt(1))
+							.userId(ids.getInt(2))
+							.username(ids.getString(3)).attempts(ids.getInt(4)).lastAttemptTime(ids.getDate(5))
+							.build();
     			}
     		}
     	}
@@ -240,9 +239,9 @@ public class LoginDAO implements ILoginDAO {
                         				throw new InvalidCredentials("You are locked out. Please contact the administrator.");
                     				}
                     			}
-                    			
-                    			throw new InvalidCredentials("Wrong password");
-                    		}                    	
+                            throw new InvalidCredentials("Wrong password");
+                    		}
+                    	
                     }
                 }
             }

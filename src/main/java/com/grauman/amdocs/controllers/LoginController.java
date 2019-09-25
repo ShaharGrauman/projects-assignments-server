@@ -27,7 +27,7 @@ import com.grauman.amdocs.models.Login;
 
 @RestController
 @RequestMapping("/login")
-@CrossOrigin
+@CrossOrigin(origins = "*" , allowCredentials = "true")
 public class LoginController {
 
     @Autowired
@@ -56,9 +56,10 @@ public class LoginController {
 
         Cookie cookie = CookieCreator
                 .createUserCookie(employeeData.getEmployee().getId(), employeeData.getEmployee().getEmail(), employeeData.getRoles(), permissions);
-
+        //cookie.setSecure(false);
         //String value = Base64.getEncoder().encodeToString((values.toString()).getBytes());
-
+        //cookie.setHttpOnly(true);
+        cookie.setPath("/");
         resp.addCookie(cookie);
 
         return ResponseEntity.ok().body("login...");
