@@ -17,4 +17,5 @@ public interface ILoginDAO extends IDAO<Login>{
     boolean firstTime(String username)throws SQLException;
     Login resetAttempts(String username)throws SQLException;
 
+    boolean logout(int employeeID) throws SQLException;
 }
