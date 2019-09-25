@@ -490,10 +490,11 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 
 //filter
 	//show just the activated Employee 
-	public List<EmployeeData> filter(int number,String roleName,String siteName,String departmentName,
+	public List<EmployeeData> filter(int number,String name,String roleName,String siteName,String departmentName,
 			String countryName,int page,int limit)throws SQLException{
 		  List <EmployeeData> found = new ArrayList<>();
 		  List<Role> employeeRoles=new ArrayList<>();
+		  name=name.toLowerCase().trim();
 		  if(page<1)
 			  page=1;
 		  int offset=(page-1)*limit;
@@ -501,6 +502,7 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 		  List<String> conditions = new ArrayList<>();
 		  
 		  if(number !=0) conditions.add(" U.employee_number=? ");
+		  if(!name.isEmpty()) conditions.add("concat(LOWER(U.first_name),' ',LOWER(U.last_name))=?");
 		  if(!roleName.isEmpty()) conditions.add(" R.name=? ");
 		  if(!siteName.isEmpty()) conditions.add(" WS.city=? ");
 		  if(!departmentName.isEmpty()) conditions.add(" U.department=? ");
@@ -524,6 +526,8 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			    	int counter = 1;
 			      if(number!=0)
 			    	  command.setInt(counter++,number);
+			      if(!name.isEmpty())
+			    	  command.setString(counter++, name);
 			      if(!roleName.isEmpty())
 			    	  command.setString(counter++,roleName);
 			      if(!siteName.isEmpty())
@@ -559,7 +563,78 @@ public class EmployeeDataDAO implements IEmployeeDataDAO {
 			   }
 			return found;
 		}
-
+	//count filter list
+	public Integer countfilter(int number,String name,String roleName,String siteName,String departmentName,
+			String countryName)throws SQLException{
+		  List <EmployeeData> found = new ArrayList<>();
+		  int countList=0;
+		  List<Role> employeeRoles=new ArrayList<>();
+		  name=name.toLowerCase().trim();
+		  
+		  List<String> conditions = new ArrayList<>();
+		  
+		  if(number !=0) conditions.add(" U.employee_number=? ");
+		  if(!name.isEmpty()) conditions.add("concat(LOWER(U.first_name),' ',LOWER(U.last_name))");
+		  if(!roleName.isEmpty()) conditions.add(" R.name=? ");
+		  if(!siteName.isEmpty()) conditions.add(" WS.city=? ");
+		  if(!departmentName.isEmpty()) conditions.add(" U.department=? ");
+		  if(!countryName.isEmpty()) conditions.add(" U.country=? ");
+		  
+		  String sqlFindCommand ="select U.id,U.employee_number,U.first_name,U.last_name,"
+	  				+ "U.department,WS.name,WS.city,C.name,U.locked,U.deactivated  "
+	  				+ " From users U "
+	  				+ " JOIN userrole UR ON UR.user_id=U.id"
+	  				+ " JOIN roles R ON R.id=UR.role_id"
+	  				+ " JOIN worksite WS ON U.work_site_id=WS.id"
+	  				+ " JOIN country C ON WS.country_id=C.id"
+	  				+ " where "
+	  				+ String.join(" and ", conditions)
+	  				+ " Group by U.id order by U.employee_number";
+	  				
+		  
+		  System.out.println(sqlFindCommand);
+			try (Connection conn = db.getConnection()) {
+			    try (PreparedStatement command = conn.prepareStatement(sqlFindCommand)) {
+			    	int counter = 1;
+			      if(number!=0)
+			    	  command.setInt(counter++,number);
+			      if(!name.isEmpty())
+			    	  command.setString(counter++, name);
+			      if(!roleName.isEmpty())
+			    	  command.setString(counter++,roleName);
+			      if(!siteName.isEmpty())
+			    	  command.setString(counter++,siteName);
+			      if(!departmentName.isEmpty())
+			    	  command.setString(counter++,departmentName);
+			      if(!countryName.isEmpty())
+			    	  command.setString(counter++,countryName);
+			       
+			       System.out.println(command);
+			       ResultSet result = command.executeQuery();
+			        
+			      while(result.next()) {
+			            employeeRoles=getEmployeeRoles(result.getInt(1));
+			            found.add(new EmployeeData(new Employee(
+								result.getInt(1),
+								result.getInt(2),
+								result.getString(3),
+								result.getString(4),
+								null,
+								result.getString(8),
+								new WorkSite(result.getString(5),result.getString(6)),
+								new Country(result.getString(7)),
+								result.getBoolean(9),
+								result.getBoolean(10)),employeeRoles));
+			            countList++;
+			          }
+			      }
+			  }
+			  catch (Exception e) {
+			      e.printStackTrace();
+			   }
+			return countList;
+		}
+	
 
 /**call the resetAttempts from LoginDAO */
 	/**
