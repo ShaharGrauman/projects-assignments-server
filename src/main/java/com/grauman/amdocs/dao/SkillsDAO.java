@@ -53,7 +53,7 @@ public class SkillsDAO implements ISkillsDAO {
 	@Override
 	public Skill add(Skill skill) throws SQLException {
 		try (Connection conn = db.getConnection()) {
-            try (PreparedStatement command = conn.prepareStatement("insert into skills (name,type) values (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement command = conn.prepareStatement("insert into skills (name,type) values (?, ?)")) {
                 command.setString(1, skill.getSkillname());
                 command.setString(2, skill.getType().toString());
                 command.executeUpdate();
