@@ -240,7 +240,7 @@ public class LoginDAO implements ILoginDAO {
                         				throw new InvalidCredentials("You are locked out. Please contact the administrator.");
                     				}
                     			}
-                            throw new InvalidCredentials("Wrong password");
+                            throw new InvalidCredentials("Email Or Password Is Incorrect");
                     		}else
 							updateLogStatus(employeeData.getEmployee().getId(), true);
                     	
