@@ -116,13 +116,14 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 
 	@Override
 	public EmployeeSkill addEmployeeSkill(RequestedEmployeeSkillVM employeeSkill) throws Exception {
+		int employeeId = authenticationDAO.getAuthenticatedUser().getId();
 		if (employeeSkill.getSkillId() != null && skillsDAO.CheckIfSkillExist(employeeSkill.getSkillId())) {
-			if (!CheckIfEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId(),
+			if (!CheckIfEmployeeSkillExist(employeeId, employeeSkill.getSkillId(),
 					employeeSkill.getLevel())) {
 				if (employeeSkill.getLevel() > 0 && employeeSkill.getLevel() < 6) {
-					if (!CheckIfPendingEmployeeSkillExist(employeeSkill.getEmployeeId(), employeeSkill.getSkillId())) {
+					if (!CheckIfPendingEmployeeSkillExist(employeeId, employeeSkill.getSkillId())) {
 						// Employee's skill added successfully
-						return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, employeeSkill.getSkillId(),
+						return add(new EmployeeSkill(0, employeeId, 0, employeeSkill.getSkillId(),
 								null, employeeSkill.getLevel(), null, null));
 					} else {
 						throw new InvalidDataException("Pending employee skill Exist with different level!!");
@@ -137,7 +138,7 @@ public class EmployeeSkillDAO implements IEmployeeSkillDAO {
 				// add new skill
 				Skill skill = skillsDAO.add(new Skill(employeeSkill.getSkillName(), 0, employeeSkill.getType()));
 				if (employeeSkill.getLevel() != null)
-					return add(new EmployeeSkill(0, employeeSkill.getEmployeeId(), 0, skill.getSkillid(), null,
+					return add(new EmployeeSkill(0, employeeId, 0, skill.getSkillid(), null,
 							employeeSkill.getLevel(), null, null));
 				else
 					return new EmployeeSkill(0, 0, 0, skill.getSkillid(), null, 0, null, null);
